@@ -1,0 +1,235 @@
+
+    
+body{
+  font-size: 0.5rem;
+}
+    /* Layout Principal */
+    .dashboard {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      font-size: 0.5rem !important;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #4460f1;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 0.7rem;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 300;
+    }
+
+    .nav-link:hover {
+      background: var(#f8fafc);
+      color: #4460f1;
+    }
+
+    .nav-link.active {
+      background: rgba(68, 96, 241, 0.1);
+      color: #4460f1;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .logout-btn {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    .logout-btn button {
+      width: 100%;
+      font-size: 0.7rem;
+      padding: 0.875rem;
+      background: #fee2e2;
+      color: #dc2626;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .logout-btn button:hover {
+      background: #fecaca;
+      transform: translateY(-2px);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .greeting {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .greeting h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .greeting p {
+      color: #64748b;
+      font-size: 0.7rem;
+    }
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.5rem;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4460f1 0%, #3347c1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .profile-icon:hover {
+      transform: scale(1.1);
+    }
+
+    
+
+    /* Welcome Card */
+    .welcome-card {
+      background: linear-gradient(135deg, #4460f1 0%, #3347c1 100%);
+      color: white;
+      padding: 2.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+    .welcome-content {
+      position: relative;
+      z-index: 1;
+    }
+    .welcome-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .welcome-card p {
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+      font-size: 0.7rem;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 280px;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+    
+
+    .main-content {
+        padding: 1rem;
+    }
+}

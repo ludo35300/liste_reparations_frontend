@@ -1,0 +1,171 @@
+<section class="auth-page register-page">
+    <div class="shape-bg">
+        <img src="/images/shape.png" alt="Background Shape" class="img-fluid w-100 h-100">
+    </div>
+
+    <div class="container-fluid p-5 h-100">
+        <div class="row h-100 align-items-center">
+            <!-- Colonne gauche (identique) -->
+            <div class="col-lg-8 position-relative">
+                <div class="column-wrap justify-content-between">
+                <div class="rocket-container animate-left" style="animation-delay: 0.2s">
+                    <img src="/images/rocket.png" alt="Rocket" class="rocket-img img-fluid">
+                </div>
+
+                <h1 class="brand-logo fw-bold mb-4 animate-left" style="animation-delay: 0.1s">
+                    {{ appConfig.title }}
+                </h1>
+
+                <h2 class="hero-text animate-left" style="animation-delay: 0.3s">
+                    {{ registerConfig.subtitle1 }} <br />
+                    {{ registerConfig.subtitle2 }}
+                </h2>
+                
+                <p class="lead text-muted mb-5 animate-left" style="animation-delay: 0.5s">
+                    Déjà un compte ? <br/>
+                    <a routerLink="/auth/login" class="text-decoration-none fw-bold">Connectez-vous !</a>
+                </p>
+
+                <div class="d-flex align-items-center animate-left" style="animation-delay: 0.7s">
+                    <img src="/images/qr-code.png" alt="QR" width="250" class="gap-3 bg-white bg-opacity-50 p-4 rounded-1 border">
+                </div>
+                </div>
+            </div>
+
+            <!-- Colonne droite : Formulaire Register -->
+            <div class="col-lg-4">
+                <div class="column-wrap justify-content-center">
+                    <form [formGroup]="registerForm" (ngSubmit)="register()">
+                        <!-- Email -->
+                        <div class="form-group">
+                            <!-- Prénom -->
+                            <div class="form-group">
+                                <input type="text"
+                                    class="form-control"
+                                    autocomplete="given-name"
+                                    formControlName="firstName"
+                                    placeholder="Prénom"
+                                    required>
+                            </div>
+
+                            <!-- Nom -->
+                            <div class="form-group">
+                                <input type="text"
+                                    class="form-control"
+                                    autocomplete="family-name"
+                                    formControlName="lastName"
+                                    placeholder="Nom"
+                                    required>
+                            </div>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                autocomplete="username"
+                                formControlName="email"
+                                placeholder="Email"
+                            >
+                            @if (emailControl.invalid && (emailControl.touched || emailControl.dirty)) {
+                                <div class="text-danger small mt-2">
+                                    @if (emailControl.hasError('required')) { {{ registerConfig.validation.errors.emailRequired }} }
+                                    @if (emailControl.hasError('email')) { {{ registerConfig.validation.errors.invalidEmail }} }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group position-relative">
+                            <input 
+                                [type]="showPassword() ? 'text' : 'password'"
+                                autocomplete="new-password"
+                                class="form-control"
+                                formControlName="password"
+                                placeholder="Mot de passe (min 8 caractères)"
+                            >
+                        
+                            <button type="button" 
+                                class="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted" 
+                                (click)="togglePassword()"
+                                [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                            >
+                                @if (showPassword()) {
+                                    <fa-icon [icon]="faEyeSlash"></fa-icon>
+                                } @else {
+                                    <fa-icon [icon]="faEye"></fa-icon>
+                                }
+                            </button>
+
+                            @if (passwordControl.invalid && (passwordControl.touched || passwordControl.dirty)) {
+                                <div class="text-danger small mt-2">
+                                    @if (passwordControl.hasError('required')) { Mot de passe requis. }
+                                    @if (passwordControl.hasError('minlength')) { {{ registerConfig.validation.errors.passwordTooShort }} }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group position-relative">
+                            <input
+                                [type]="showConfirmPassword() ? 'text' : 'password'"
+                                autocomplete="new-password"
+                                class="form-control"
+                                formControlName="confirmPassword"
+                                placeholder="Confirmer le mot de passe"
+                            >
+                        
+                            <button type="button"
+                                class="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted" 
+                                (click)="toggleConfirmPassword()"
+                                [attr.aria-label]="showConfirmPassword() ? 'Masquer' : 'Afficher'">
+                                @if (showConfirmPassword()) { <fa-icon [icon]="faEyeSlash"></fa-icon>} 
+                                @else { <fa-icon [icon]="faEye"></fa-icon> }
+                            </button>
+
+                            @if (confirmPasswordControl.invalid && (confirmPasswordControl.touched || confirmPasswordControl.dirty)) {
+                                <div class="text-danger small mt-2">
+                                    @if (confirmPasswordControl.hasError('required')) { Confirmation requise. }
+                                </div>
+                            }
+
+                            @if (registerForm.hasError('mismatch') && (confirmPasswordControl.touched || confirmPasswordControl.dirty)) {
+                                <div class="text-danger small mt-2">
+                                    {{ registerConfig.validation.errors.passwordsMismatch }}
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Forgot Password (optionnel sur register) -->
+                        <div class="d-flex form-link mb-3">
+                            <a href="#" >Conditions d'utilisation</a>
+                        </div>
+
+                        <!-- Alert Erreur -->
+                        @if (errorMessage()) {
+                            <div class="alert alert-danger py-2 text-center small">
+                                {{ errorMessage() }}
+                            </div>
+                        }
+
+                        <!-- Bouton Submit -->
+                        <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || loading()">
+                        @if (loading()) { 
+                            <span class="spinner-border spinner-border-sm"></span> 
+                        } @else { 
+                            {{ registerConfig.button.text }} 
+                        }
+                        </button>
+
+                        <div class="style-line text-center text-muted small mb-3">
+                            <span>Ou continuer avec</span>
+                        </div>
+
+                        <div class="d-flex gap-2 socialIcons">
+                            <button type="button" class="btn"><fa-icon [icon]="faGoogle" class="icon googleIcon"></fa-icon></button>
+                            <button type="button" class="btn"><fa-icon [icon]="faApple" class="appleIcon"></fa-icon></button>
+                            <button type="button" class="btn"><fa-icon [icon]="faFacebook" class="icon facebookIcon"></fa-icon></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
