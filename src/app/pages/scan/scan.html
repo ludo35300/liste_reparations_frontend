@@ -1,0 +1,86 @@
+<div class="scan-container">
+  <h2>📷 Nouvelle réparation</h2>
+
+  <div class="upload-zone">
+    <label for="fileInput" class="upload-label">
+      📂 Choisir une image de fiche
+    </label>
+    <input id="fileInput" type="file" accept="image/*"
+           (change)="onFileSelected($event)" hidden />
+  </div>
+
+  @if (preview()) {
+    <div class="preview-zone">
+      <img [src]="preview()" alt="Aperçu fiche" class="preview-img" />
+      <button class="btn btn-ocr" (click)="analyser()" [disabled]="loading()">
+        {{ loading() ? '⏳ Analyse en cours…' : '🔍 Analyser par OCR' }}
+      </button>
+    </div>
+
+    <div class="form-zone">
+      <h3>✏️ Vérifier et corriger</h3>
+
+      <div class="form-grid">
+        <label>
+          Numéro de série *
+          <input [(ngModel)]="form.numero_serie" placeholder="ex: SANTOS-40AN-001" />
+        </label>
+        <label>
+          Type de machine
+          <input [(ngModel)]="form.machine_type" placeholder="ex: MOULIN SANTOS 40AN" />
+        </label>
+        <label>
+          Technicien
+          <input [(ngModel)]="form.technicien" placeholder="Nom du technicien" />
+        </label>
+        <label>
+          Date * (JJ/MM/AAAA)
+          <input [(ngModel)]="form.date_reparation" placeholder="ex: 25/03/2026" />
+        </label>
+      </div>
+
+      <label class="full-width">
+        Notes
+        <textarea [(ngModel)]="form.notes" rows="2" placeholder="Remarques…"></textarea>
+      </label>
+
+      @if (getPieces().length > 0) {
+        <h4>🔩 Pièces détectées</h4>
+        <table class="pieces-table">
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Désignation</th>
+              <th>Quantité</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
+              <tr [class.highlight]="piece.quantite > 0">
+                <td>{{ piece.ref_piece }}</td>
+                <td>{{ piece.designation }}</td>
+                <td>
+                  <input type="number" min="0"
+                         [value]="piece.quantite"
+                         (input)="updateQuantite(i, $any($event.target).value)"
+                         class="qty-input" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      @if (error()) {
+        <p class="msg error">⚠️ {{ error() }}</p>
+      }
+      @if (saved()) {
+        <p class="msg success">✅ Réparation enregistrée !</p>
+      }
+
+      <button class="btn btn-save" (click)="enregistrer()">
+        💾 Enregistrer la réparation
+      </button>
+    </div>
+  }
+</div>

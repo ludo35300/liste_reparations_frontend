@@ -1,0 +1,44 @@
+<div class="stats-container">
+  <h2>📊 Statistiques</h2>
+
+  @if (stats(); as s) {
+    <div class="stats-cards">
+      <div class="card">
+        <span class="card-value">{{ s.total_reparations }}</span>
+        <span class="card-label">Réparations totales</span>
+      </div>
+      <div class="card">
+        <span class="card-value">{{ s.machines_uniques }}</span>
+        <span class="card-label">Machines uniques</span>
+      </div>
+      <div class="card">
+        <span class="card-value">{{ s.total_pieces }}</span>
+        <span class="card-label">Pièces changées</span>
+      </div>
+    </div>
+
+    <h3>🏆 Top 10 pièces les plus changées</h3>
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Référence</th>
+          <th>Désignation</th>
+          <th>Total changé</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of s.pieces_les_plus_changees; track p.ref; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ p.ref }}</td>
+            <td>{{ p.designation }}</td>
+            <td><strong>{{ p.total }}</strong></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p>Chargement…</p>
+  }
+</div>

@@ -1,0 +1,57 @@
+<div class="search-container">
+  <h2>🔍 Rechercher une machine</h2>
+
+  <div class="search-bar">
+    <input
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      placeholder="Numéro de série (ex: SANTOS-40AN-001)"
+      (keyup.enter)="rechercher()" />
+    <button class="btn btn-search" (click)="rechercher()" [disabled]="loading()">
+      {{ loading() ? '⏳' : '🔍 Rechercher' }}
+    </button>
+    <button class="btn btn-new" (click)="nouvelleReparation()">
+      ➕ Nouvelle réparation
+    </button>
+  </div>
+
+  @if (searched() && resultats().length === 0) {
+    <div class="not-found">
+      <p>❌ Aucune réparation trouvée pour <strong>{{ query() }}</strong></p>
+      <button class="btn btn-new" (click)="nouvelleReparation()">
+        Créer la première réparation
+      </button>
+    </div>
+  }
+
+  @if (resultats().length > 0) {
+    <div class="results">
+      <h3>🔧 {{ resultats()[0].numero_serie }}
+        — {{ resultats().length }} intervention(s)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Machine</th>
+            <th>Technicien</th>
+            <th>Pièces</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (rep of resultats(); track rep.id) {
+            <tr (click)="voirDetail(rep)" class="clickable">
+              <td>{{ rep.date_reparation }}</td>
+              <td>{{ rep.machine_type }}</td>
+              <td>{{ rep.technicien || '—' }}</td>
+              <td>{{ rep.pieces?.length ?? 0 }} pièce(s)</td>
+              <td>{{ rep.notes || '—' }}</td>
+              <td>👁</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

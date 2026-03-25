@@ -1,0 +1,61 @@
+<div class="history-container">
+  <div class="history-header">
+    <button class="btn btn-back" (click)="retour()">← Retour</button>
+    <h2>🔧 Historique — {{ numeroSerie() }}</h2>
+    <span class="badge">{{ reparations().length }} intervention(s)</span>
+  </div>
+
+  <div class="history-layout">
+    <!-- Liste des interventions -->
+    <aside class="history-list">
+      @for (rep of reparations(); track rep.id) {
+        <div class="history-item"
+             [class.active]="selected()?.id === rep.id"
+             (click)="selectionner(rep)">
+          <strong>{{ rep.date_reparation }}</strong>
+          <span>{{ rep.technicien || 'N/A' }}</span>
+          <span class="pieces-count">{{ rep.pieces?.length }} pièce(s)</span>
+        </div>
+      }
+    </aside>
+
+    <!-- Détail de l'intervention sélectionnée -->
+    @if (selected(); as rep) {
+      <main class="history-detail">
+        <div class="detail-header">
+          <div>
+            <p><strong>Date :</strong> {{ rep.date_reparation }}</p>
+            <p><strong>Machine :</strong> {{ rep.machine_type }}</p>
+            <p><strong>Technicien :</strong> {{ rep.technicien || '—' }}</p>
+            <p><strong>Notes :</strong> {{ rep.notes || '—' }}</p>
+          </div>
+          <button class="btn btn-delete"
+                  (click)="supprimer(rep.id!)">
+            🗑 Supprimer
+          </button>
+        </div>
+
+        @if (rep.pieces && rep.pieces.length > 0) {
+          <table class="pieces-table">
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Désignation</th>
+                <th>Quantité</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of rep.pieces; track p.ref_piece) {
+                <tr>
+                  <td>{{ p.ref_piece }}</td>
+                  <td>{{ p.designation }}</td>
+                  <td>{{ p.quantite }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </main>
+    }
+  </div>
+</div>
