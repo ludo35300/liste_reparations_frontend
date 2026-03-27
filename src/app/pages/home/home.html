@@ -1,46 +1,72 @@
 <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo">🚀 AuthModule</div>
-        
-        
-        <a routerLink="/home" class="nav-link active">
-            <span class="nav-icon"><fa-icon [icon]="faGrip"></fa-icon></span>
-            <span>Dashboard</span>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">🔧 Réparations</div>
+
+    <nav class="nav-menu">
+      @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route"
+           routerLinkActive="active"
+           class="nav-link">
+          <span class="nav-icon"><fa-icon [icon]="item.icon" /></span>
+          <span>{{ item.label }}</span>
         </a>
+      }
+    </nav>
 
-        <div class="logout-btn">
-            <button (click)="logout()" class="btn"><fa-icon [icon]="faDoorOpen"></fa-icon> Déconnexion</button>
+    <div class="sidebar-footer">
+      @if (me()) {
+        <div class="user-info">
+          <div class="avatar">
+            {{ me()!.firstName.charAt(0) }}{{ me()!.lastName.charAt(0) }}
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ me()!.firstName }} {{ me()!.lastName }}</span>
+            <span class="user-email">{{ me()!.email }}</span>
+          </div>
         </div>
-    </aside>
+      }
+      <button (click)="logout()" class="logout-btn">
+        <fa-icon [icon]="faDoorOpen" /> Déconnexion
+      </button>
+    </div>
+  </aside>
 
-        <!-- Main Content -->
-    <main class="main-content">
-        @if (loading()) { <p>Chargement...</p> }
-        @if (errorMessage()) { <div class="alert alert-danger">{{ errorMessage() }}</div>}
-        <!-- Header -->
-        @if (me()) {
-            <div class="header-section">
-                
-                <div class="greeting">
-                    <h1>Bienvenue, {{ me()!.firstName }} {{ me()!.lastName }} ! 👋</h1>
-                </div>
-                <div class="header-actions">
-                    <div class="status-badge">
-                        <span class="status-dot"></span> Connecté
-                    </div>
-                    <div class="profile-icon" title="Profil">AM</div>
-                </div>
-                
-            </div>
+  <!-- Main Content -->
+  <main class="main-content">
 
-            <!-- Welcome Card -->
-            <div class="welcome-card">
-                <div class="welcome-content">
-                <h2>🎉 Authentification réussie !</h2>
-                <p>Votre adresse email: {{ me()!.email }}</p>
-                </div>
+    @if (loading()) {
+      <div class="loading">⏳ Chargement...</div>
+    }
+    @if (errorMessage()) {
+      <div class="alert alert-danger">{{ errorMessage() }}</div>
+    }
+
+    @if (me()) {
+      <div class="header-section">
+        <div class="greeting">
+          <h1>Bonjour, {{ me()!.firstName }} 👋</h1>
+          <p>Que voulez-vous faire aujourd'hui ?</p>
+        </div>
+        <div class="status-badge">
+          <span class="status-dot"></span> Connecté
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        @for (card of dashCards; track card.route) {
+          <div class="dash-card" [routerLink]="card.route">
+            <div class="card-icon">{{ card.icon }}</div>
+            <div class="card-body">
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.desc }}</p>
             </div>
+            <span class="card-arrow">→</span>
+          </div>
         }
-    </main>
+      </div>
+    }
+
+  </main>
 </div>
