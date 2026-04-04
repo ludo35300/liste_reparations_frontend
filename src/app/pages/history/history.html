@@ -1,16 +1,11 @@
 <div class="layout">
 
-  <app-sidebar
-    [navItems]="navItems"
-    appTitle="Réparations"
-    appEmoji="🔧"
-  />
-
   <div class="layout-right">
 
     <app-topbar
       [me]="me()"
-      pageTitle="Historique"
+      pageTitle="Tableau de bord"
+      [navItems]="navItems"
       (logoutEvt)="logout()"
     />
 
@@ -89,6 +84,7 @@
 
               <button
                 class="btn-delete"
+                disabled
                 (click)="supprimer(rep.id!)"
                 aria-label="Supprimer cette intervention"
               >

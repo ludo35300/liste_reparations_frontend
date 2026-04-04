@@ -14,12 +14,11 @@ import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Stats } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
-import { Sidebar } from '../../components/sidebar/sidebar';
 
 @Component({
   selector: 'app-stats',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, Sidebar, Topbar],
+  imports: [CommonModule, FontAwesomeModule, Topbar],
   templateUrl: './stats.html',
   styleUrl: './stats.scss',
 })

@@ -14,13 +14,12 @@ import { ReparationService } from '../../services/reparation.service';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Reparation } from '../../models/reparation.model';
-import { Sidebar } from '../../components/sidebar/sidebar';
 import { Topbar } from '../../components/topbar/topbar';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, Sidebar, Topbar],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar],
   templateUrl: './search.html',
   styleUrl: './search.scss',
 })

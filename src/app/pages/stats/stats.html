@@ -1,14 +1,10 @@
 <div class="layout">
-  <app-sidebar
-    [navItems]="navItems"
-    appTitle="Réparations"
-    appEmoji="🔧"
-  />
 
   <div class="layout-right">
     <app-topbar
       [me]="me()"
-      pageTitle="Statistiques"
+      pageTitle="Tableau de bord"
+      [navItems]="navItems"
       (logoutEvt)="logout()"
     />
 

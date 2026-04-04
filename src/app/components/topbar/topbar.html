@@ -1,36 +1,44 @@
-<header class="topbar">
-  <div class="topbar-left">
+<!-- Niveau 1 : se cache au scroll -->
+<div class="topbar-top" [class.hidden]="topbarHidden()">
+
+  <!-- Gauche : Brand -->
+  <div class="topbar-brand">
+    <div class="brand-icon"><i class="fas fa-wrench"></i></div>
+    <span class="brand-name">Réparations</span>
+  </div>
+
+  <!-- Centre : Outils -->
+  <div class="topbar-tools">
+    <button class="tool-btn" title="Recherche" aria-label="Recherche">
+      <i class="fas fa-search"></i>
+    </button>
+    <button class="tool-btn" title="Plein écran" (click)="toggleFullscreen()">
+      <i class="fas fa-expand"></i>
+    </button>
+    <button class="tool-btn" title="Notifications">
+      <i class="fas fa-bell"></i>
+    </button>
     @if (pageTitle()) {
-      <h1 class="page-title">{{ pageTitle() }}</h1>
+      <span class="topbar-page-title d-none d-md-inline">{{ pageTitle() }}</span>
     }
   </div>
 
+  <!-- Droite : Profil -->
   <div class="topbar-right">
     @if (me()) {
-      <div class="user-menu" [class.open]="menuOpen()" (clickOutside)="menuOpen.set(false)">
-
-        <!-- Bouton déclencheur -->
-        <button
-          class="user-chip"
-          (click)="toggleMenu()"
-          [attr.aria-expanded]="menuOpen()"
-          aria-haspopup="true"
-          [attr.aria-label]="'Menu de ' + me()!.firstName">
-          
-          <div class="avatar" [attr.aria-label]="'Compte de ' + me()!.firstName">
-            {{ initials() }}
+      <div class="user-menu" [class.open]="menuOpen()">
+        <button class="user-chip" (click)="toggleMenu()"
+          [attr.aria-expanded]="menuOpen()" aria-haspopup="true">
+          <div class="avatar">{{ initials() }}</div>
+          <div class="user-info d-none d-sm-flex">
+            <span class="user-name">{{ me()!.firstName }} {{ me()!.lastName }}</span>
+            <span class="user-email">{{ me()!.email }}</span>
           </div>
-          <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"
-               width="14" height="14" aria-hidden="true">
-            <path fill-rule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-              clip-rule="evenodd"/>
-          </svg>
+          <i class="fas fa-chevron-down chevron"></i>
         </button>
 
-        <!-- Dropdown -->
         @if (menuOpen()) {
-          <div class="dropdown" role="menu">
+          <div class="dropdown-menu-custom" role="menu">
             <div class="dropdown-header">
               <div class="avatar avatar-lg">{{ initials() }}</div>
               <div>
@@ -38,27 +46,53 @@
                 <p class="dropdown-email">{{ me()!.email }}</p>
               </div>
             </div>
-
             <div class="dropdown-divider"></div>
-
-            <!-- Profil (désactivé pour l'instant) -->
-            <button class="dropdown-item disabled" disabled role="menuitem">
-              <fa-icon [icon]="faUser" />
+            <button class="dropdown-item-custom disabled" disabled role="menuitem">
+              <i class="fas fa-user"></i>
               <span>Mon profil</span>
-              <span class="dropdown-soon">Bientôt</span>
+              <span class="badge-soon">Bientôt</span>
             </button>
-
             <div class="dropdown-divider"></div>
-
-            <!-- Déconnexion -->
-            <button class="dropdown-item danger" (click)="onLogout()" role="menuitem">
-              <fa-icon [icon]="faDoorOpen" />
+            <button class="dropdown-item-custom danger" (click)="onLogout()" role="menuitem">
+              <i class="fas fa-sign-out-alt"></i>
               <span>Déconnexion</span>
             </button>
           </div>
         }
-
       </div>
     }
   </div>
-</header>
+</div>
+
+<!-- Niveau 2 : navbar toujours visible -->
+<nav class="topbar-nav" [class.scrolled]="topbarHidden()" aria-label="Navigation">
+
+  <!-- Hamburger mobile -->
+  <button class="nav-hamburger d-md-none"
+    (click)="mobileNavOpen.set(!mobileNavOpen())" aria-label="Menu">
+    <i class="fas" [class.fa-bars]="!mobileNavOpen()" [class.fa-times]="mobileNavOpen()"></i>
+  </button>
+
+  <!-- Liens desktop -->
+  <div class="nav-links" [class.mobile-open]="mobileNavOpen()">
+    @for (item of navItems(); track item.route) {
+      <a [routerLink]="item.route"
+         routerLinkActive="nav-active"
+         [routerLinkActiveOptions]="{ exact: item.route === '/home' }"
+         class="nav-link-item"
+         (click)="mobileNavOpen.set(false)">
+        <fa-icon [icon]="item.icon" class="nav-icon"></fa-icon>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </div>
+
+  <!-- Breadcrumb droite -->
+  @if (pageTitle()) {
+    <div class="nav-breadcrumb d-none d-lg-flex">
+      <i class="fas fa-home"></i>
+      <i class="fas fa-chevron-right breadcrumb-sep"></i>
+      <span class="breadcrumb-current">{{ pageTitle() }}</span>
+    </div>
+  }
+</nav>

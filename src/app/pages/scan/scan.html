@@ -1,174 +1,295 @@
 <div class="layout">
 
-  <app-sidebar
-    [navItems]="navItems"
-    appTitle="Réparations"
-    appEmoji="🔧"
-  />
 
   <div class="layout-right">
 
     <app-topbar
       [me]="me()"
-      pageTitle="Nouvelle réparation"
+      pageTitle="Tableau de bord"
+      [navItems]="navItems"
       (logoutEvt)="logout()"
     />
 
     <main class="main-content">
 
-      @if (errorMessage()) {
-        <div class="alert alert-danger" role="alert">⚠️ {{ errorMessage() }}</div>
-      }
+      <!-- ═══ STEPPER ══════════════════════════════════════════ -->
+      <div class="stepper">
+        <div class="stepper-track">
 
-      <div class="page-header">
-        <div>
-          <h2 class="page-title">📷 Nouvelle réparation</h2>
-          <p class="page-sub">Importez une fiche pour lancer l'analyse OCR</p>
-        </div>
-      </div>
-
-      <!-- Upload Zone -->
-      <div class="upload-card">
-        <label for="fileInput" class="upload-zone" [class.has-file]="preview()">
-          @if (!preview()) {
-            <span class="upload-icon">📂</span>
-            <span class="upload-label-text">Choisir une image de fiche</span>
-            <span class="upload-hint">JPG, PNG, WEBP acceptés</span>
-          } @else {
-            <span class="upload-icon">✅</span>
-            <span class="upload-label-text">Image sélectionnée</span>
-            <span class="upload-hint">Cliquer pour changer</span>
-          }
-        </label>
-        <input id="fileInput" type="file" accept="image/*"
-               (change)="onFileSelected($event)" hidden />
-      </div>
-
-      @if (preview()) {
-
-        <!-- Analyse Button -->
-        <div class="action-row">
-          <button class="btn btn-primary" (click)="analyser()" [disabled]="loading()">
-            @if (loading()) {
-              <span class="btn-spinner" aria-hidden="true"></span>
-              Analyse en cours…
-            } @else {
-              🔍 Analyser par OCR
-            }
-          </button>
-        </div>
-
-        <!-- Form -->
-        <div class="form-card">
-          <h3 class="form-section-title">✏️ Vérifier et corriger</h3>
-
-          <div class="form-grid">
-            <label class="field-label">
-              <span>Numéro de série <span class="required">*</span></span>
-              <input class="field-input" [(ngModel)]="form.numero_serie"
-                     placeholder="ex: SANTOS-40AN-001" />
-            </label>
-            <label class="field-label">
-              <span>Type de machine</span>
-              <input class="field-input" [(ngModel)]="form.machine_type"
-                     placeholder="ex: MOULIN SANTOS 40AN" />
-            </label>
-            <label class="field-label">
-              <span>Technicien</span>
-              <input class="field-input" [(ngModel)]="form.technicien"
-                     placeholder="Nom du technicien" />
-            </label>
-            <label class="field-label">
-              <span>Date <span class="required">*</span></span>
-              <input class="field-input" [(ngModel)]="form.date_reparation"
-                     placeholder="JJ/MM/AAAA" />
-            </label>
+          <!-- Step 1 -->
+          <div class="stepper-step" [class.active]="currentStep() === 1" [class.done]="currentStep() > 1">
+            <div class="stepper-bubble">
+              @if (currentStep() > 1) { <span class="stepper-check">✓</span> }
+              @else { <span class="stepper-icon">📂</span> }
+            </div>
+            <span class="stepper-label">Import</span>
           </div>
 
-          <label class="field-label full-width">
-            <span>Notes</span>
-            <textarea class="field-input field-textarea"
-                      [(ngModel)]="form.notes" rows="3"
-                      placeholder="Remarques, observations…"></textarea>
-          </label>
+          <div class="stepper-line" [class.done]="currentStep() > 1"></div>
 
-          @if (getPieces().length > 0) {
-            <div class="pieces-section">
-
-              <!-- Avertissement nouvelles pièces -->
-              @if (avertissementActif()) {
-                <div class="alert-warning" role="alert">
-                  <span class="alert-warning-icon">⚠️</span>
-                  <div class="alert-warning-body">
-                    <strong>Nouvelles pièces détectées</strong>
-                    <span>Ces références n'existent pas encore en base. Vérifiez chaque pièce avant de valider.</span>
-                  </div>
-                </div>
+          <!-- Step 2 -->
+          <div class="stepper-step" [class.active]="currentStep() === 2" [class.done]="currentStep() > 2">
+            <div class="stepper-bubble">
+              @if (currentStep() === 2) {
+                <span class="stepper-spinner"></span>
+              } @else if (currentStep() > 2) {
+                <span class="stepper-check">✓</span>
+              } @else {
+                <span class="stepper-icon">🔍</span>
               }
+            </div>
+            <span class="stepper-label">Analyse</span>
+          </div>
 
-              <h4 class="form-section-title">🔩 Pièces détectées</h4>
+          <div class="stepper-line" [class.done]="currentStep() > 2"></div>
 
-              <div class="table-wrapper">
-                <table class="pieces-table">
-                  <thead>
-                    <tr>
-                      <th>Référence</th>
-                      <th>Désignation</th>
-                      <th>Quantité</th>
-                      <th>Statut</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
-                      <tr [class.row-highlight]="piece.quantite > 0"
-                          [class.row-new]="isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)"
-                          [class.row-validated]="isNouvelle(piece.ref_piece) && isValidee(piece.ref_piece)">
-                        <td>
-                          <span class="cell-ref">{{ piece.ref_piece }}</span>
-                          @if (isNouvelle(piece.ref_piece)) {
-                            <span class="badge-new">Nouvelle</span>
-                          }
-                        </td>
-                        <td>{{ piece.designation }}</td>
-                        <td>
-                          <input type="number" min="0"
-                                [value]="piece.quantite"
-                                (input)="updateQuantite(i, $any($event.target).value)"
-                                class="qty-input" />
-                        </td>
-                        <td class="cell-status">
-                          @if (isNouvelle(piece.ref_piece)) {
-                            @if (!isValidee(piece.ref_piece)) {
-                              <button class="btn-validate" (click)="validerPiece(piece.ref_piece)"
-                                      title="Confirmer cette pièce">
-                                ✔ Valider
-                              </button>
-                            } @else {
-                              <span class="status-ok">✔ Vérifiée</span>
-                            }
-                          } @else {
-                            <span class="status-known">En base</span>
-                          }
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+          <!-- Step 3 -->
+          <div class="stepper-step" [class.active]="currentStep() === 3" [class.done]="currentStep() > 3">
+            <div class="stepper-bubble">
+              @if (currentStep() > 3) { <span class="stepper-check">✓</span> }
+              @else { <span class="stepper-icon">✏️</span> }
+            </div>
+            <span class="stepper-label">Formulaire</span>
+          </div>
+
+          <div class="stepper-line" [class.done]="currentStep() > 3"></div>
+
+          <!-- Step 4 -->
+          <div class="stepper-step" [class.active]="currentStep() === 4">
+            <div class="stepper-bubble">
+              <span class="stepper-icon">
+                @if (saved()) { ✅ } @else if (currentStep() === 4 && error()) { ❌ } @else { 🏁 }
+              </span>
+            </div>
+            <span class="stepper-label">Résultat</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══ STEP 1 : Upload ══════════════════════════════════ -->
+      @if (currentStep() === 1) {
+        <div class="step-panel">
+          <div class="upload-zone"
+               [class.drag-over]="isDragging()"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave()"
+               (drop)="onDrop($event)">
+            <span class="upload-icon">📂</span>
+            <span class="upload-label-text">Glissez votre fiche ici</span>
+            <span class="upload-hint">ou choisissez un fichier — JPG, PNG, WEBP acceptés</span>
+            <div class="upload-buttons">
+              <label class="btn btn-outline" for="fileInputGallery">
+                🖼️ Depuis la galerie
+              </label>
+              <input id="fileInputGallery" type="file" accept="image/*"
+                     (change)="onFileSelected($event)" hidden />
+              <label class="btn btn-primary" for="fileInputCamera">
+                📷 Prendre une photo
+              </label>
+              <input id="fileInputCamera" type="file" accept="image/*" capture="environment"
+                     (change)="onFileSelected($event)" hidden />
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ═══ STEP 2 : Analyse en cours ═══════════════════════ -->
+      @if (currentStep() === 2) {
+        <div class="step-panel step-panel--analyse">
+          <div class="analyse-layout">
+            <div class="analyse-preview">
+              @if (preview()) {
+                <img [src]="preview()" alt="Fiche scannée" class="preview-img" />
+              }
+              <div class="preview-overlay-analyse">
+                <div class="big-spinner"></div>
               </div>
+            </div>
+            <div class="analyse-info">
+              <div class="analyse-badge">
+                <div class="pulse-dot"></div>
+                Analyse en cours
+              </div>
+              <h3 class="analyse-title">Mistral AI analyse votre fiche…</h3>
+              <p class="analyse-sub">Extraction du numéro de série, du type de machine et des pièces détectées.</p>
+              <div class="analyse-steps-list">
+                <div class="astep" [class.done]="analyseStep() >= 1" [class.active]="analyseStep() === 1">
+                  <span class="astep-dot"></span> Compression de l'image
+                </div>
+                <div class="astep" [class.done]="analyseStep() >= 2" [class.active]="analyseStep() === 2">
+                  <span class="astep-dot"></span> OCR — lecture du texte
+                </div>
+                <div class="astep" [class.done]="analyseStep() >= 3" [class.active]="analyseStep() === 3">
+                  <span class="astep-dot"></span> Extraction des données structurées
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ═══ STEP 3 : Formulaire ══════════════════════════════ -->
+      @if (currentStep() === 3) {
+        <div class="step-panel">
+
+          <!-- Bandeau OCR échoué -->
+          @if (isOcrFailed()) {
+            <div class="alert-banner alert-banner--warning">
+              <span>⚠️</span>
+              <div>
+                <strong>Analyse incomplète</strong>
+                <span>L'OCR n'a pas pu extraire toutes les données. Remplissez le formulaire manuellement.</span>
+              </div>
+              <button class="btn btn-sm btn-outline" (click)="relancer()">🔍 Réessayer</button>
             </div>
           }
 
-          @if (saved()) {
-            <div class="alert alert-success" role="status">✅ Réparation enregistrée !</div>
-          }
+          <div class="form-card">
+            <div class="form-header">
+              <h3 class="form-section-title">✏️ Vérifier et corriger les données</h3>
+              @if (!isOcrFailed()) {
+                <span class="form-status-ok">✅ Données pré-remplies par l'OCR — vérifiez avant d'enregistrer</span>
+              }
+            </div>
 
-          <div class="form-footer">
-            <button class="btn btn-save" (click)="enregistrer()">
-              💾 Enregistrer la réparation
-            </button>
+            <!-- Preview miniature + changer image -->
+            <div class="form-preview-row">
+              @if (preview()) {
+                <img [src]="preview()" alt="Fiche" class="form-thumb" />
+              }
+              <button class="btn btn-sm btn-outline" (click)="reinitialiser()">🔄 Changer d'image</button>
+            </div>
+
+            <div class="form-grid">
+              <label class="field-label">
+                <span>Numéro de série <span class="required">*</span></span>
+                <input class="field-input" [(ngModel)]="form.numero_serie" placeholder="ex: SANTOS-40AN-001" />
+              </label>
+              <label class="field-label">
+                <span>Type de machine
+                  @if (isNewMachine()) {
+                    <span class="badge-new">Nouvelle</span>
+                  }
+                </span>
+                <input class="field-input" [(ngModel)]="form.machine_type"
+                       [class.field-new]="isNewMachine()"
+                       placeholder="ex: MOULIN SANTOS 40AN" />
+              </label>
+              <label class="field-label">
+                <span>Technicien</span>
+                <input class="field-input" [(ngModel)]="form.technicien" placeholder="Nom du technicien" />
+              </label>
+              <label class="field-label">
+                <span>Date <span class="required">*</span></span>
+                <input class="field-input" [(ngModel)]="form.date_reparation" placeholder="JJ/MM/AAAA" />
+              </label>
+            </div>
+
+            <label class="field-label full-width">
+              <span>Notes</span>
+              <textarea class="field-input field-textarea"
+                        [(ngModel)]="form.notes" rows="3"
+                        placeholder="Remarques, observations…"></textarea>
+            </label>
+
+            @if (getPieces().length > 0) {
+              <div class="pieces-section">
+                @if (avertissementActif()) {
+                  <div class="alert-banner alert-banner--warning">
+                    <span>⚠️</span>
+                    <div>
+                      <strong>Nouvelles pièces détectées</strong>
+                      <span>Vérifiez et validez chaque nouvelle pièce avant d'enregistrer.</span>
+                    </div>
+                  </div>
+                }
+                <h4 class="form-section-title">🔩 Pièces détectées</h4>
+                <div class="table-wrapper">
+                  <table class="pieces-table">
+                    <thead>
+                      <tr>
+                        <th>Référence</th>
+                        <th>Désignation</th>
+                        <th>Quantité</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
+                        <tr [class.row-highlight]="piece.quantite > 0"
+                            [class.row-new]="isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)"
+                            [class.row-validated]="isNouvelle(piece.ref_piece) && isValidee(piece.ref_piece)">
+                          <td>
+                            <span class="cell-ref">{{ piece.ref_piece }}</span>
+                            @if (isNouvelle(piece.ref_piece)) {
+                              <span class="badge-new">Nouvelle</span>
+                            }
+                          </td>
+                          <td>{{ piece.designation }}</td>
+                          <td>
+                            <input type="number" min="0"
+                                   [value]="piece.quantite"
+                                   (input)="updateQuantite(i, $any($event.target).value)"
+                                   class="qty-input" />
+                          </td>
+                          <td class="cell-status">
+                            @if (isNouvelle(piece.ref_piece)) {
+                              @if (!isValidee(piece.ref_piece)) {
+                                <button class="btn-validate" (click)="validerPiece(piece.ref_piece)">✔ Valider</button>
+                              } @else {
+                                <span class="status-ok">✔ Vérifiée</span>
+                              }
+                            } @else {
+                              <span class="status-known">En base</span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            @if (error()) {
+              <div class="alert alert-danger">⚠️ {{ error() }}</div>
+            }
+
+            <div class="form-footer">
+              <button class="btn btn-save" (click)="enregistrer()">
+                💾 Enregistrer la réparation
+              </button>
+            </div>
           </div>
         </div>
+      }
 
+      <!-- ═══ STEP 4 : Résultat ════════════════════════════════ -->
+      @if (currentStep() === 4) {
+        <div class="step-panel step-panel--result">
+          @if (saved()) {
+            <div class="result-card result-card--success">
+              <span class="result-icon">✅</span>
+              <h3>Réparation enregistrée !</h3>
+              <p>La fiche a été sauvegardée avec succès dans la base de données.</p>
+              <div class="result-actions">
+                <button class="btn btn-primary" (click)="reinitialiser()">➕ Nouvelle réparation</button>
+                <button class="btn btn-outline" (click)="goSearch()">🔍 Voir les réparations</button>
+              </div>
+            </div>
+          } @else {
+            <div class="result-card result-card--error">
+              <span class="result-icon">❌</span>
+              <h3>Erreur lors de l'enregistrement</h3>
+              <p>{{ error() || "Une erreur inattendue s'est produite." }}</p>
+              <div class="result-actions">
+                <button class="btn btn-primary" (click)="currentStep.set(3)">↩️ Retour au formulaire</button>
+                <button class="btn btn-outline" (click)="reinitialiser()">🔄 Recommencer</button>
+              </div>
+            </div>
+          }
+        </div>
       }
 
     </main>

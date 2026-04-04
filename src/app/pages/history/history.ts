@@ -14,12 +14,11 @@ import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Reparation } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
-import { Sidebar } from '../../components/sidebar/sidebar';
 
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, Sidebar, Topbar, FontAwesomeModule],
+  imports: [CommonModule, Topbar, FontAwesomeModule],
   templateUrl: './history.html',
   styleUrl: './history.scss',
 })

@@ -1,16 +1,13 @@
 <div class="layout">
 
-  <app-sidebar
-    [navItems]="navItems"
-    appTitle="Réparations"
-    appEmoji="🔧"
-  />
+ 
 
   <div class="layout-right">
 
     <app-topbar
       [me]="me()"
       pageTitle="Tableau de bord"
+      [navItems]="navItems"
       (logoutEvt)="logout()"
     />
 
@@ -18,7 +15,7 @@
 
       @if (loading()) {
         <div class="state-loading" role="status" aria-live="polite">
-          <div class="spinner" aria-hidden="true"></div>
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           <span>Chargement...</span>
         </div>
       }

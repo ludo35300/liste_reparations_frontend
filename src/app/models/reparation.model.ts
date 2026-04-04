@@ -18,6 +18,7 @@ export interface Reparation {
 }
 
 export interface OcrResult {
+  is_new_machine: boolean;
   numero_serie: string;
   date: string;
   nb_pieces: number;

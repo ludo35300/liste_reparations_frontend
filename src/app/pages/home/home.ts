@@ -6,12 +6,11 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Topbar } from '../../components/topbar/topbar';
-import { Sidebar } from '../../components/sidebar/sidebar';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FontAwesomeModule, Sidebar, Topbar],
+  imports: [RouterLink, FontAwesomeModule, Topbar],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
