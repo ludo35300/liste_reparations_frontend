@@ -1,44 +1,103 @@
-<div class="stats-container">
-  <h2>📊 Statistiques</h2>
+<div class="layout">
+  <app-sidebar
+    [navItems]="navItems"
+    appTitle="Réparations"
+    appEmoji="🔧"
+  />
 
-  @if (stats(); as s) {
-    <div class="stats-cards">
-      <div class="card">
-        <span class="card-value">{{ s.total_reparations }}</span>
-        <span class="card-label">Réparations totales</span>
-      </div>
-      <div class="card">
-        <span class="card-value">{{ s.machines_uniques }}</span>
-        <span class="card-label">Machines uniques</span>
-      </div>
-      <div class="card">
-        <span class="card-value">{{ s.total_pieces }}</span>
-        <span class="card-label">Pièces changées</span>
-      </div>
-    </div>
+  <div class="layout-right">
+    <app-topbar
+      [me]="me()"
+      pageTitle="Statistiques"
+      (logoutEvt)="logout()"
+    />
 
-    <h3>🏆 Top 10 pièces les plus changées</h3>
-    <table class="stats-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Référence</th>
-          <th>Désignation</th>
-          <th>Total changé</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (p of s.pieces_les_plus_changees; track p.ref; let i = $index) {
-          <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ p.ref }}</td>
-            <td>{{ p.designation }}</td>
-            <td><strong>{{ p.total }}</strong></td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  } @else {
-    <p>Chargement…</p>
-  }
+    <main class="main-content">
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert">⚠️ {{ errorMessage() }}</div>
+      }
+
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Statistiques</h2>
+          <p class="page-sub">Vue d'ensemble de l'activité de réparation</p>
+        </div>
+      </div>
+
+      @if (stats(); as s) {
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-value">{{ s.total_reparations }}</span>
+            <span class="kpi-label">Réparations totales</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ s.machines_uniques }}</span>
+            <span class="kpi-label">Machines uniques</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ s.total_pieces }}</span>
+            <span class="kpi-label">Pièces changées</span>
+          </div>
+        </div>
+
+        <!-- Top pièces -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <h3 class="table-card-title">Top 10 — Pièces les plus changées</h3>
+          </div>
+          <div class="table-wrapper">
+            <table class="stats-table">
+              <thead>
+                <tr>
+                  <th class="col-rank">#</th>
+                  <th>Référence</th>
+                  <th>Désignation</th>
+                  <th class="col-total">Total changé</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of s.pieces_les_plus_changees; track p.ref; let i = $index) {
+                  <tr [class.row-top3]="i < 3">
+                    <td class="col-rank">
+                      <span class="rank-badge" [class.gold]="i === 0"
+                                               [class.silver]="i === 1"
+                                               [class.bronze]="i === 2">
+                        {{ i + 1 }}
+                      </span>
+                    </td>
+                    <td class="cell-ref">{{ p.ref }}</td>
+                    <td>{{ p.designation }}</td>
+                    <td class="col-total">
+                      <span class="total-value">{{ p.total }}</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      } @else if (!errorMessage()) {
+        <!-- Skeleton loading -->
+        <div class="kpi-grid">
+          <div class="kpi-card skeleton-card">
+            <span class="skeleton sk-value"></span>
+            <span class="skeleton sk-label"></span>
+          </div>
+          <div class="kpi-card skeleton-card">
+            <span class="skeleton sk-value"></span>
+            <span class="skeleton sk-label"></span>
+          </div>
+          <div class="kpi-card skeleton-card">
+            <span class="skeleton sk-value"></span>
+            <span class="skeleton sk-label"></span>
+          </div>
+        </div>
+      }
+
+    </main>
+  </div>
 </div>

@@ -1,18 +1,17 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faDoorOpen, faGrip, faQrcode,
-  faMagnifyingGlass, faChartBar
-} from '@fortawesome/free-solid-svg-icons';
+import { faGrip, faQrcode, faMagnifyingGlass, faChartBar, faDoorOpen } from '@fortawesome/free-solid-svg-icons';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
+import { Topbar } from '../../components/topbar/topbar';
+import { Sidebar } from '../../components/sidebar/sidebar';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FontAwesomeModule, RouterLink, RouterLinkActive],
+  imports: [RouterLink, FontAwesomeModule, Sidebar, Topbar],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -37,12 +36,23 @@ export class Home implements OnInit {
     { label: 'Statistiques', route: '/stats',  icon: faChartBar },
   ];
 
+  // Remplace par des données dynamiques selon ton API
+  public readonly kpiCards = [
+    { icon: '🔧', label: 'Interventions totales', value: '128',  trend: '+12%', trendUp: true,  color: '#696cff' },
+    { icon: '✅', label: 'Clôturées ce mois',     value: '34',   trend: '+5%',  trendUp: true,  color: '#71dd37' },
+    { icon: '⏳', label: 'En attente',             value: '7',    trend: '-2',   trendUp: false, color: '#ffab00' },
+    { icon: '📦', label: 'Pièces commandées',      value: '21',   trend: '+8%',  trendUp: true,  color: '#03c3ec' },
+  ];
+
   public readonly dashCards = [
-    { route: '/scan',   icon: '📷', title: 'Scanner une fiche',
+    { route: '/scan',   icon: '📷', color: '#696cff',
+      title: 'Scanner une fiche',
       desc: 'Analyser une fiche de réparation par OCR' },
-    { route: '/search', icon: '🔍', title: 'Rechercher une machine',
+    { route: '/search', icon: '🔍', color: '#03c3ec',
+      title: 'Rechercher une machine',
       desc: 'Consulter l\'historique par numéro de série' },
-    { route: '/stats',  icon: '📊', title: 'Statistiques',
+    { route: '/stats',  icon: '📊', color: '#71dd37',
+      title: 'Statistiques',
       desc: 'Vue globale des interventions et pièces changées' },
   ];
 

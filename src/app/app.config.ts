@@ -48,6 +48,6 @@ export const appConfig: ApplicationConfig = {
 };
 
 export const appInfos = {
-  title: 'Authentification',
+  title: 'Technicien',
 };
 

@@ -1,0 +1,23 @@
+<aside class="sidebar">
+  <div class="logo">
+    <span class="logo-icon">{{ appEmoji() }}</span>
+    <span class="logo-text">{{ appTitle() }}</span>
+  </div>
+
+  <nav class="nav-menu" aria-label="Navigation principale">
+    @for (item of navItems(); track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/home' }"
+        class="nav-link"
+        [attr.aria-label]="item.label"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          <fa-icon [icon]="item.icon" />
+        </span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</aside>

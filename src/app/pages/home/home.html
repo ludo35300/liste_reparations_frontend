@@ -1,72 +1,76 @@
-<div class="dashboard">
+<div class="layout">
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">🔧 Réparations</div>
+  <app-sidebar
+    [navItems]="navItems"
+    appTitle="Réparations"
+    appEmoji="🔧"
+  />
 
-    <nav class="nav-menu">
-      @for (item of navItems; track item.route) {
-        <a [routerLink]="item.route"
-           routerLinkActive="active"
-           class="nav-link">
-          <span class="nav-icon"><fa-icon [icon]="item.icon" /></span>
-          <span>{{ item.label }}</span>
-        </a>
+  <div class="layout-right">
+
+    <app-topbar
+      [me]="me()"
+      pageTitle="Tableau de bord"
+      (logoutEvt)="logout()"
+    />
+
+    <main class="main-content">
+
+      @if (loading()) {
+        <div class="state-loading" role="status" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <span>Chargement...</span>
+        </div>
       }
-    </nav>
 
-    <div class="sidebar-footer">
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
+      }
+
       @if (me()) {
-        <div class="user-info">
-          <div class="avatar">
-            {{ me()!.firstName.charAt(0) }}{{ me()!.lastName.charAt(0) }}
-          </div>
-          <div class="user-details">
-            <span class="user-name">{{ me()!.firstName }} {{ me()!.lastName }}</span>
-            <span class="user-email">{{ me()!.email }}</span>
-          </div>
-        </div>
-      }
-      <button (click)="logout()" class="logout-btn">
-        <fa-icon [icon]="faDoorOpen" /> Déconnexion
-      </button>
-    </div>
-  </aside>
 
-  <!-- Main Content -->
-  <main class="main-content">
-
-    @if (loading()) {
-      <div class="loading">⏳ Chargement...</div>
-    }
-    @if (errorMessage()) {
-      <div class="alert alert-danger">{{ errorMessage() }}</div>
-    }
-
-    @if (me()) {
-      <div class="header-section">
+        <!-- Greeting -->
         <div class="greeting">
-          <h1>Bonjour, {{ me()!.firstName }} 👋</h1>
-          <p>Que voulez-vous faire aujourd'hui ?</p>
-        </div>
-        <div class="status-badge">
-          <span class="status-dot"></span> Connecté
-        </div>
-      </div>
-
-      <div class="cards-grid">
-        @for (card of dashCards; track card.route) {
-          <div class="dash-card" [routerLink]="card.route">
-            <div class="card-icon">{{ card.icon }}</div>
-            <div class="card-body">
-              <h3>{{ card.title }}</h3>
-              <p>{{ card.desc }}</p>
-            </div>
-            <span class="card-arrow">→</span>
+          <div>
+            <h2 class="greeting-title">Bonjour, {{ me()!.firstName }} 👋</h2>
           </div>
-        }
-      </div>
-    }
+        </div>
 
-  </main>
+        <!-- KPI Row 
+        <div class="kpi-row">
+          @for (kpi of kpiCards; track kpi.label) {
+            <div class="kpi-card" [style.--kpi-color]="kpi.color">
+              <div class="kpi-icon">{{ kpi.icon }}</div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ kpi.value }}</span>
+                <span class="kpi-label">{{ kpi.label }}</span>
+              </div>
+              <span class="kpi-trend" [class.up]="kpi.trendUp" [class.down]="!kpi.trendUp">
+                {{ kpi.trendUp ? '▲' : '▼' }} {{ kpi.trend }}
+              </span>
+            </div>
+          }
+        </div>-->
+
+        <!-- Action Cards -->
+        <h3 class="section-title">Actions rapides</h3>
+        <div class="cards-grid">
+          @for (card of dashCards; track card.route) {
+            <div class="dash-card" [routerLink]="card.route"
+                 role="button" tabindex="0" [attr.aria-label]="card.title"
+                 [style.--card-color]="card.color">
+              <div class="card-icon-wrap">{{ card.icon }}</div>
+              <div class="card-body">
+                <h3>{{ card.title }}</h3>
+                <p>{{ card.desc }}</p>
+              </div>
+              <span class="card-arrow" aria-hidden="true">→</span>
+            </div>
+          }
+        </div>
+
+      }
+
+    </main>
+  </div>
 </div>

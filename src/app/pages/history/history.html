@@ -1,61 +1,141 @@
-<div class="history-container">
-  <div class="history-header">
-    <button class="btn btn-back" (click)="retour()">← Retour</button>
-    <h2>🔧 Historique — {{ numeroSerie() }}</h2>
-    <span class="badge">{{ reparations().length }} intervention(s)</span>
-  </div>
+<div class="layout">
 
-  <div class="history-layout">
-    <!-- Liste des interventions -->
-    <aside class="history-list">
-      @for (rep of reparations(); track rep.id) {
-        <div class="history-item"
-             [class.active]="selected()?.id === rep.id"
-             (click)="selectionner(rep)">
-          <strong>{{ rep.date_reparation }}</strong>
-          <span>{{ rep.technicien || 'N/A' }}</span>
-          <span class="pieces-count">{{ rep.pieces?.length }} pièce(s)</span>
-        </div>
-      }
-    </aside>
+  <app-sidebar
+    [navItems]="navItems"
+    appTitle="Réparations"
+    appEmoji="🔧"
+  />
 
-    <!-- Détail de l'intervention sélectionnée -->
-    @if (selected(); as rep) {
-      <main class="history-detail">
-        <div class="detail-header">
-          <div>
-            <p><strong>Date :</strong> {{ rep.date_reparation }}</p>
-            <p><strong>Machine :</strong> {{ rep.machine_type }}</p>
-            <p><strong>Technicien :</strong> {{ rep.technicien || '—' }}</p>
-            <p><strong>Notes :</strong> {{ rep.notes || '—' }}</p>
-          </div>
-          <button class="btn btn-delete"
-                  (click)="supprimer(rep.id!)">
-            🗑 Supprimer
+  <div class="layout-right">
+
+    <app-topbar
+      [me]="me()"
+      pageTitle="Historique"
+      (logoutEvt)="logout()"
+    />
+
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <button class="btn-back" (click)="retour()">
+            <span aria-hidden="true">←</span> Retour
           </button>
+          <div>
+            <h2 class="page-title">Historique — {{ numeroSerie() }}</h2>
+            <p class="page-sub">Toutes les interventions enregistrées</p>
+          </div>
         </div>
+        <span class="badge-count">
+          {{ reparations().length }} intervention{{ reparations().length > 1 ? 's' : '' }}
+        </span>
+      </div>
 
-        @if (rep.pieces && rep.pieces.length > 0) {
-          <table class="pieces-table">
-            <thead>
-              <tr>
-                <th>Référence</th>
-                <th>Désignation</th>
-                <th>Quantité</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (p of rep.pieces; track p.ref_piece) {
-                <tr>
-                  <td>{{ p.ref_piece }}</td>
-                  <td>{{ p.designation }}</td>
-                  <td>{{ p.quantite }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+      <!-- Layout deux colonnes -->
+      <div class="history-layout">
+
+        <!-- Liste -->
+        <aside class="history-list">
+          @if (reparations().length === 0) {
+            <div class="empty-state">
+              <span class="empty-icon">📋</span>
+              <p>Aucune intervention trouvée</p>
+            </div>
+          }
+
+          @for (rep of reparations(); track rep.id) {
+            <button
+              class="history-item"
+              [class.active]="selected()?.id === rep.id"
+              (click)="selectionner(rep)"
+              [attr.aria-pressed]="selected()?.id === rep.id"
+              [attr.aria-label]="'Intervention du ' + rep.date_reparation"
+            >
+              <div class="item-date">{{ rep.date_reparation }}</div>
+              <div class="item-tech">{{ rep.technicien || 'Technicien N/A' }}</div>
+              <span class="item-badge">
+                {{ rep.pieces?.length ?? 0 }} pièce{{ (rep.pieces?.length ?? 0) > 1 ? 's' : '' }}
+              </span>
+            </button>
+          }
+        </aside>
+
+        <!-- Détail -->
+        @if (selected(); as rep) {
+          <section class="history-detail" aria-label="Détail de l'intervention">
+
+            <div class="detail-header">
+              <div class="detail-meta">
+                <div class="meta-row">
+                  <span class="meta-label">Date</span>
+                  <span class="meta-value">{{ rep.date_reparation }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Machine</span>
+                  <span class="meta-value">{{ rep.machine_type || '—' }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Technicien</span>
+                  <span class="meta-value">{{ rep.technicien || '—' }}</span>
+                </div>
+                @if (rep.notes) {
+                  <div class="meta-row meta-notes">
+                    <span class="meta-label">Notes</span>
+                    <span class="meta-value">{{ rep.notes }}</span>
+                  </div>
+                }
+              </div>
+
+              <button
+                class="btn-delete"
+                (click)="supprimer(rep.id!)"
+                aria-label="Supprimer cette intervention"
+              >
+                🗑 Supprimer
+              </button>
+            </div>
+
+            @if (rep.pieces && rep.pieces.length > 0) {
+              <div class="pieces-section">
+                <h3 class="pieces-title">🔩 Pièces changées</h3>
+                <div class="table-wrapper">
+                  <table class="pieces-table">
+                    <thead>
+                      <tr>
+                        <th>Référence</th>
+                        <th>Désignation</th>
+                        <th>Quantité</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (p of rep.pieces; track p.ref_piece) {
+                        <tr>
+                          <td class="cell-ref">{{ p.ref_piece }}</td>
+                          <td>{{ p.designation }}</td>
+                          <td class="cell-qty">{{ p.quantite }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            } @else {
+              <div class="no-pieces">
+                <span>Aucune pièce enregistrée pour cette intervention</span>
+              </div>
+            }
+
+          </section>
+        } @else {
+          <div class="detail-placeholder">
+            <span class="placeholder-icon">👈</span>
+            <p>Sélectionnez une intervention pour voir le détail</p>
+          </div>
         }
-      </main>
-    }
+
+      </div>
+
+    </main>
   </div>
 </div>

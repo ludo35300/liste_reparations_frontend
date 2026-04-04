@@ -1,86 +1,176 @@
-<div class="scan-container">
-  <h2>📷 Nouvelle réparation</h2>
+<div class="layout">
 
-  <div class="upload-zone">
-    <label for="fileInput" class="upload-label">
-      📂 Choisir une image de fiche
-    </label>
-    <input id="fileInput" type="file" accept="image/*"
-           (change)="onFileSelected($event)" hidden />
-  </div>
+  <app-sidebar
+    [navItems]="navItems"
+    appTitle="Réparations"
+    appEmoji="🔧"
+  />
 
-  @if (preview()) {
-    <div class="preview-zone">
-      <img [src]="preview()" alt="Aperçu fiche" class="preview-img" />
-      <button class="btn btn-ocr" (click)="analyser()" [disabled]="loading()">
-        {{ loading() ? '⏳ Analyse en cours…' : '🔍 Analyser par OCR' }}
-      </button>
-    </div>
+  <div class="layout-right">
 
-    <div class="form-zone">
-      <h3>✏️ Vérifier et corriger</h3>
+    <app-topbar
+      [me]="me()"
+      pageTitle="Nouvelle réparation"
+      (logoutEvt)="logout()"
+    />
 
-      <div class="form-grid">
-        <label>
-          Numéro de série *
-          <input [(ngModel)]="form.numero_serie" placeholder="ex: SANTOS-40AN-001" />
-        </label>
-        <label>
-          Type de machine
-          <input [(ngModel)]="form.machine_type" placeholder="ex: MOULIN SANTOS 40AN" />
-        </label>
-        <label>
-          Technicien
-          <input [(ngModel)]="form.technicien" placeholder="Nom du technicien" />
-        </label>
-        <label>
-          Date * (JJ/MM/AAAA)
-          <input [(ngModel)]="form.date_reparation" placeholder="ex: 25/03/2026" />
-        </label>
+    <main class="main-content">
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert">⚠️ {{ errorMessage() }}</div>
+      }
+
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">📷 Nouvelle réparation</h2>
+          <p class="page-sub">Importez une fiche pour lancer l'analyse OCR</p>
+        </div>
       </div>
 
-      <label class="full-width">
-        Notes
-        <textarea [(ngModel)]="form.notes" rows="2" placeholder="Remarques…"></textarea>
-      </label>
+      <!-- Upload Zone -->
+      <div class="upload-card">
+        <label for="fileInput" class="upload-zone" [class.has-file]="preview()">
+          @if (!preview()) {
+            <span class="upload-icon">📂</span>
+            <span class="upload-label-text">Choisir une image de fiche</span>
+            <span class="upload-hint">JPG, PNG, WEBP acceptés</span>
+          } @else {
+            <span class="upload-icon">✅</span>
+            <span class="upload-label-text">Image sélectionnée</span>
+            <span class="upload-hint">Cliquer pour changer</span>
+          }
+        </label>
+        <input id="fileInput" type="file" accept="image/*"
+               (change)="onFileSelected($event)" hidden />
+      </div>
 
-      @if (getPieces().length > 0) {
-        <h4>🔩 Pièces détectées</h4>
-        <table class="pieces-table">
-          <thead>
-            <tr>
-              <th>Référence</th>
-              <th>Désignation</th>
-              <th>Quantité</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
-              <tr [class.highlight]="piece.quantite > 0">
-                <td>{{ piece.ref_piece }}</td>
-                <td>{{ piece.designation }}</td>
-                <td>
-                  <input type="number" min="0"
-                         [value]="piece.quantite"
-                         (input)="updateQuantite(i, $any($event.target).value)"
-                         class="qty-input" />
-                </td>
-              </tr>
+      @if (preview()) {
+
+        <!-- Analyse Button -->
+        <div class="action-row">
+          <button class="btn btn-primary" (click)="analyser()" [disabled]="loading()">
+            @if (loading()) {
+              <span class="btn-spinner" aria-hidden="true"></span>
+              Analyse en cours…
+            } @else {
+              🔍 Analyser par OCR
             }
-          </tbody>
-        </table>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <div class="form-card">
+          <h3 class="form-section-title">✏️ Vérifier et corriger</h3>
+
+          <div class="form-grid">
+            <label class="field-label">
+              <span>Numéro de série <span class="required">*</span></span>
+              <input class="field-input" [(ngModel)]="form.numero_serie"
+                     placeholder="ex: SANTOS-40AN-001" />
+            </label>
+            <label class="field-label">
+              <span>Type de machine</span>
+              <input class="field-input" [(ngModel)]="form.machine_type"
+                     placeholder="ex: MOULIN SANTOS 40AN" />
+            </label>
+            <label class="field-label">
+              <span>Technicien</span>
+              <input class="field-input" [(ngModel)]="form.technicien"
+                     placeholder="Nom du technicien" />
+            </label>
+            <label class="field-label">
+              <span>Date <span class="required">*</span></span>
+              <input class="field-input" [(ngModel)]="form.date_reparation"
+                     placeholder="JJ/MM/AAAA" />
+            </label>
+          </div>
+
+          <label class="field-label full-width">
+            <span>Notes</span>
+            <textarea class="field-input field-textarea"
+                      [(ngModel)]="form.notes" rows="3"
+                      placeholder="Remarques, observations…"></textarea>
+          </label>
+
+          @if (getPieces().length > 0) {
+            <div class="pieces-section">
+
+              <!-- Avertissement nouvelles pièces -->
+              @if (avertissementActif()) {
+                <div class="alert-warning" role="alert">
+                  <span class="alert-warning-icon">⚠️</span>
+                  <div class="alert-warning-body">
+                    <strong>Nouvelles pièces détectées</strong>
+                    <span>Ces références n'existent pas encore en base. Vérifiez chaque pièce avant de valider.</span>
+                  </div>
+                </div>
+              }
+
+              <h4 class="form-section-title">🔩 Pièces détectées</h4>
+
+              <div class="table-wrapper">
+                <table class="pieces-table">
+                  <thead>
+                    <tr>
+                      <th>Référence</th>
+                      <th>Désignation</th>
+                      <th>Quantité</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
+                      <tr [class.row-highlight]="piece.quantite > 0"
+                          [class.row-new]="isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)"
+                          [class.row-validated]="isNouvelle(piece.ref_piece) && isValidee(piece.ref_piece)">
+                        <td>
+                          <span class="cell-ref">{{ piece.ref_piece }}</span>
+                          @if (isNouvelle(piece.ref_piece)) {
+                            <span class="badge-new">Nouvelle</span>
+                          }
+                        </td>
+                        <td>{{ piece.designation }}</td>
+                        <td>
+                          <input type="number" min="0"
+                                [value]="piece.quantite"
+                                (input)="updateQuantite(i, $any($event.target).value)"
+                                class="qty-input" />
+                        </td>
+                        <td class="cell-status">
+                          @if (isNouvelle(piece.ref_piece)) {
+                            @if (!isValidee(piece.ref_piece)) {
+                              <button class="btn-validate" (click)="validerPiece(piece.ref_piece)"
+                                      title="Confirmer cette pièce">
+                                ✔ Valider
+                              </button>
+                            } @else {
+                              <span class="status-ok">✔ Vérifiée</span>
+                            }
+                          } @else {
+                            <span class="status-known">En base</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
+          @if (saved()) {
+            <div class="alert alert-success" role="status">✅ Réparation enregistrée !</div>
+          }
+
+          <div class="form-footer">
+            <button class="btn btn-save" (click)="enregistrer()">
+              💾 Enregistrer la réparation
+            </button>
+          </div>
+        </div>
+
       }
 
-      @if (error()) {
-        <p class="msg error">⚠️ {{ error() }}</p>
-      }
-      @if (saved()) {
-        <p class="msg success">✅ Réparation enregistrée !</p>
-      }
-
-      <button class="btn btn-save" (click)="enregistrer()">
-        💾 Enregistrer la réparation
-      </button>
-    </div>
-  }
+    </main>
+  </div>
 </div>

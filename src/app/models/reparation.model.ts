@@ -3,6 +3,7 @@ export interface PieceChangee {
   ref_piece: string;
   designation: string;
   quantite: number;
+  is_new?:     boolean;
 }
 
 export interface Reparation {
