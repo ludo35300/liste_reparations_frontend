@@ -126,7 +126,6 @@
                     class="brand-logo-img"
                     loading="lazy" />
                 } @else {
-                  <i class="fas fa-industry brand-card-icon"></i>
                   <span class="brand-card-img-label">{{ group.brand }}</span>
                 
 
@@ -160,15 +159,18 @@
               <!-- Liste des modèles -->
               <ul class="brand-model-list">
                 @for (machine of group.machines; track machine.id) {
-                  <li class="brand-model-item">
+                  <li class="brand-model-item"
+                      (click)="openPiecesModal(machine)"
+                      style="cursor: pointer"
+                      [attr.aria-label]="'Voir les pièces de ' + machine.label" >
                     <span class="brand-model-name">{{ machine.modele }}</span>
                     <div class="brand-model-right">
                       <span class="brand-model-type">{{ machine.type_machine }}</span>
-                      <button class="btn-delete-sm"
+                      <button class="btn btn-danger"
                               (click)="deleteMachine(machine, $event)"
                               title="Supprimer"
                               [attr.aria-label]="'Supprimer ' + machine.label">
-                        <i class="fas fa-trash-alt"></i>
+                        <fa-icon [icon]="faTrash"></fa-icon>
                       </button>
                     </div>
                   </li>
@@ -195,4 +197,9 @@
 
     </main>
   </div>
+  <app-pieces-machine
+    [machine]="selectedMachine()"
+    (closeEvt)="closePiecesModal()"
+  />
+
 </div>
