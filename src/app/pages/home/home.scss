@@ -69,57 +69,85 @@
   margin: 0 0 1rem;
 }
 
-/* ─── Action Cards ───────────────────────────────────── */
+/* ─── Cards Grid : 3 colonnes ─────────────────────────── */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 992px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 576px) { grid-template-columns: 1fr; }
 }
 
+/* ─── Card ────────────────────────────────────────────── */
 .dash-card {
   background: var(--surface);
-  border-radius: var(--radius);
-  padding: 1.4rem 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition), transform var(--transition);
   text-decoration: none;
   color: inherit;
 
   &:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-    .card-arrow { transform: translateX(4px); color: var(--card-color, var(--primary)); }
+    transform: translateY(-4px);
+
+    .card-read-more { color: var(--card-color, var(--primary)); }
+    .card-big-icon  { transform: scale(1.1); }
   }
 
-  &:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
 }
 
-.card-icon-wrap {
-  font-size: 1.75rem;
-  width: 54px; height: 54px;
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--card-color, var(--primary)) 13%, transparent);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+/* ─── Zone image / illustration ───────────────────────── */
+.card-img-top {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
 }
 
-.card-body {
+.card-big-icon {
+  font-size: 4rem;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+  display: block;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.08));
+}
+
+/* ─── Corps ───────────────────────────────────────────── */
+.card-content {
+  padding: 1.1rem 1.25rem .75rem;
   flex: 1;
-  h3 { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin: 0 0 0.2rem; }
-  p  { font-size: 0.75rem; color: var(--text-muted); margin: 0; line-height: 1.45; }
 }
 
-.card-arrow {
-  margin-left: auto; font-size: 1.1rem;
-  color: var(--text-muted);
-  transition: transform var(--transition), color var(--transition);
-  flex-shrink: 0;
+.card-title {
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 .4rem;
+  line-height: 1.3;
 }
+
+.card-desc {
+  font-size: .77rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+
 
 /* ─── Loading / Alerts ───────────────────────────────── */
 .state-loading {

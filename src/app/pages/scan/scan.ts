@@ -5,6 +5,10 @@ import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faGrip, faQrcode, faMagnifyingGlass, faChartBar,
+  faFolderOpen,
+  faImage,
+  faPen,
+  faFlagCheckered,
 } from '@fortawesome/free-solid-svg-icons';
 import { firstValueFrom } from 'rxjs';
 import { ReparationService } from '../../services/reparation.service';
@@ -12,6 +16,7 @@ import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Reparation, PieceChangee, OcrResult } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
+import { NavService } from '../../core/nav.service';
 
 type ScanState = 'idle' | 'loading-image' | 'analysing' | 'success' | 'ocr-failed';
 
@@ -29,17 +34,22 @@ export class Scan implements OnInit {
   private readonly auth    = inject(AuthService);
   private readonly router  = inject(Router);
 
+  protected readonly navItems = inject(NavService).navItems; // Injection du menu partagé
+
   // ── Layout ────────────────────────────────────────────────
   public readonly me           = signal<MeResponse | null>(null);
   public readonly errorMessage = signal<string | null>(null);
 
-  public readonly navItems = [
-    { label: 'Dashboard',    route: '/home',    icon: faGrip },
-    { label: 'Scanner',      route: '/scan',    icon: faQrcode },
-    { label: 'Rechercher',   route: '/search',  icon: faMagnifyingGlass },
-    { label: 'Statistiques', route: '/history', icon: faChartBar },
-  ];
+  // ── Icones ─────────────────────────────────────────────
+  public readonly faFolderOpen             = faFolderOpen;
+  public readonly faMagnifyingGlass        = faMagnifyingGlass;
+  public readonly faPen                    = faPen
+  public readonly faImage                  = faImage;
+  public readonly faFlagCheckered          = faFlagCheckered;
 
+
+  
+  
   // ── Stepper ───────────────────────────────────────────────
   public readonly currentStep = signal<number>(1);
 

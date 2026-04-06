@@ -1,9 +1,9 @@
+<!-- Niveau 1 : se cache au scroll -->
 <div class="layout">
-
   <div class="layout-right">
     <app-topbar
       [me]="me()"
-      pageTitle="Tableau de bord"
+      pageTitle="Rechercher une machine par numéro de série"
       [navItems]="navItems"
       (logoutEvt)="logout()"
     />
@@ -40,7 +40,7 @@
             @if (loading()) {
               <span class="btn-spinner" aria-hidden="true"></span>
             } @else {
-              Rechercher
+              <i class="fas fa-search me-1"></i> Rechercher
             }
           </button>
         </div>
@@ -65,7 +65,6 @@
             <h3 class="results-title">{{ resultats()[0].numero_serie }}</h3>
             <span class="results-badge">{{ resultats().length }} intervention(s)</span>
           </div>
-
           <div class="table-wrapper">
             <table class="results-table">
               <thead>
@@ -100,6 +99,8 @@
           </div>
         </div>
       }
+
+      
 
     </main>
   </div>

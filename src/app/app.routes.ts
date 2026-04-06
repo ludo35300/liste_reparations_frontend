@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authUiRoutes } from './auth-lib/auth-ui.routes';
 import { Home } from './pages/home/home';
 import { authGuard } from './auth-lib/guards/auth.guard';
+import { Machines } from './pages/machines/machines';
 
 export const routes: Routes = [
   { path: 'auth', children: authUiRoutes },
@@ -36,7 +37,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/stats/stats').then(m => m.StatsPage)
   },
-
+  { path: 'machines', 
+    title: 'Machines', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/machines/machines').then(m => m.Machines)
+  },
   { path: '',   redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' },
 ];

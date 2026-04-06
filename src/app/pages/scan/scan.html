@@ -1,11 +1,9 @@
 <div class="layout">
-
-
   <div class="layout-right">
 
     <app-topbar
       [me]="me()"
-      pageTitle="Tableau de bord"
+      pageTitle="Scanner une fiche de réparation"
       [navItems]="navItems"
       (logoutEvt)="logout()"
     />
@@ -20,7 +18,7 @@
           <div class="stepper-step" [class.active]="currentStep() === 1" [class.done]="currentStep() > 1">
             <div class="stepper-bubble">
               @if (currentStep() > 1) { <span class="stepper-check">✓</span> }
-              @else { <span class="stepper-icon">📂</span> }
+              @else { <span class="stepper-icon"><fa-icon [icon]="faFolderOpen"></fa-icon></span> }
             </div>
             <span class="stepper-label">Import</span>
           </div>
@@ -35,7 +33,7 @@
               } @else if (currentStep() > 2) {
                 <span class="stepper-check">✓</span>
               } @else {
-                <span class="stepper-icon">🔍</span>
+                <span class="stepper-icon"><fa-icon [icon]="faMagnifyingGlass"></fa-icon></span>
               }
             </div>
             <span class="stepper-label">Analyse</span>
@@ -47,7 +45,7 @@
           <div class="stepper-step" [class.active]="currentStep() === 3" [class.done]="currentStep() > 3">
             <div class="stepper-bubble">
               @if (currentStep() > 3) { <span class="stepper-check">✓</span> }
-              @else { <span class="stepper-icon">✏️</span> }
+              @else { <span class="stepper-icon"><fa-icon [icon]="faPen"></fa-icon></span> }
             </div>
             <span class="stepper-label">Formulaire</span>
           </div>
@@ -58,7 +56,7 @@
           <div class="stepper-step" [class.active]="currentStep() === 4">
             <div class="stepper-bubble">
               <span class="stepper-icon">
-                @if (saved()) { ✅ } @else if (currentStep() === 4 && error()) { ❌ } @else { 🏁 }
+                @if (saved()) { ✅ } @else if (currentStep() === 4 && error()) { ❌ } @else { <fa-icon [icon]="faFlagCheckered"></fa-icon> }
               </span>
             </div>
             <span class="stepper-label">Résultat</span>

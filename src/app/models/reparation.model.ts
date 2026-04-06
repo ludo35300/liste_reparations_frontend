@@ -38,3 +38,24 @@ export interface Stats {
     total: number;
   }[];
 }
+
+export interface MachineTypeRef {
+  id:           number;
+  marque:       string;
+  modele:       string;
+  type_machine: string;
+  url_logo?:    string;
+  label:        string;   // calculé par le back : "MOULIN A CAFE SANTOS 40AN"
+}
+
+export interface BrandGroup {
+  brand: string;
+  machines: MachineTypeRef[];
+  expanded: boolean;
+}
+
+export interface PieceRef {
+  id:          number;
+  ref_piece:   string;
+  designation: string;
+}

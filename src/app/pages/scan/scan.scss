@@ -46,21 +46,20 @@
 
 /* ─── STEPPER ─────────────────────────────────────────────── */
 .stepper {
-  margin-bottom: 2rem;
-  padding: 1.25rem 1.75rem;
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+  padding: 0 1rem;
 }
 
 .stepper-track {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
 }
-
-.stepper-step {
+/*.stepper-step {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -122,16 +121,73 @@
     }
     .stepper-label { color: #4caf29; }
   }
+}*/
+/* ── Étape (bulle + label) ── */
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .625rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
+/* ── Bulle ── */
+.stepper-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;              /* carré arrondi comme dans l'image */
+  background: #eef0f8;
+  border: 1.5px solid #dde1f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  color: #b0b8d0;
+  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+
+  /* Icône FontAwesome à l'intérieur */
+  fa-icon, i {
+    font-size: .9rem;
+    color: #b0b8d0;
+    transition: color .25s ease;
+  }
+}
+
+/* ── Label sous la bulle ── */
+.stepper-label {
+  font-size: .72rem;
+  font-weight: 500;
+  color: #b0b8d0;
+  white-space: nowrap;
+  transition: color .25s ease;
+  letter-spacing: .01em;
+}
+
+/* ── Ligne de connexion ── */
 .stepper-line {
   flex: 1;
   height: 2px;
-  background: var(--border);
-  margin: 0 0.5rem;
-  margin-bottom: 1.2rem;
-  transition: background 0.4s ease;
-  &.done { background: var(--success); }
+  background: #dde1f0;
+  align-self: flex-start;
+  margin-top: 22px;                 /* centré verticalement sur les bulles */
+  min-width: 40px;
+  transition: background .3s ease;
+  position: relative;
+  z-index: 0;
+
+  /* Progression animée */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: #696cff;
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  &.done::after { width: 100%; }
 }
 
 /* ─── STEP PANEL ──────────────────────────────────────────── */

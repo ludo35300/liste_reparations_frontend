@@ -14,6 +14,7 @@ import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Reparation } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
+import { NavService } from '../../core/nav.service';
 
 @Component({
   selector: 'app-history',
@@ -29,17 +30,14 @@ export class History implements OnInit {
   private readonly auth    = inject(AuthService);
   private readonly route   = inject(ActivatedRoute);
   private readonly router  = inject(Router);
+  
+  protected readonly navItems = inject(NavService).navItems; // Injection du menu partagé
 
   // ── Layout partagé (Sidebar + Topbar) ─────────────────────
   public readonly me           = signal<MeResponse | null>(null);
   public readonly errorMessage = signal<string | null>(null);
 
-  public readonly navItems = [
-    { label: 'Dashboard',    route: '/home',   icon: faGrip },
-    { label: 'Scanner',      route: '/scan',   icon: faQrcode },
-    { label: 'Rechercher',   route: '/search', icon: faMagnifyingGlass },
-    { label: 'Statistiques', route: '/stats',  icon: faChartBar },
-  ];
+  
 
   // ── Signals métier (inchangés) ─────────────────────────────
   public readonly reparations = signal<Reparation[]>([]);
