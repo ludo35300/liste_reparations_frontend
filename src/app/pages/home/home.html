@@ -1,16 +1,10 @@
 <div class="layout">
-
-  <app-sidebar
-    [navItems]="navItems"
-    appTitle="Réparations"
-    appEmoji="🔧"
-  />
-
   <div class="layout-right">
 
     <app-topbar
       [me]="me()"
       pageTitle="Tableau de bord"
+      [navItems]="navItems"
       (logoutEvt)="logout()"
     />
 
@@ -18,7 +12,7 @@
 
       @if (loading()) {
         <div class="state-loading" role="status" aria-live="polite">
-          <div class="spinner" aria-hidden="true"></div>
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           <span>Chargement...</span>
         </div>
       }
@@ -36,35 +30,27 @@
           </div>
         </div>
 
-        <!-- KPI Row 
-        <div class="kpi-row">
-          @for (kpi of kpiCards; track kpi.label) {
-            <div class="kpi-card" [style.--kpi-color]="kpi.color">
-              <div class="kpi-icon">{{ kpi.icon }}</div>
-              <div class="kpi-body">
-                <span class="kpi-value">{{ kpi.value }}</span>
-                <span class="kpi-label">{{ kpi.label }}</span>
-              </div>
-              <span class="kpi-trend" [class.up]="kpi.trendUp" [class.down]="!kpi.trendUp">
-                {{ kpi.trendUp ? '▲' : '▼' }} {{ kpi.trend }}
-              </span>
-            </div>
-          }
-        </div>-->
+        
 
         <!-- Action Cards -->
         <h3 class="section-title">Actions rapides</h3>
         <div class="cards-grid">
           @for (card of dashCards; track card.route) {
             <div class="dash-card" [routerLink]="card.route"
-                 role="button" tabindex="0" [attr.aria-label]="card.title"
-                 [style.--card-color]="card.color">
-              <div class="card-icon-wrap">{{ card.icon }}</div>
-              <div class="card-body">
-                <h3>{{ card.title }}</h3>
-                <p>{{ card.desc }}</p>
+                role="button" tabindex="0"
+                [attr.aria-label]="card.title"
+                [style.--card-color]="card.color">
+
+              <!-- Image / Illustration en haut -->
+              <div class="card-img-top" [style.background]="card.color + '18'">
+                <span class="card-big-icon">{{ card.icon }}</span>
               </div>
-              <span class="card-arrow" aria-hidden="true">→</span>
+
+              <!-- Corps -->
+              <div class="card-content">
+                <h3 class="card-title">{{ card.title }}</h3>
+                <p class="card-desc">{{ card.desc }}</p>
+              </div>
             </div>
           }
         </div>

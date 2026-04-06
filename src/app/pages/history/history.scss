@@ -1,24 +1,28 @@
-/* ─── Variables ───────────────────────────────────────────── */
 :host {
-  --primary:       #696cff;
-  --primary-light: rgba(105, 108, 255, 0.12);
+  /* ✅ Couleurs alignées avec le thème global */
+  --primary:       #4460f1;
+  --primary-light: rgba(68, 96, 241, 0.12);
   --surface:       #ffffff;
-  --bg:            #f4f5fb;
+  --bg:            #f0f2f8;
   --text:          #566a7f;
-  --text-dark:     #32475c;
-  --text-muted:    #a8b8c8;
-  --border:        #eaeaf0;
-  --success:       #71dd37;
-  --danger:        #ff3e1d;
-  --danger-light:  #ffe0db;
-  --radius:        14px;
-  --radius-sm:     10px;
-  --shadow-sm:     0 2px 8px rgba(47, 43, 61, 0.07);
-  --shadow-md:     0 6px 24px rgba(47, 43, 61, 0.13);
+  --text-dark:     #2b2d42;
+  --text-muted:    #8898aa;
+  --border:        #e2e8f0;
+  --success:       #16a34a;
+  --danger:        #dc2626;
+  --danger-light:  #fee2e2;
+  --radius:        12px;
+  --radius-sm:     8px;
+  --shadow-sm:     0 2px 8px rgba(43, 45, 66, 0.07);
+  --shadow-md:     0 6px 24px rgba(43, 45, 66, 0.13);
   --transition:    0.2s ease;
+
+  /* ✅ Sync avec les hauteurs de la topbar */
+  --topbar-top-h:  56px;
+  --navbar-h:      48px;
 }
 
-/* ─── Layout ──────────────────────────────────────────────── */
+/* ─── Layout ─────────────────────────────────────────── */
 .layout {
   display: flex;
   min-height: 100vh;
@@ -30,15 +34,14 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  width: 100%;
 }
 
+/* ✅ padding-top = hauteur topbar-top + navbar */
 .main-content {
   flex: 1;
-  padding: 2rem 2.25rem;
+  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2rem 2rem;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
 }
 
 /* ─── Page Header ────────────────────────────────────────────*/

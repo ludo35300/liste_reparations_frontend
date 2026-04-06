@@ -1,0 +1,198 @@
+<div class="layout">
+  <div class="layout-right">
+
+    <app-topbar
+      [me]="me()"
+      pageTitle="Machines"
+      [navItems]="navItems"
+      (logoutEvt)="logout()"
+    />
+
+    <main class="main-content">
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert">⚠️ {{ errorMessage() }}</div>
+      }
+
+      <!-- En-tête page -->
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Machines</h2>
+          <p class="page-sub">
+            <span class="stat-pill"><i class="fas fa-industry me-1"></i>{{ totalBrands() }} marque{{ totalBrands() > 1 ? 's' : '' }}</span>
+            <span class="stat-pill"><i class="fas fa-mug-hot me-1"></i>{{ totalMachines() }} modèle{{ totalMachines() > 1 ? 's' : '' }}</span>
+          </p>
+        </div>
+        <button class="btn btn-primary" (click)="toggleForm()">
+          @if (showForm()) {
+            <i class="fas fa-times me-1"></i> Annuler
+          } @else {
+            <i class="fas fa-plus me-1"></i> Nouvelle machine
+          }
+        </button>
+      </div>
+
+      <!-- Formulaire ajout -->
+      @if (showForm()) {
+        <div class="form-card">
+          <h3 class="form-card-title">
+            <i class="fas fa-plus-circle me-2"></i>Ajouter une machine
+          </h3>
+
+          <div class="form-row">
+            <label class="field-label">
+              <span>Type <span class="required">*</span></span>
+              <select class="field-input field-select"
+                [ngModel]="formTypeMachine()"
+                (ngModelChange)="formTypeMachine.set($event)">
+                <option value="" disabled selected>Choisir un type...</option>
+                <option value="MACHINE A CAFE">Machine à café</option>
+                <option value="MOULIN A CAFE">Moulin à café</option>
+              </select>
+            </label>
+
+            <label class="field-label">
+              <span>Marque <span class="required">*</span></span>
+              <input class="field-input"
+                     [ngModel]="formMarque()"
+                     (ngModelChange)="formMarque.set($event)"
+                     placeholder="ex: SANTOS"
+                     (keyup.enter)="saveMachine()" />
+            </label>
+            <label class="field-label">
+              <span>Modèle <span class="required">*</span></span>
+              <input class="field-input"
+                     [ngModel]="formModel()"
+                     (ngModelChange)="formModel.set($event)"
+                     placeholder="ex: 40AN"
+                     (keyup.enter)="saveMachine()" />
+            </label>
+          </div>
+
+          <!-- Aperçu du label final -->
+          @if (labelPreview()) {
+            <div class="label-preview">
+              <span class="label-preview-hint">Label enregistré :</span>
+              <span class="label-preview-value">{{ labelPreview() }}</span>
+            </div>
+          }
+
+          @if (formError()) {
+            <p class="field-error">{{ formError() }}</p>
+          }
+
+          <div class="form-actions">
+            <button class="btn btn-outline" (click)="toggleForm()">Annuler</button>
+            <button class="btn btn-primary" (click)="saveMachine()" [disabled]="saving()">
+              @if (saving()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              } @else {
+                <i class="fas fa-save me-1"></i>
+              }
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Skeleton chargement -->
+      @if (loading()) {
+        <div class="brands-grid">
+          @for (i of [1,2,3]; track i) {
+            <div class="skeleton-brand-card">
+              <div class="skeleton skeleton-heading"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Liste par marques -->
+      @if (!loading() && brandGroups().length > 0) {
+        <div class="brands-cards-grid">
+          @for (group of brandGroups(); track group.brand) {
+
+            <div class="brand-card-new">
+
+              <!-- Image de la marque -->
+              <div class="brand-card-img"
+                  [class.has-logo]="group.machines[0]?.url_logo">
+
+                @if (group.machines[0]?.url_logo) {
+                  <img
+                    [src]="group.machines[0].url_logo"
+                    [alt]="group.brand"
+                    class="brand-logo-img"
+                    loading="lazy" />
+                } @else {
+                  <i class="fas fa-industry brand-card-icon"></i>
+                  <span class="brand-card-img-label">{{ group.brand }}</span>
+                
+
+                  <!-- Bouton upload logo au hover 
+                  <label class="logo-upload-btn"
+                        [attr.for]="'logo-' + group.brand"
+                        title="Changer le logo">
+                    @if (uploadingId() === group.machines[0]?.id) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      <i class="fas fa-camera"></i>
+                    }
+                  </label>
+                  <input [id]="'logo-' + group.brand"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                        class="logo-input-hidden"
+                        (change)="onLogoSelected(group.machines[0], $event)" />
+                    -->
+                  }
+              </div>
+
+              <!-- Contenu -->
+              <div class="brand-card-body">
+                <h4 class="brand-card-title">{{ group.brand }}</h4>
+                <p class="brand-card-sub">
+                  {{ group.machines.length }} modèle{{ group.machines.length > 1 ? 's' : '' }} enregistré{{ group.machines.length > 1 ? 's' : '' }}
+                </p>
+              </div>
+
+              <!-- Liste des modèles -->
+              <ul class="brand-model-list">
+                @for (machine of group.machines; track machine.id) {
+                  <li class="brand-model-item">
+                    <span class="brand-model-name">{{ machine.modele }}</span>
+                    <div class="brand-model-right">
+                      <span class="brand-model-type">{{ machine.type_machine }}</span>
+                      <button class="btn-delete-sm"
+                              (click)="deleteMachine(machine, $event)"
+                              title="Supprimer"
+                              [attr.aria-label]="'Supprimer ' + machine.label">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+
+            </div>
+
+          }
+        </div>
+      }
+
+      <!-- État vide -->
+      @if (!loading() && brandGroups().length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-industry empty-icon-fa"></i>
+          <h3>Aucune machine enregistrée</h3>
+          <p>Ajoutez votre première machine pour commencer.</p>
+          <button class="btn btn-primary" (click)="toggleForm()">
+            <i class="fas fa-plus me-1"></i> Ajouter une machine
+          </button>
+        </div>
+      }
+
+    </main>
+  </div>
+</div>
