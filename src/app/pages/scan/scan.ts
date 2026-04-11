@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faGrip, faQrcode, faMagnifyingGlass, faChartBar,
+  faMagnifyingGlass,
   faFolderOpen,
   faImage,
   faPen,
@@ -17,6 +17,9 @@ import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Reparation, PieceChangee, OcrResult } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
+import { forkJoin, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
+import { ReferenceService } from '../../services/references.services';
 
 type ScanState = 'idle' | 'loading-image' | 'analysing' | 'success' | 'ocr-failed';
 
@@ -33,6 +36,7 @@ export class Scan implements OnInit {
   private readonly service = inject(ReparationService);
   private readonly auth    = inject(AuthService);
   private readonly router  = inject(Router);
+  private readonly refService = inject(ReferenceService);
 
   protected readonly navItems = inject(NavService).navItems; // Injection du menu partagé
 
@@ -272,7 +276,25 @@ export class Scan implements OnInit {
   public isValidee(ref: string):  boolean { return this.piecesValidees().has(ref); }
 
   public validerPiece(ref: string): void {
+    // Marque comme validée visuellement immédiatement
     this.piecesValidees.update(set => new Set([...set, ref]));
+
+    // Cherche la machine puis associe la pièce
+    this.refService.getMachineByLabel(this.form.machine_type).pipe(
+      switchMap(machine => {
+        if (!machine) return of(null);
+        return this.refService.getAllPieces().pipe(
+          switchMap(pieces => {
+            const piece = pieces.find(p => p.ref_piece === ref);
+            if (!piece) return of(null);
+            return this.refService.addPieceToMachine(machine.id, piece.id).pipe(
+              catchError(() => of(null)) // doublon ignoré silencieusement
+            );
+          })
+        );
+      }),
+      catchError(() => of(null))
+    ).subscribe();
   }
 
   // ── Enregistrement ────────────────────────────────────────
@@ -286,10 +308,12 @@ export class Scan implements OnInit {
       return;
     }
 
+
     const payload: Reparation = {
       ...this.form,
       pieces: this.form.pieces?.filter(p => p.quantite > 0) ?? [],
     };
+
 
     this.service.enregistrer(payload).subscribe({
       next: () => {

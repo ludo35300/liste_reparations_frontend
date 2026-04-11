@@ -1,3 +1,22 @@
 :host {
     display: block;
 }
+*:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+
+/* Layout global */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.layout-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Quand topbar-top cachée, la navbar monte */
+body.topbar-hidden .topbar-nav { top: 0 !important; }

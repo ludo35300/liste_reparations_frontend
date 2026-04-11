@@ -10,12 +10,14 @@ import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
 import {  ReferenceService } from '../../services/references.services';
 import { BrandGroup, MachineTypeRef } from '../../models/reparation.model';
+import { PiecesMachine } from '../../components/modals/pieces-machine/pieces-machine';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
   selector: 'app-machines',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar, PiecesMachine],
   templateUrl: './machines.html',
   styleUrl: './machines.scss',
 })
@@ -33,6 +35,8 @@ export class Machines implements OnInit {
   public readonly loading       = signal(false);
   public readonly brandGroups   = signal<BrandGroup[]>([]);
 
+  public readonly selectedMachine = signal<MachineTypeRef | null>(null);
+
   // ── Formulaire ajout ───────────────────────────────────────
   public readonly showForm      = signal(false);
   public readonly formTypeMachine  = signal('');
@@ -41,13 +45,15 @@ export class Machines implements OnInit {
   public readonly saving        = signal(false);
   public readonly formError     = signal<string | null>(null);
 
+  public readonly faTrash = faTrash;
+
   // ── Computed ───────────────────────────────────────────────
   public readonly totalMachines = computed(() =>
     this.brandGroups().reduce((acc, g) => acc + g.machines.length, 0)
   );
 
   public readonly totalBrands = computed(() => this.brandGroups().length);
-  
+
 public readonly uploadingId = signal<number | null>(null);
 
 public onLogoSelected(machine: MachineTypeRef, event: Event): void {
@@ -175,5 +181,13 @@ public onLogoSelected(machine: MachineTypeRef, event: Event): void {
   public async logout(): Promise<void> {
     await firstValueFrom(this.auth.logoutHttp());
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
+  }
+
+  public openPiecesModal(machine: MachineTypeRef): void {
+    this.selectedMachine.set(machine);
+  }
+
+  public closePiecesModal(): void {
+    this.selectedMachine.set(null);
   }
 }

@@ -1,0 +1,104 @@
+@if (machine()) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true"
+       [attr.aria-label]="'Pièces de ' + machine()!.label">
+
+    <div class="modal-box">
+
+      <!-- En-tête -->
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <i class="fas fa-cogs modal-title-icon"></i>
+          <div>
+            <h3 class="modal-title">{{ machine()!.label }}</h3>
+            <span class="modal-subtitle">Pièces associées</span>
+          </div>
+        </div>
+        <div class="modal-header-actions">
+            <button class="btn btn-primary btn-sm" (click)="toggleAddForm()" title="Associer une pièce">
+            @if (showAddForm()) {
+                <fa-icon [icon]="faXmark"></fa-icon> Annuler
+            } @else {
+                <fa-icon [icon]="faPlus"></fa-icon> Ajouter
+            }
+            </button>
+            <button class="modal-close-btn" (click)="close()" aria-label="Fermer">
+                <fa-icon [icon]="faXmark"></fa-icon>
+            </button>
+        </div>
+      </div>
+
+      <!-- Contenu -->
+      <div class="modal-body">
+
+        @if (loading()) {
+          <div class="modal-loading">
+            <span class="spinner-border spinner-border-sm me-2"></span>Chargement...
+          </div>
+        }
+
+        @if (error()) {
+          <p class="modal-error"><fa-icon [icon]="faWarning"></fa-icon> {{ error() }}</p>
+        }
+        <!-- Formulaire ajout pièce -->
+        @if (showAddForm()) {
+        <div class="add-piece-form">
+            <select class="field-input field-select"
+                    [ngModel]="selectedPieceId()"
+                    (ngModelChange)="selectedPieceId.set($event ? +$event : null)">
+            <option [value]="null" disabled selected>Choisir une pièce...</option>
+            @for (piece of allPieces(); track piece.id) {
+                <option [value]="piece.id">{{ piece.ref_piece }} — {{ piece.designation }}</option>
+            }
+            </select>
+            @if (addError()) {
+            <p class="field-error">{{ addError() }}</p>
+            }
+            <button class="btn btn-primary btn-sm" (click)="addPiece()" [disabled]="adding()">
+            @if (adding()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+            } @else {
+                <i class="fas fa-link me-1"></i>
+            }
+            Associer
+            </button>
+        </div>
+        }
+
+        @if (!loading() && !error() && pieces().length === 0) {
+          <div class="modal-empty">
+            <i class="fas fa-box-open modal-empty-icon"></i>
+            <p>Aucune pièce associée à cette machine.</p>
+          </div>
+        }
+
+        @if (!loading() && pieces().length > 0) {
+          <ul class="pieces-list">
+            @for (piece of pieces(); track piece.id) {
+              <li class="piece-item">
+                <span class="piece-ref">{{ piece.ref_piece }}</span>
+                <span class="piece-designation">{{ piece.designation }}</span>
+                <button class="btn btn-danger ms-auto"
+                    (click)="removePiece(piece.id)"
+                    title="Retirer"
+                    [attr.aria-label]="'Retirer ' + piece.ref_piece">
+                    <fa-icon [icon]="faXmark"></fa-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+
+      </div>
+
+      <!-- Pied -->
+      <div class="modal-footer">
+        <span class="pieces-count">
+          {{ pieces().length }} pièce{{ pieces().length > 1 ? 's' : '' }}
+        </span>
+
+        <button class="btn btn-primary" (click)="close()">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+}

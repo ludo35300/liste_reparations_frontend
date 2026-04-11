@@ -38,37 +38,23 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+
 html, body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--text);
-  background-color: var(--bg);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    font-family: 'Inter','Roboto', sans-serif;
+    font-weight: 400;
+    height: 100%;
+    line-height: 1.7;
+    width: 100%;
+    -webkit-font-smoothing: antialiased; /* Rend la police plus nette sur Mac/iOS */
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--text);
+    background-color: #fff;
 }
 
-*:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
 
-/* Layout global */
-.layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg);
-}
-
-.layout-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
-/* Quand topbar-top cachée, la navbar monte */
-body.topbar-hidden .topbar-nav { top: 0 !important; }
 
 /* =========================================================
    Auth Pages
@@ -91,10 +77,10 @@ body.topbar-hidden .topbar-nav { top: 0 !important; }
   form { margin-top: 10px; }
 
   .rocket-img {
-    position: absolute; z-index: -1; top: 50%; right: 50px;
+    position: absolute; z-index: -1; top: -250px; right: 50px;
     transform: translateY(-50%);
     animation: float 6s ease-in-out infinite;
-    width: 50%;
+    width: 70%;
     filter: drop-shadow(0 30px 40px rgba(13, 110, 253, 0.2));
     pointer-events: none;
   }
@@ -167,7 +153,7 @@ body.topbar-hidden .topbar-nav { top: 0 !important; }
   }
 
   @media (max-width: 991px) {
-    height: auto; padding: 50px 0; overflow-y: auto;
+    height: auto; padding: 20px 0; overflow-y: auto;
     .rocket-img { display: none; }
     .shape-bg   { width: 100%; height: 400px; }
     .col-lg-8   { text-align: center; margin-bottom: 40px; }
