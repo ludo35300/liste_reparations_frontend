@@ -75,6 +75,43 @@
     border: 1px solid #ffb3a8;
   }
 }
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-card-count {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+
+  &.status-done    { background: #d4efcc; color: #2e6010; }
+  &.status-pending { background: #fef3c7; color: #92400e; }
+  &.status-wait    { background: #e0e7ff; color: #3730a3; }
+}
+
+.cell-notes {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.empty-msg {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-muted, #6b7280);
+}
 
 // ── KPI Grid ──────────────────────────────────────────────────
 .kpi-grid {

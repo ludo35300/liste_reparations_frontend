@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { ReparationService } from '../../services/reparation.service';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
-import { Stats } from '../../models/reparation.model';
+import { Reparation, Stats } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
 
@@ -29,7 +29,6 @@ export class StatsPage implements OnInit {
   // ── Layout partagé ─────────────────────────────────────────
   public readonly me           = signal<MeResponse | null>(null);
   public readonly errorMessage = signal<string | null>(null);
-
   
 
   // ── Signal métier ──────────────────────────────────────────
@@ -50,6 +49,10 @@ export class StatsPage implements OnInit {
       next: (data) => this.stats.set(data),
       error: () => this.errorMessage.set('Impossible de charger les statistiques.'),
     });
+  }
+
+  public voirDetail(rep: Reparation): void {
+    this.router.navigate(['/history', rep.numero_serie]);
   }
 
   // ── Logout ─────────────────────────────────────────────────

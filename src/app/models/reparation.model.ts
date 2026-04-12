@@ -37,6 +37,7 @@ export interface Stats {
     designation: string;
     total: number;
   }[];
+  reparations: Reparation[]; 
 }
 
 export interface MachineTypeRef {
