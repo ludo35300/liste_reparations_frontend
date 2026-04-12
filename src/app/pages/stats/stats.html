@@ -39,6 +39,50 @@
           </div>
         </div>
 
+        <!-- Liste des réparations -->
+        <div class="table-card mb-3">
+          <div class="table-card-header">
+            <h3 class="table-card-title">Toutes les réparations</h3>
+            <span class="table-card-count">{{ s.reparations.length }} au total</span>
+          </div>
+
+          @if (s.reparations.length > 0) {
+            <div class="table-wrapper">
+              <table class="stats-table">
+                <thead>
+                  <tr>
+                    <th class="col-rank">#</th>
+                    <th>N° Série</th>
+                    <th>Type machine</th>
+                    <th>Date</th>
+                    <th>Technicien</th>
+                    <th>Pièces</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of s.reparations; track r.id; let i = $index) {
+                    <tr (click)="voirDetail(r)" class="row-clickable">
+                      <td class="col-rank">{{ i + 1 }}</td>
+                      <td class="cell-ref">{{ r.numero_serie }}</td>
+                      <td>{{ r.machine_type }}</td>
+                      <td class="cell-date">{{ r.date_reparation }}</td>
+                      <td>{{ r.technicien ?? '—' }}</td>
+                      <td>
+                        <span class="pieces-count">
+                          {{ r.pieces?.length ?? 0 }}
+                        </span>
+                      </td>
+                      <td class="cell-notes">{{ r.notes ?? '—' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p class="empty-msg">Aucune réparation enregistrée.</p>
+          }
+        </div>
         <!-- Top pièces -->
         <div class="table-card">
           <div class="table-card-header">
@@ -75,6 +119,8 @@
             </table>
           </div>
         </div>
+
+        
 
       } @else if (!errorMessage()) {
         <!-- Skeleton loading -->
