@@ -7,10 +7,10 @@ import { firstValueFrom } from 'rxjs';
 import { ReparationService } from '../../services/reparation.service';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
-import { BrandGroup, MachineTypeRef, Reparation } from '../../models/reparation.model';
+import { BrandGroup, MachineTypeRef, Reparation, SearchResult } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-search',
@@ -25,24 +25,27 @@ export class Search implements OnInit {
   private readonly service = inject(ReparationService);
   private readonly auth    = inject(AuthService);
   private readonly router  = inject(Router);
-
-  protected readonly navItems = inject(NavService).navItems; // Injection du menu partagé
-
+  protected readonly navItems = inject(NavService).navItems; 
   // ── Layout partagé ─────────────────────────────────────────
   public readonly me           = signal<MeResponse | null>(null);
   public readonly errorMessage = signal<string | null>(null);
-
   // ── Signals métier (inchangés) ─────────────────────────────
   public readonly query     = signal('');
-  public readonly resultats = signal<Reparation[]>([]);
   public readonly searched  = signal(false);
   public readonly loading   = signal(false);
+  // Résultat enrichi unique (le nouvel endpoint retourne 1 objet, pas un tableau)
+  public readonly searchResult = signal<SearchResult | null>(null);
 
   // ── Machines groupées par marque ──────────────────────────
   public readonly brandGroups  = signal<BrandGroup[]>([]);
   public readonly loadingBrands = signal(false);
-
   public readonly faChevronDown = faChevronDown; // Icône pour l'accordéon
+  public readonly faBookOpen = faBookOpen; // Icône pour le manuel d'utilisation
+
+  // Raccourcis calculés pour le template
+  public readonly resultats = computed(() => this.searchResult()?.reparations ?? []);
+  public readonly machineInfo = computed(() => this.searchResult()?.machine_info ?? null);
+  public readonly specsEntries = computed(() => Object.entries(this.machineInfo()?.specs ?? {}));
 
   // ── Lifecycle ──────────────────────────────────────────────
   ngOnInit(): void {
@@ -50,9 +53,7 @@ export class Search implements OnInit {
       try {
         const me = await firstValueFrom(this.auth.getMeHttp());
         this.me.set(me);
-      } catch {
-        // Silencieux
-      }
+      } catch { /* silencieux */ }
     })();
     this.loadBrands();
   }
@@ -106,13 +107,18 @@ export class Search implements OnInit {
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
 
-  // ── Actions métier (inchangées) ────────────────────────────
+  // ── Recherche enrichie ─────────────────────────────────────
   public rechercher(): void {
-    if (!this.query().trim()) return;
+    const q = this.query().trim();
+    if (!q) return;
+
     this.loading.set(true);
-    this.service.historique(this.query()).subscribe({
+    this.errorMessage.set(null);
+    this.searchResult.set(null);
+
+    this.service.search(q).subscribe({
       next: (data) => {
-        this.resultats.set(data);
+        this.searchResult.set(data);
         this.searched.set(true);
         this.loading.set(false);
       },
@@ -129,5 +135,9 @@ export class Search implements OnInit {
 
   public nouvelleReparation(): void {
     this.router.navigate(['/scan']);
+  }
+
+  public ouvrirVueEclatee(url: string): void {
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 }

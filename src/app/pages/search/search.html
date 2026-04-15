@@ -1,4 +1,3 @@
-<!-- Niveau 1 : se cache au scroll -->
 <div class="layout">
   <div class="layout-right">
     <app-topbar
@@ -47,7 +46,7 @@
       </div>
 
       <!-- Aucun résultat -->
-      @if (searched() && resultats().length === 0) {
+      @if (searched() && !searchResult()?.found && !loading()) {
         <div class="empty-state">
           <div class="empty-icon">🔎</div>
           <h3>Aucune réparation trouvée</h3>
@@ -58,50 +57,111 @@
         </div>
       }
 
-      <!-- Résultats -->
-      @if (resultats().length > 0) {
-        <div class="results-card">
-          <div class="results-header">
-            <h3 class="results-title">{{ resultats()[0].numero_serie }}</h3>
-            <span class="results-badge">{{ resultats().length }} intervention(s)</span>
-          </div>
-          <div class="table-wrapper">
-            <table class="results-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Machine</th>
-                  <th>Technicien</th>
-                  <th>Pièces</th>
-                  <th>Notes</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (rep of resultats(); track rep.id) {
-                  <tr (click)="voirDetail(rep)" class="row-clickable">
-                    <td class="cell-date">{{ rep.date_reparation }}</td>
-                    <td>{{ rep.machine_type }}</td>
-                    <td>{{ rep.technicien || '—' }}</td>
-                    <td>
-                      <span class="badge-pieces">
-                        {{ rep.pieces?.length ?? 0 }} pièce(s)
-                      </span>
-                    </td>
-                    <td class="cell-notes">{{ rep.notes || '—' }}</td>
-                    <td class="cell-action">
-                      <span class="icon-detail" aria-hidden="true">→</span>
-                    </td>
+      @if (searchResult()?.found) {
+
+        <div class="results-layout">
+
+          <!-- ── Colonne gauche 2/3 : tableau historique ───────── -->
+          <div class="results-card">
+            <div class="results-header">
+              <h3 class="results-title">{{ searchResult()!.numero_serie }}</h3>
+              <span class="results-badge">
+                {{ searchResult()!.nombre_reparations }} intervention(s)
+              </span>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Machine</th>
+                    <th>Technicien</th>
+                    <th>Pièces</th>
+                    <th>Notes</th>
+                    <th></th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (rep of resultats(); track rep.id) {
+                    <tr (click)="voirDetail(rep)" class="row-clickable">
+                      <td class="cell-date">{{ rep.date_reparation }}</td>
+                      <td>{{ rep.machine_type }}</td>
+                      <td>{{ rep.technicien || '—' }}</td>
+                      <td>
+                        <span class="badge-pieces">
+                          {{ rep.pieces?.length ?? 0 }} pièce(s)
+                        </span>
+                      </td>
+                      <td class="cell-notes">{{ rep.notes || '—' }}</td>
+                      <td class="cell-action">
+                        <span class="icon-detail" aria-hidden="true">→</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
+
+          <!-- ── Colonne droite 1/3 : infos machine ────────────── -->
+          <aside class="machine-aside">
+
+            @if (machineInfo(); as info) {
+
+              <div class="aside-section">
+                <p class="aside-label">Modèle</p>
+                <p class="aside-value aside-model">{{ searchResult()!.machine_type }}</p>
+              </div>
+
+              @if (info.description) {
+                <div class="aside-section">
+                  <p class="aside-label">Description</p>
+                  <p class="aside-desc">{{ info.description }}</p>
+                </div>
+              }
+
+              @if (specsEntries().length > 0) {
+                <div class="aside-section">
+                  <p class="aside-label">Caractéristiques</p>
+                  <dl class="specs-list">
+                    @for (entry of specsEntries(); track entry[0]) {
+                      <div class="spec-row">
+                        <dt>{{ entry[0] }}</dt>
+                        <dd>{{ entry[1] }}</dd>
+                      </div>
+                    }
+                  </dl>
+                </div>
+              }
+
+              @if (info.exploded_view; as view) {
+                <div class="aside-section aside-exploded">
+                  <p class="aside-label">Documentation</p>
+                  @if (view.note) {
+                    <p class="aside-desc">{{ view.note }}</p>
+                  }
+                  <button
+                    class="btn btn-exploded"
+                    (click)="ouvrirVueEclatee(view.pdf_url)">
+                    <fa-icon [icon]="faBookOpen" class="nav-icon" aria-hidden="true"></fa-icon> Manuel d'utilisation et d'entretien
+                  </button>
+                </div>
+              }
+
+            } @else {
+              <!-- Aucune info machine connue -->
+              <div class="aside-empty">
+                <span class="aside-empty-icon">🔩</span>
+                <p>Aucune information disponible pour ce modèle.</p>
+              </div>
+            }
+
+          </aside>
+
         </div>
-      }
 
-      
-
+      } <!-- /found -->
     </main>
   </div>
 </div>

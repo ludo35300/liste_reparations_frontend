@@ -60,3 +60,25 @@ export interface PieceRef {
   ref_piece:   string;
   designation: string;
 }
+
+export interface ExplodedView {
+  label: string;
+  pdf_url: string;
+  note: string | null;
+}
+
+export interface MachineInfo {
+  description: string | null;
+  specs: Record<string, string> | null;
+  exploded_view: ExplodedView | null;
+}
+
+export interface SearchResult {
+  query: string;
+  found: boolean;
+  numero_serie: string;
+  machine_type: string;
+  nombre_reparations: number;
+  reparations: Reparation[];
+  machine_info: MachineInfo | null;
+}
