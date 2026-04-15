@@ -1,5 +1,4 @@
 :host {
-  /* ✅ Couleurs alignées avec le thème global */
   --primary:       #4460f1;
   --primary-light: rgba(68, 96, 241, 0.12);
   --surface:       #ffffff;
@@ -16,13 +15,11 @@
   --shadow-sm:     0 2px 8px rgba(43, 45, 66, 0.07);
   --shadow-md:     0 6px 24px rgba(43, 45, 66, 0.13);
   --transition:    0.2s ease;
-
-  /* ✅ Sync avec les hauteurs de la topbar */
   --topbar-top-h:  56px;
   --navbar-h:      48px;
 }
 
-/* ─── Layout ─────────────────────────────────────────── */
+// ── Layout ────────────────────────────────────────────────────
 .layout {
   display: flex;
   min-height: 100vh;
@@ -37,12 +34,12 @@
   width: 100%;
 }
 
-/* ✅ padding-top = hauteur topbar-top + navbar */
 .main-content {
   flex: 1;
   padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2rem 2rem;
   overflow-y: auto;
 }
+
 // ── Page Header ───────────────────────────────────────────────
 .page-header {
   display: flex;
@@ -93,31 +90,27 @@
   transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
   white-space: nowrap;
 
-  &:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:not(:disabled):hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  &:not(:disabled):active { transform: translateY(0); }
+}
+
+.btn-primary  { background: var(--primary); color: #fff; }
+.btn-search   { background: var(--primary); color: #fff; min-width: 120px; justify-content: center; }
+
+.btn-exploded {
+  background: #fff;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.25rem;
 
   &:not(:disabled):hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    background: var(--primary-light);
+    box-shadow: none;
+    transform: none;
   }
-
-  &:not(:disabled):active {
-    transform: translateY(0);
-  }
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-}
-
-.btn-search {
-  background: var(--primary);
-  color: #fff;
-  min-width: 120px;
-  justify-content: center;
 }
 
 // ── Spinner bouton ────────────────────────────────────────────
@@ -130,9 +123,7 @@
   animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 // ── Search Card ───────────────────────────────────────────────
 .search-card {
@@ -161,13 +152,11 @@
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition);
 
-  &::placeholder {
-    color: var(--text-muted);
-  }
+  &::placeholder { color: var(--text-muted); }
 
   &:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(68, 96, 241, 0.15);
     background: var(--surface);
   }
 }
@@ -185,42 +174,37 @@
   box-shadow: var(--shadow-sm);
   gap: 0.75rem;
 
-  .empty-icon {
-    font-size: 2.5rem;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-  }
+  .empty-icon { font-size: 2.5rem; line-height: 1; margin-bottom: 0.25rem; }
 
-  h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0;
-  }
+  h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 
   p {
     font-size: 0.875rem;
     color: var(--text-muted);
     margin: 0;
     max-width: 36ch;
-
-    strong {
-      color: var(--text-dark);
-    }
+    strong { color: var(--text-dark); }
   }
 
-  .btn {
-    margin-top: 0.5rem;
-  }
+  .btn { margin-top: 0.5rem; }
 }
 
-// ── Results Card ──────────────────────────────────────────────
+// ── Results Layout (grid 2/3 + 1/3) ──────────────────────────
+.results-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;   // tableau flexible + aside fixe 320px
+  gap: 1.5rem;
+  align-items: start;                  // aside ne s'étire pas sur toute la hauteur
+}
+
+// ── Results Card (colonne gauche) ─────────────────────────────
 .results-card {
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
   overflow: hidden;
+  min-width: 0;                        // évite le débordement en grid
 }
 
 .results-header {
@@ -252,9 +236,7 @@
 }
 
 // ── Table ─────────────────────────────────────────────────────
-.table-wrapper {
-  overflow-x: auto;
-}
+.table-wrapper { overflow-x: auto; }
 
 .results-table {
   width: 100%;
@@ -277,19 +259,12 @@
     }
   }
 
-  tbody {
-    tr.row-clickable {
-      cursor: pointer;
-      transition: background var(--transition);
+  tbody tr.row-clickable {
+    cursor: pointer;
+    transition: background var(--transition);
 
-      &:hover {
-        background: var(--bg);
-      }
-
-      &:active {
-        background: var(--primary-light);
-      }
-    }
+    &:hover { background: var(--bg); }
+    &:active { background: var(--primary-light); }
   }
 
   td {
@@ -297,15 +272,9 @@
     border-bottom: 1px solid var(--border);
     color: var(--text);
     vertical-align: middle;
-
-    &:last-child {
-      border-bottom: none;
-    }
   }
 
-  tbody tr:last-child td {
-    border-bottom: none;
-  }
+  tbody tr:last-child td { border-bottom: none; }
 }
 
 .cell-date {
@@ -331,21 +300,16 @@
   font-size: 0.9rem;
   transition: color var(--transition);
 
-  .row-clickable:hover & {
-    color: var(--primary);
-  }
+  .row-clickable:hover & { color: var(--primary); }
 }
 
-.icon-detail {
-  font-weight: 700;
-  font-size: 1rem;
-}
+.icon-detail { font-weight: 700; font-size: 1rem; }
 
 .badge-pieces {
   display: inline-flex;
   align-items: center;
   padding: 0.15rem 0.55rem;
-  background: rgba(105, 108, 255, 0.08);
+  background: rgba(68, 96, 241, 0.08);
   color: var(--primary);
   border-radius: 9999px;
   font-size: 0.72rem;
@@ -353,7 +317,118 @@
   white-space: nowrap;
 }
 
+// ── Machine Aside (colonne droite 1/3) ────────────────────────
+.machine-aside {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: sticky;
+  top: calc(var(--topbar-top-h) + var(--navbar-h) + 1rem);
+}
+
+.aside-section {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child { border-bottom: none; }
+
+  &.aside-exploded { background: rgba(68, 96, 241, 0.03); }
+}
+
+.aside-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.aside-model {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.02em;
+}
+
+.aside-value {
+  font-size: 0.875rem;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.aside-desc {
+  font-size: 0.8rem;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.55;
+}
+
+// ── Specs list ────────────────────────────────────────────────
+.specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+
+  dt {
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  dd {
+    color: var(--text-dark);
+    font-weight: 600;
+    text-align: right;
+    margin: 0;
+  }
+}
+
+// ── Aside empty ───────────────────────────────────────────────
+.aside-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1.25rem;
+  gap: 0.6rem;
+
+  .aside-empty-icon { font-size: 2rem; opacity: 0.5; }
+
+  p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+    max-width: 24ch;
+  }
+}
+
 // ── Mobile ────────────────────────────────────────────────────
+@media (max-width: 900px) {
+  // Sur tablette/mobile : aside passe sous le tableau
+  .results-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .machine-aside {
+    position: static;  // plus de sticky sur mobile
+    order: -1;         // aside apparaît AVANT le tableau sur mobile
+  }
+}
+
 @media (max-width: 768px) {
   .main-content {
     padding: 1.25rem 1rem;
@@ -364,36 +439,22 @@
     flex-direction: column;
     align-items: flex-start;
 
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
+    .btn { width: 100%; justify-content: center; }
   }
 
   .search-bar {
     flex-direction: column;
 
     .search-input,
-    .btn-search {
-      width: 100%;
-    }
+    .btn-search { width: 100%; }
   }
 
-  .search-card {
-    padding: 1.25rem 1rem;
-  }
+  .search-card { padding: 1.25rem 1rem; }
 
-  // Masquage des colonnes secondaires sur petits écrans
   .results-table {
-    th:nth-child(3),
-    td:nth-child(3),
-    th:nth-child(5),
-    td:nth-child(5) {
-      display: none;
-    }
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(5), td:nth-child(5) { display: none; }
   }
 
-  .cell-notes {
-    max-width: 120px;
-  }
+  .cell-notes { max-width: 120px; }
 }
