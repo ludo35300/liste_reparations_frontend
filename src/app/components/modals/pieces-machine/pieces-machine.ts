@@ -6,6 +6,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus, faTrash, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   selector: 'app-pieces-machine',
   imports: [CommonModule, FontAwesomeModule, FormsModule],
@@ -42,7 +43,7 @@ export class PiecesMachine implements OnChanges{
     this.loading.set(true);
     this.error.set(null);
     this.refService.getPiecesByMachine(m.id).subscribe({
-      next: (data) => { this.pieces.set(data); this.loading.set(false); },
+      next: (data: PieceRef[]) => { this.pieces.set(data); this.loading.set(false); },
       error: ()    => { this.error.set('Impossible de charger les pièces.'); this.loading.set(false); },
     });
     // Charge toutes les pièces disponibles pour le select
@@ -83,7 +84,7 @@ export class PiecesMachine implements OnChanges{
         this.selectedPieceId.set(null);
         // Recharge les pièces de la machine
         this.refService.getPiecesByMachine(machineId).subscribe({
-          next: (data) => this.pieces.set(data),
+          next: (data: PieceRef[]) => this.pieces.set(data),
         });
       },
       error: () => {

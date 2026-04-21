@@ -27,7 +27,7 @@
           @if (showMarqueForm()) {
             <i class="fas fa-times me-1"></i> Annuler
           } @else {
-            <i class="fas fa-plus me-1"></i> Nouvelle marque
+            <fa-icon [icon]="faPlus"></fa-icon> &nbsp; Nouvelle marque
           }
         </button>
       </div>
@@ -125,71 +125,90 @@
       @if (!loading() && brandGroups().length > 0) {
         <div class="brands-cards-grid">
           @for (group of brandGroups(); track group.marque.id) {
-
-            <div class="brand-card-new">
-
-              <!-- Image de la marque -->
-              <div class="brand-card-img" [class.has-logo]="group.marque.url_logo">
+            <article class="brand-card">
+              <div class="brand-card__media" [class.brand-card__media--logo]="group.marque.url_logo">
                 @if (group.marque.url_logo) {
-                  <img [src]="group.marque.url_logo"
-                       [alt]="group.marque.nom"
-                       class="brand-logo-img"
-                       loading="lazy" />
+                  <img
+                    [src]="group.marque.url_logo"
+                    [alt]="group.marque.nom"
+                    class="brand-card__logo"
+                    loading="lazy" />
                 } @else {
-                  <span class="brand-card-img-label">{{ group.marque.nom }}</span>
+                  <div class="brand-card__placeholder">
+                    <span class="brand-card__placeholder-text">{{ group.marque.nom }}</span>
+                  </div>
                 }
+
+                <div class="brand-card__overlay"></div>
               </div>
 
-              <!-- Contenu -->
-              <div class="brand-card-body">
-                <div class="brand-card-header">
-                  <div>
-                    <h4 class="brand-card-title">{{ group.marque.nom }}</h4>
-                    <p class="brand-card-sub">
+              <div class="brand-card__body">
+                <header class="brand-card__header">
+                  <div class="brand-card__title-wrap">
+                    <h4 class="brand-card__title">{{ group.marque.nom }}</h4>
+                    <p class="brand-card__meta">
                       {{ group.modeles.length }} modèle{{ group.modeles.length > 1 ? 's' : '' }}
                     </p>
                   </div>
-                  <div class="brand-card-actions">
-                    <button class="btn btn-sm btn-outline"
-                            (click)="openModeleForm(group.marque.id)"
-                            title="Ajouter un modèle">
-                      <i class="fas fa-plus"></i>
+
+                  <div class="brand-card__actions">
+                    <button
+                      type="button"
+                      class="icon-btn icon-btn--primary"
+                      (click)="openModeleForm(group.marque.id)"
+                      title="Ajouter un modèle"
+                      aria-label="Ajouter un modèle">
+                      <fa-icon [icon]="faPlus"></fa-icon>
                     </button>
-                    <button class="btn btn-sm btn-danger"
-                            (click)="deleteMarque(group.marque, $event)"
-                            title="Supprimer la marque">
+
+                    <button
+                      type="button"
+                      class="icon-btn icon-btn--danger"
+                      (click)="deleteMarque(group.marque, $event)"
+                      title="Supprimer la marque"
+                      aria-label="Supprimer la marque">
                       <fa-icon [icon]="faTrash"></fa-icon>
                     </button>
                   </div>
-                </div>
-              </div>
+                </header>
 
-              <!-- Liste des modèles -->
-              <ul class="brand-model-list">
-                @for (modele of group.modeles; track modele.id) {
-                  <li class="brand-model-item"
-                      (click)="openPiecesModal(modele)"
-                      style="cursor: pointer"
-                      [attr.aria-label]="'Voir les pièces de ' + modele.nom">
-                    <span class="brand-model-name">{{ modele.nom }}</span>
-                    <div class="brand-model-right">
-                      <span class="brand-model-type">{{ modele.type_machine }}</span>
-                      <button class="btn btn-danger btn-sm"
-                              (click)="deleteModele(modele, $event)"
-                              title="Supprimer"
-                              [attr.aria-label]="'Supprimer ' + modele.nom">
+                <ul class="brand-model-list">
+                  @for (modele of group.modeles; track modele.id) {
+                    <li class="brand-model-item">
+                      <button
+                        type="button"
+                        class="brand-model-item__main"
+                        (click)="openPiecesModal(modele)"
+                        [attr.aria-label]="'Voir les pièces de ' + modele.nom">
+                        <span class="brand-model-name">{{ modele.nom }}</span>
+                        <span class="brand-model-type">{{ modele.type_machine }}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="icon-btn icon-btn--ghost-danger"
+                        (click)="deleteModele(modele, $event)"
+                        title="Supprimer"
+                        [attr.aria-label]="'Supprimer ' + modele.nom">
                         <fa-icon [icon]="faTrash"></fa-icon>
                       </button>
-                    </div>
-                  </li>
-                }
-                @if (group.modeles.length === 0) {
-                  <li class="brand-model-empty">Aucun modèle — <a (click)="openModeleForm(group.marque.id)">ajouter</a></li>
-                }
-              </ul>
+                    </li>
+                  }
 
-            </div>
-
+                  @if (group.modeles.length === 0) {
+                    <li class="brand-model-empty">
+                      <span>Aucun modèle</span>
+                      <button
+                        type="button"
+                        class="brand-model-empty__link"
+                        (click)="openModeleForm(group.marque.id)">
+                        Ajouter
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </article>
           }
         </div>
       }

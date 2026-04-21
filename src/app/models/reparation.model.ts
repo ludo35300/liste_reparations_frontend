@@ -1,5 +1,3 @@
-// ── Références catalogue ───────────────────────────────────────
-
 export interface Marque {
   id: number;
   nom: string;
@@ -12,17 +10,16 @@ export interface Modele {
   type_machine: string;
   marque_id: number;
   marque?: Marque;
-  label: string;        // ex: "EXPRESSO DE'LONGHI MAGNIFICA"
+  label: string;
 }
 
 export interface PieceRef {
   id: number;
   ref_piece: string;
   designation: string;
-  marque_id: number;
+  marque_id?: number;
 }
 
-// ── Machine physique (numéro de série) ─────────────────────────
 export interface Machine {
   id: number;
   numero_serie: string;
@@ -34,7 +31,6 @@ export interface Machine {
   created_at?: string;
 }
 
-// ── Réparation ─────────────────────────────────────────────────
 export interface PieceChangee {
   id?: number;
   piece_ref_id?: number;
@@ -46,8 +42,16 @@ export interface PieceChangee {
 
 export interface Reparation {
   id?: number;
-  machine_id: number;
+  machine_id?: number;
   machine?: Machine;
+  // Snapshots retournés par l'API historique
+  machine_snapshot?: string;
+  technicien_snapshot?: string;
+  // Champs formulaire/OCR
+  numero_serie?: string;
+  machine_type?: string;
+  notes?: string;
+  // Communs
   technicien?: string;
   technicien_id?: number;
   date_reparation: string;
@@ -56,36 +60,54 @@ export interface Reparation {
   pieces: PieceChangee[];
 }
 
-// ── OCR ────────────────────────────────────────────────────────
 export interface OcrResult {
-  technicien:     string;
-  date:           string;
-  numero_serie:   string;
-  machine_type:   string;
-  is_new_machine: boolean;
-  pieces:         PieceChangee[];
+  technicien:      string;
+  date:            string;
+  numero_serie:    string;
+  machine_type:    string;
+  is_new_machine:  boolean;
+  pieces:          PieceChangee[];
   nb_pieces_total: number;
-  erreur?:        string;
+  erreur?:         string;
 }
 
-// ── Stats ──────────────────────────────────────────────────────
 export interface Stats {
   total_reparations: number;
   total_pieces:      number;
   machines_uniques:  number;
   pieces_les_plus_changees: { ref: string; designation: string; total: number }[];
-  reparations: any[];
+  reparations: Reparation[];
 }
 
-// ── Vue groupée par marque (pour la page Machines) ─────────────
+export interface ExplodedView {
+  label:      string;
+  pdf_url:    string;
+  image_url?: string;  // ← ajouté
+  note?:      string;
+}
+
+export interface SearchResult {
+  found:              boolean;
+  numero_serie:       string;
+  machine_type?:      string;
+  nombre_reparations: number;
+  reparations:        Reparation[];
+  machine_info?: {
+    brand:        string;
+    model:        string;
+    description?: string;
+    specs:        Record<string, string>;
+    exploded_view?: ExplodedView | null;  // ← utilise l'interface
+  };
+}
+
 export interface BrandGroup {
   marque: Marque;
   modeles: Modele[];
   expanded: boolean;
 }
 
-// ── Compat (à supprimer quand tous les composants sont migrés) ──
 /** @deprecated Utiliser Modele */
-export type MachineTypeRef = Modele & { marque: string; modele: string; type_machine: string; label: string };
-/** @deprecated Utiliser BrandGroup */
-export interface BrandGroupLegacy { brand: string; machines: MachineTypeRef[]; expanded: boolean; }
+export type MachineTypeRef = Modele & {
+  marque: string; modele: string; type_machine: string; label: string;
+};

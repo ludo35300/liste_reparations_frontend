@@ -50,7 +50,7 @@
               <div class="item-date">{{ rep.date_reparation }}</div>
               <div class="item-tech">{{ rep.technicien || 'Technicien N/A' }}</div>
               <span class="item-badge">
-                {{ rep.pieces?.length ?? 0 }} pièce{{ (rep.pieces?.length ?? 0) > 1 ? 's' : '' }}
+                {{ rep.pieces.length }} pièce{{ (rep.pieces.length) > 1 ? 's' : '' }}
               </span>
             </button>
           }

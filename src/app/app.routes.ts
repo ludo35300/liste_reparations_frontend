@@ -42,6 +42,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/machines/machines').then(m => m.Machines)
   },
+  { path: 'ajout-repair', 
+    title: 'Ajouter une réparation', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/add-repair/add-repair').then(m => m.AddRepair)
+  },
   { path: '',   redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' },
 ];

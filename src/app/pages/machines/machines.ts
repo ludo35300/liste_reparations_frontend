@@ -4,21 +4,20 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService }     from '../../auth-lib/services/auth.service';
 import { MeResponse }      from '../../auth-lib/models/auth.model';
 import { Topbar }          from '../../components/topbar/topbar';
 import { NavService }      from '../../core/nav.service';
-import { ReferenceService } from '../../services/references.service';
 import { Marque, Modele, BrandGroup } from '../../models/reparation.model';
-// import { PiecesMachine }   from '../../components/modals/pieces-machine/pieces-machine';
+import { ReferenceService } from '../../services/references.services';
 
 
 @Component({
   selector: 'app-machines',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar /*, PiecesMachine*/],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar],
   templateUrl: './machines.html',
   styleUrl: './machines.scss',
 })
@@ -35,6 +34,7 @@ export class Machines implements OnInit {
   readonly loading      = signal(false);
   readonly brandGroups  = signal<BrandGroup[]>([]);
   readonly faTrash      = faTrash;
+  readonly faPlus       = faPlus;
 
   // ── Formulaire ajout marque ────────────────────────────────
   readonly showMarqueForm  = signal(false);

@@ -1,0 +1,126 @@
+:host {
+  --primary: #4460f1;
+  --primary-soft: rgba(68, 96, 241, 0.12);
+  --surface: #ffffff;
+  --bg: #f3f6fb;
+  --text-dark: #1f2937;
+  --text-muted: #7b8794;
+  --border: #e5eaf2;
+  --radius: 18px;
+  --shadow-sm: 0 6px 18px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 16px 40px rgba(15, 23, 42, 0.1);
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --topbar-top-h: 56px;
+  --navbar-h: 48px;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.layout-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.5rem) 2rem 2rem;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.page-sub {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.mode-selector {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mode-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  padding: 1.2rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition),
+    background var(--transition);
+}
+
+.mode-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.mode-card.active {
+  border-color: var(--primary);
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+.mode-card-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.mode-card-body h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.mode-card-body p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.mode-content {
+  min-height: 320px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1rem) 1rem 1rem;
+  }
+
+  .mode-selector {
+    grid-template-columns: 1fr;
+  }
+}

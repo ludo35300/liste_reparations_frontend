@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { MachineTypeRef, OcrResult, Reparation, Stats } from '../models/reparation.model';
+import { OcrResult, Reparation, SearchResult, Stats } from '../models/reparation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReparationService {
@@ -37,11 +37,11 @@ export class ReparationService {
   }
 
   // Retourne toutes les machines distinctes
-  getAllMachines(): Observable<MachineTypeRef[]> {
-    return this.http.get<MachineTypeRef[]>(`${this.api}/machines`);
+  getAllMachines(): Observable<SearchResult[]> {
+    return this.http.get<SearchResult[]>(`${this.api}/machines`);
   }
 
-  /*search(query: string): Observable<SearchResult> {
-    return this.http.get<SearchResult>(`${this.api}/reparations/search`, { params: { q: query } });
-  }*/
+  search(query: string): Observable<SearchResult[]> {
+    return this.http.get<SearchResult[]>(`${this.api}/reparations/search?q=${encodeURIComponent(query)}`);
+  }
 }
