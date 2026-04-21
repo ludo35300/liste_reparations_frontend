@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, EventEmitter, Output, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,7 +13,6 @@ import { ReparationService } from '../../services/reparation.service';
 import { AuthService }       from '../../auth-lib/services/auth.service';
 import { MeResponse }        from '../../auth-lib/models/auth.model';
 import { Reparation, PieceChangee, OcrResult } from '../../models/reparation.model';
-import { Topbar }            from '../../components/topbar/topbar';
 import { NavService }        from '../../core/nav.service';
 import { ReferenceService } from '../../services/references.services';
 
@@ -36,11 +35,14 @@ const EMPTY_FORM = (): ScanForm => ({
 @Component({
   selector: 'app-scan',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './scan.html',
   styleUrl: './scan.scss',
 })
 export class Scan implements OnInit {
+  @Output() submitted = new EventEmitter<Reparation>();
+
+  // ── Services ───────────────────────────────────────────────
 
   private readonly service    = inject(ReparationService);
   private readonly auth       = inject(AuthService);

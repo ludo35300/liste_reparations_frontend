@@ -1,1 +1,41 @@
-<p>repair-manuel-form works!</p>
+<div class="form-card">
+  <h3 class="form-card-title">Saisie manuelle</h3>
+
+  @if (error()) {
+    <p class="field-error">{{ error() }}</p>
+  }
+
+  <div class="form-row">
+    <label class="field-label">
+      Numéro de série
+      <input class="field-input" [(ngModel)]="form.numero_serie" />
+    </label>
+
+    <label class="field-label">
+      Date de réparation
+      <input class="field-input" type="date" [(ngModel)]="form.date_reparation" />
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label class="field-label">
+      Machine
+      <input class="field-input" [(ngModel)]="form.machine_type" />
+    </label>
+
+    <label class="field-label">
+      Technicien
+      <input class="field-input" [(ngModel)]="form.technicien" />
+    </label>
+  </div>
+
+  <label class="field-label">
+    Notes
+    <textarea class="field-input" [(ngModel)]="form.notes"></textarea>
+  </label>
+
+  <div class="form-actions">
+    <button type="button" class="btn btn-outline" (click)="addPiece()">Ajouter une pièce</button>
+    <button type="button" class="btn btn-primary" (click)="submit()">Enregistrer</button>
+  </div>
+</div>
