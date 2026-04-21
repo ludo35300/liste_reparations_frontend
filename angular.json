@@ -54,7 +54,13 @@
             "development": {
               "optimization": { "scripts": true, "styles": true, "fonts": true },
               "extractLicenses": false,
-              "sourceMap": false
+              "sourceMap": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

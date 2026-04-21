@@ -62,7 +62,8 @@
                 </thead>
                 <tbody>
                   @for (r of s.reparations; track r.id; let i = $index) {
-                    <tr (click)="voirDetail(r)" class="row-clickable">
+                    <tr  class="row-clickable">
+                      <!--<tr (click)="voirDetail(r)" class="row-clickable"></tr>-->
                       <td class="col-rank">{{ i + 1 }}</td>
                       <td class="cell-ref">{{ r.numero_serie }}</td>
                       <td>{{ r.machine_type }}</td>

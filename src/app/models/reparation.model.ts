@@ -1,84 +1,91 @@
+// ── Références catalogue ───────────────────────────────────────
+
+export interface Marque {
+  id: number;
+  nom: string;
+  url_logo?: string | null;
+}
+
+export interface Modele {
+  id: number;
+  nom: string;
+  type_machine: string;
+  marque_id: number;
+  marque?: Marque;
+  label: string;        // ex: "EXPRESSO DE'LONGHI MAGNIFICA"
+}
+
+export interface PieceRef {
+  id: number;
+  ref_piece: string;
+  designation: string;
+  marque_id: number;
+}
+
+// ── Machine physique (numéro de série) ─────────────────────────
+export interface Machine {
+  id: number;
+  numero_serie: string;
+  modele_id?: number | null;
+  modele?: Modele | null;
+  statut: 'en_attente' | 'en_reparation' | 'pret' | 'termine';
+  date_entree?: string | null;
+  notes?: string;
+  created_at?: string;
+}
+
+// ── Réparation ─────────────────────────────────────────────────
 export interface PieceChangee {
   id?: number;
+  piece_ref_id?: number;
   ref_piece: string;
   designation: string;
   quantite: number;
-  is_new?:     boolean;
+  is_new?: boolean;
 }
 
 export interface Reparation {
   id?: number;
-  numero_serie: string;
-  machine_type: string;
+  machine_id: number;
+  machine?: Machine;
   technicien?: string;
-  date_reparation: string;   // format JJ/MM/AAAA
-  notes?: string;
+  technicien_id?: number;
+  date_reparation: string;
+  description?: string;
   created_at?: string;
-  pieces?: PieceChangee[];
-}
-
-export interface OcrResult {
-  is_new_machine: boolean;
-  numero_serie: string;
-  date: string;
-  nb_pieces: number;
-  technicien: string;
-  machine_type: string;
   pieces: PieceChangee[];
-  texte_brut: string;
 }
 
+// ── OCR ────────────────────────────────────────────────────────
+export interface OcrResult {
+  technicien:     string;
+  date:           string;
+  numero_serie:   string;
+  machine_type:   string;
+  is_new_machine: boolean;
+  pieces:         PieceChangee[];
+  nb_pieces_total: number;
+  erreur?:        string;
+}
+
+// ── Stats ──────────────────────────────────────────────────────
 export interface Stats {
   total_reparations: number;
-  machines_uniques: number;
-  total_pieces: number;
-  pieces_les_plus_changees: {
-    ref: string;
-    designation: string;
-    total: number;
-  }[];
-  reparations: Reparation[]; 
+  total_pieces:      number;
+  machines_uniques:  number;
+  pieces_les_plus_changees: { ref: string; designation: string; total: number }[];
+  reparations: any[];
 }
 
-export interface MachineTypeRef {
-  id:           number;
-  marque:       string;
-  modele:       string;
-  type_machine: string;
-  url_logo?:    string;
-  label:        string;   // calculé par le back : "MOULIN A CAFE SANTOS 40AN"
-}
-
+// ── Vue groupée par marque (pour la page Machines) ─────────────
 export interface BrandGroup {
-  brand: string;
-  machines: MachineTypeRef[];
+  marque: Marque;
+  modeles: Modele[];
   expanded: boolean;
 }
 
-export interface PieceRef {
-  id:          number;
-  ref_piece:   string;
-  designation: string;
-}
-
-export interface ExplodedView {
-  label: string;
-  pdf_url: string;
-  note: string | null;
-}
-
-export interface MachineInfo {
-  description: string | null;
-  specs: Record<string, string> | null;
-  exploded_view: ExplodedView | null;
-}
-
-export interface SearchResult {
-  query: string;
-  found: boolean;
-  numero_serie: string;
-  machine_type: string;
-  nombre_reparations: number;
-  reparations: Reparation[];
-  machine_info: MachineInfo | null;
-}
+// ── Compat (à supprimer quand tous les composants sont migrés) ──
+/** @deprecated Utiliser Modele */
+export type MachineTypeRef = Modele & { marque: string; modele: string; type_machine: string; label: string };
+/** @deprecated Utiliser BrandGroup */
+export interface BrandGroupLegacy { brand: string; machines: MachineTypeRef[]; expanded: boolean; }

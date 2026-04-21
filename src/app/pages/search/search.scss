@@ -457,4 +457,47 @@
   }
 
   .cell-notes { max-width: 120px; }
+
+  
+}
+
+// ── Vue éclatée image ─────────────────────────────────────────
+.exploded-img-wrapper {
+  position: relative;
+  margin-top: 0.75rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: zoom-in;
+
+  &:hover .exploded-img-zoom {
+    opacity: 1;
+  }
+}
+
+.exploded-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform var(--transition);
+
+  .exploded-img-wrapper:hover & {
+    transform: scale(1.02);
+  }
+}
+
+.exploded-img-zoom {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(43, 45, 66, 0.65);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity var(--transition);
+  cursor: pointer;
 }

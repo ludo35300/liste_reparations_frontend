@@ -51,9 +51,9 @@ export class StatsPage implements OnInit {
     });
   }
 
-  public voirDetail(rep: Reparation): void {
+  /*public voirDetail(rep: Reparation): void {
     this.router.navigate(['/history', rep.numero_serie]);
-  }
+  }*/
 
   // ── Logout ─────────────────────────────────────────────────
   public async logout(): Promise<void> {

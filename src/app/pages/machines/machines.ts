@@ -4,20 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { AuthService } from '../../auth-lib/services/auth.service';
-import { MeResponse } from '../../auth-lib/models/auth.model';
-import { Topbar } from '../../components/topbar/topbar';
-import { NavService } from '../../core/nav.service';
-import {  ReferenceService } from '../../services/references.services';
-import { BrandGroup, MachineTypeRef } from '../../models/reparation.model';
-import { PiecesMachine } from '../../components/modals/pieces-machine/pieces-machine';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+
+import { AuthService }     from '../../auth-lib/services/auth.service';
+import { MeResponse }      from '../../auth-lib/models/auth.model';
+import { Topbar }          from '../../components/topbar/topbar';
+import { NavService }      from '../../core/nav.service';
+import { ReferenceService } from '../../services/references.service';
+import { Marque, Modele, BrandGroup } from '../../models/reparation.model';
+// import { PiecesMachine }   from '../../components/modals/pieces-machine/pieces-machine';
 
 
 @Component({
   selector: 'app-machines',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar, PiecesMachine],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, Topbar /*, PiecesMachine*/],
   templateUrl: './machines.html',
   styleUrl: './machines.scss',
 })
@@ -26,168 +27,153 @@ export class Machines implements OnInit {
   private readonly refService = inject(ReferenceService);
   private readonly auth       = inject(AuthService);
   private readonly router     = inject(Router);
-
   protected readonly navItems = inject(NavService).navItems;
 
-  // ── State ──────────────────────────────────────────────────
-  public readonly me            = signal<MeResponse | null>(null);
-  public readonly errorMessage  = signal<string | null>(null);
-  public readonly loading       = signal(false);
-  public readonly brandGroups   = signal<BrandGroup[]>([]);
+  // ── State général ──────────────────────────────────────────
+  readonly me           = signal<MeResponse | null>(null);
+  readonly errorMessage = signal<string | null>(null);
+  readonly loading      = signal(false);
+  readonly brandGroups  = signal<BrandGroup[]>([]);
+  readonly faTrash      = faTrash;
 
-  public readonly selectedMachine = signal<MachineTypeRef | null>(null);
+  // ── Formulaire ajout marque ────────────────────────────────
+  readonly showMarqueForm  = signal(false);
+  readonly formMarqueNom   = signal('');
+  readonly savingMarque    = signal(false);
+  readonly errorMarque     = signal<string | null>(null);
 
-  // ── Formulaire ajout ───────────────────────────────────────
-  public readonly showForm      = signal(false);
-  public readonly formTypeMachine  = signal('');
-  public readonly formMarque       = signal('');
-  public readonly formModel     = signal('');
-  public readonly saving        = signal(false);
-  public readonly formError     = signal<string | null>(null);
+  // ── Formulaire ajout modèle ────────────────────────────────
+  readonly showModeleForm   = signal(false);
+  readonly activeMarqueId   = signal<number | null>(null);   // marque cible
+  readonly formModeleNom    = signal('');
+  readonly formModeleType   = signal('');
+  readonly savingModele     = signal(false);
+  readonly errorModele      = signal<string | null>(null);
 
-  public readonly faTrash = faTrash;
+  // ── Sélection modèle (modale pièces) ──────────────────────
+  readonly selectedModele = signal<Modele | null>(null);
 
   // ── Computed ───────────────────────────────────────────────
-  public readonly totalMachines = computed(() =>
-    this.brandGroups().reduce((acc, g) => acc + g.machines.length, 0)
+  readonly totalBrands  = computed(() => this.brandGroups().length);
+  readonly totalModeles = computed(() =>
+    this.brandGroups().reduce((acc, g) => acc + g.modeles.length, 0)
   );
-
-  public readonly totalBrands = computed(() => this.brandGroups().length);
-
-public readonly uploadingId = signal<number | null>(null);
-
-public onLogoSelected(machine: MachineTypeRef, event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (!input.files?.length) return;
-
-  const file = input.files[0];
-  this.uploadingId.set(machine.id);
-
-  this.refService.uploadLogo(machine.id, file).subscribe({
-    next: () => {
-      this.uploadingId.set(null);
-      this.loadMachines();
-    },
-    error: () => {
-      this.uploadingId.set(null);
-      this.errorMessage.set("Erreur lors de l'upload du logo.");
-    },
-  });
-}
-  // Label composé : "MARQUE MODELE" en majuscules
-  public readonly labelPreview = computed(() => {
-    const t = this.formTypeMachine().trim().toUpperCase();
-    const b = this.formMarque().trim().toUpperCase();
-    const m = this.formModel().trim().toUpperCase();
-    if (!t && !b && !m) return '';
-    return [t, b, m].filter(Boolean).join(' ');
-  });
 
   // ── Lifecycle ──────────────────────────────────────────────
   ngOnInit(): void {
-    (async () => {
-      try {
-        const me = await firstValueFrom(this.auth.getMeHttp());
-        this.me.set(me);
-      } catch { /* silencieux */ }
-    })();
-    this.loadMachines();
+    firstValueFrom(this.auth.getMeHttp()).then(me => this.me.set(me)).catch(() => {});
+    this.loadAll();
   }
 
   // ── Chargement ─────────────────────────────────────────────
-  public loadMachines(): void {
+  loadAll(): void {
     this.loading.set(true);
-    this.refService.getAllMachines().subscribe({
-      next: (machines) => {
-        this.brandGroups.set(this.groupByBrand(machines));
-        this.loading.set(false);
+    this.refService.getAllMarques().subscribe({
+      next: (marques) => {
+        this.refService.getAllModeles().subscribe({
+          next: (modeles) => {
+            this.brandGroups.set(this.buildGroups(marques, modeles));
+            this.loading.set(false);
+          },
+          error: () => { this.errorMessage.set('Erreur chargement modèles.'); this.loading.set(false); }
+        });
       },
-      error: () => {
-        this.errorMessage.set('Impossible de charger les machines.');
-        this.loading.set(false);
-      },
+      error: () => { this.errorMessage.set('Erreur chargement marques.'); this.loading.set(false); }
     });
   }
 
-  private groupByBrand(machines: MachineTypeRef[]): BrandGroup[] {
-    const map = new Map<string, MachineTypeRef[]>();
-    for (const m of machines) {
-      if (!m?.marque) continue;
-      const brand = m.marque.trim().toUpperCase();
-      if (!map.has(brand)) map.set(brand, []);
-      map.get(brand)!.push(m);
-    }
-    return Array.from(map.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([brand, machines]) => ({ brand, machines, expanded: true }));
+  private buildGroups(marques: Marque[], modeles: Modele[]): BrandGroup[] {
+    return marques
+      .sort((a, b) => a.nom.localeCompare(b.nom))
+      .map(marque => ({
+        marque,
+        modeles: modeles
+          .filter(m => m.marque_id === marque.id)
+          .sort((a, b) => a.nom.localeCompare(b.nom)),
+        expanded: true,
+      }));
   }
 
-  // ── Toggle accordéon ──────────────────────────────────────
-  public toggleBrand(group: BrandGroup): void {
+  // ── Marques ────────────────────────────────────────────────
+  toggleMarqueForm(): void {
+    this.showMarqueForm.update(v => !v);
+    this.formMarqueNom.set('');
+    this.errorMarque.set(null);
+  }
+
+  saveMarque(): void {
+    const nom = this.formMarqueNom().trim().toUpperCase();
+    if (!nom) { this.errorMarque.set('Nom requis.'); return; }
+    this.savingMarque.set(true);
+    this.refService.createMarque(nom).subscribe({
+      next: () => {
+        this.savingMarque.set(false);
+        this.showMarqueForm.set(false);
+        this.formMarqueNom.set('');
+        this.loadAll();
+      },
+      error: () => { this.errorMarque.set('Erreur lors de la création.'); this.savingMarque.set(false); }
+    });
+  }
+
+  deleteMarque(marque: Marque, event: Event): void {
+    event.stopPropagation();
+    if (!confirm(`Supprimer la marque "${marque.nom}" et tous ses modèles ?`)) return;
+    this.refService.deleteMarque(marque.id).subscribe({
+      next: () => this.loadAll(),
+      error: () => this.errorMessage.set('Erreur lors de la suppression.')
+    });
+  }
+
+  // ── Modèles ────────────────────────────────────────────────
+  openModeleForm(marqueId: number): void {
+    this.activeMarqueId.set(marqueId);
+    this.showModeleForm.set(true);
+    this.formModeleNom.set('');
+    this.formModeleType.set('');
+    this.errorModele.set(null);
+  }
+
+  closeModeleForm(): void {
+    this.showModeleForm.set(false);
+    this.activeMarqueId.set(null);
+  }
+
+  saveModele(): void {
+    const nom  = this.formModeleNom().trim().toUpperCase();
+    const type = this.formModeleType().trim();
+    const mid  = this.activeMarqueId();
+    if (!nom || !type || !mid) { this.errorModele.set('Tous les champs sont requis.'); return; }
+    this.savingModele.set(true);
+    this.refService.createModele(mid, nom, type).subscribe({
+      next: () => {
+        this.savingModele.set(false);
+        this.closeModeleForm();
+        this.loadAll();
+      },
+      error: () => { this.errorModele.set('Erreur lors de la création.'); this.savingModele.set(false); }
+    });
+  }
+
+  deleteModele(modele: Modele, event: Event): void {
+    event.stopPropagation();
+    if (!confirm(`Supprimer le modèle "${modele.nom}" ?`)) return;
+    this.refService.deleteModele(modele.id).subscribe({
+      next: () => this.loadAll(),
+      error: () => this.errorMessage.set('Erreur lors de la suppression.')
+    });
+  }
+
+  toggleBrand(group: BrandGroup): void {
     group.expanded = !group.expanded;
     this.brandGroups.update(g => [...g]);
   }
 
-  // ── Ajout machine ─────────────────────────────────────────
-  public toggleForm(): void {
-    this.showForm.update(v => !v);
-    this.formTypeMachine.set('');  // ← manquait
-    this.formMarque.set('');
-    this.formModel.set('');
-    this.formError.set(null);
-  }
+  openPiecesModal(modele: Modele): void { this.selectedModele.set(modele); }
+  closePiecesModal(): void { this.selectedModele.set(null); }
 
-  public saveMachine(): void {
-    const type_machine = this.formTypeMachine().trim();
-    const marque       = this.formMarque().trim();
-    const modele       = this.formModel().trim();
-
-    if (!type_machine || !marque || !modele) {
-      this.formError.set('Tous les champs sont requis.');
-      return;
-    }
-
-    this.saving.set(true);
-    this.formError.set(null);
-
-    // ✅ 3 arguments au lieu de 1
-    this.refService.createMachine(marque, modele, type_machine).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.showForm.set(false);
-        this.formTypeMachine.set('');
-        this.formMarque.set('');
-        this.formModel.set('');
-        this.loadMachines();
-      },
-      error: () => {
-        this.formError.set('Erreur lors de la création.');
-        this.saving.set(false);
-      },
-    });
-  }
-
-  // ── Suppression ───────────────────────────────────────────
-  public deleteMachine(machine: MachineTypeRef, event: Event): void {
-    event.stopPropagation();
-    if (!confirm(`Supprimer "${machine.label}" ?`)) return;
-    this.refService.deleteMachine(machine.id).subscribe({
-      next: () => this.loadMachines(),
-      error: () => this.errorMessage.set('Erreur lors de la suppression.'),
-    });
-  }
-
-  // ── Logout ────────────────────────────────────────────────
-  public async logout(): Promise<void> {
+  async logout(): Promise<void> {
     await firstValueFrom(this.auth.logoutHttp());
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
-  }
-
-  public openPiecesModal(machine: MachineTypeRef): void {
-    this.selectedMachine.set(machine);
-  }
-
-  public closePiecesModal(): void {
-    this.selectedMachine.set(null);
   }
 }

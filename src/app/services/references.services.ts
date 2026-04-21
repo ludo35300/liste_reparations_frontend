@@ -1,78 +1,75 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
-import { MachineTypeRef, PieceRef } from '../models/reparation.model';
+import { Observable } from 'rxjs';
+import { Marque, Modele, PieceRef } from '../models/reparation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {
-    private http = inject(HttpClient);
-    private api = '/api'; 
+  private http = inject(HttpClient);
+  private api  = '/api';
 
-    getAllMachines(): Observable<MachineTypeRef[]> {
-        return this.http.get<MachineTypeRef[]>(`${this.api}/machines`);
-    }
+  // ── Marques ────────────────────────────────────────────────
+  getAllMarques(): Observable<Marque[]> {
+    return this.http.get<Marque[]>(`${this.api}/marques`);
+  }
 
-    createMachine(marque: string, modele: string, type_machine: string): Observable<MachineTypeRef> {
-        return this.http.post<MachineTypeRef>(`${this.api}/machines`, {
-        marque,
-        modele,
-        type_machine,
-        });
-    }
+  createMarque(nom: string): Observable<Marque> {
+    return this.http.post<Marque>(`${this.api}/marques`, { nom });
+  }
 
-    deleteMachine(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.api}/machines/${id}`);
-    }
+  deleteMarque(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/marques/${id}`);
+  }
 
-    
-    // ── Pièces ─────────────────────────────────────────────────
+  uploadLogoMarque(marqueId: number, file: File): Observable<Marque> {
+    const fd = new FormData();
+    fd.append('logo', file);
+    return this.http.patch<Marque>(`${this.api}/marques/${marqueId}/logo`, fd);
+  }
 
-    getAllPieces(): Observable<PieceRef[]> {
-        return this.http.get<PieceRef[]>(`${this.api}/pieces`);
-    }
+  // ── Modeles ────────────────────────────────────────────────
+  getModelesByMarque(marqueId: number): Observable<Modele[]> {
+    return this.http.get<Modele[]>(`${this.api}/marques/${marqueId}/modeles`);
+  }
 
-    createPiece(ref_piece: string, designation: string): Observable<PieceRef> {
-        return this.http.post<PieceRef>(`${this.api}/pieces`, {
-        ref_piece,
-        designation,
-        });
-    }
+  getAllModeles(): Observable<Modele[]> {
+    return this.http.get<Modele[]>(`${this.api}/modeles`);
+  }
 
-    deletePiece(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.api}/pieces/${id}`);
-    }
+  createModele(marqueId: number, nom: string, type_machine: string): Observable<Modele> {
+    return this.http.post<Modele>(`${this.api}/modeles`, {
+      marque_id: marqueId,
+      nom,
+      type_machine,
+    });
+  }
 
-    // ── Association Machine ↔ Pièce ────────────────────────────
+  deleteModele(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/modeles/${id}`);
+  }
 
-    addPieceToMachine(machineId: number, pieceId: number): Observable<MachineTypeRef> {
-        return this.http.post<MachineTypeRef>(
-        `${this.api}/machines/${machineId}/pieces/${pieceId}`, {}
-        );
-    }
+  // ── Pièces ─────────────────────────────────────────────────
+  getAllPieces(): Observable<PieceRef[]> {
+    return this.http.get<PieceRef[]>(`${this.api}/pieces`);
+  }
 
-    removePieceFromMachine(machineId: number, pieceId: number): Observable<MachineTypeRef> {
-        return this.http.delete<MachineTypeRef>(
-        `${this.api}/machines/${machineId}/pieces/${pieceId}`
-        );
-    }
+  createPiece(ref_piece: string, designation: string): Observable<PieceRef> {
+    return this.http.post<PieceRef>(`${this.api}/pieces`, { ref_piece, designation });
+  }
 
-    uploadLogo(machineId: number, file: File): Observable<MachineTypeRef> {
-        const formData = new FormData();
-        formData.append('logo', file);
-        return this.http.patch<MachineTypeRef>(
-            `${this.api}/machines/${machineId}/logo`,
-            formData
-        );
-    }
-    getPiecesByMachine(machineId: number): Observable<PieceRef[]> {
-        return this.http.get<PieceRef[]>(`${this.api}/machines/${machineId}/pieces`);
-    }
+  deletePiece(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/pieces/${id}`);
+  }
 
-    getMachineByLabel(label: string): Observable<MachineTypeRef | undefined> {
-        return this.getAllMachines().pipe(
-            map(machines => machines.find(
-            m => m.label.toUpperCase() === label.trim().toUpperCase()
-            ))
-        );
-    }
+  getPiecesByModele(modeleId: number): Observable<PieceRef[]> {
+    return this.http.get<PieceRef[]>(`${this.api}/modeles/${modeleId}/pieces`);
+  }
+
+  addPieceToModele(modeleId: number, pieceId: number): Observable<void> {
+    return this.http.post<void>(`${this.api}/modeles/${modeleId}/pieces/${pieceId}`, {});
+  }
+
+  removePieceFromModele(modeleId: number, pieceId: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/modeles/${modeleId}/pieces/${pieceId}`);
+  }
 }

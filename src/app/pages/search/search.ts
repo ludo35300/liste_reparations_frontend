@@ -7,10 +7,12 @@ import { firstValueFrom } from 'rxjs';
 import { ReparationService } from '../../services/reparation.service';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
-import { BrandGroup, MachineTypeRef, Reparation, SearchResult } from '../../models/reparation.model';
+import { BrandGroup, MachineTypeRef, Reparation } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
 import { faBookOpen, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-search',
@@ -34,7 +36,7 @@ export class Search implements OnInit {
   public readonly searched  = signal(false);
   public readonly loading   = signal(false);
   // Résultat enrichi unique (le nouvel endpoint retourne 1 objet, pas un tableau)
-  public readonly searchResult = signal<SearchResult | null>(null);
+  //public readonly searchResult = signal<SearchResult | null>(null);
 
   // ── Machines groupées par marque ──────────────────────────
   public readonly brandGroups  = signal<BrandGroup[]>([]);
@@ -43,9 +45,11 @@ export class Search implements OnInit {
   public readonly faBookOpen = faBookOpen; // Icône pour le manuel d'utilisation
 
   // Raccourcis calculés pour le template
-  public readonly resultats = computed(() => this.searchResult()?.reparations ?? []);
-  public readonly machineInfo = computed(() => this.searchResult()?.machine_info ?? null);
-  public readonly specsEntries = computed(() => Object.entries(this.machineInfo()?.specs ?? {}));
+  //public readonly resultats = computed(() => this.searchResult()?.reparations ?? []);
+  //public readonly machineInfo = computed(() => this.searchResult()?.machine_info ?? null);
+  //public readonly specsEntries = computed(() => Object.entries(this.machineInfo()?.specs ?? {}));
+
+  private readonly backendUrl = environment.apiUrl;
 
   // ── Lifecycle ──────────────────────────────────────────────
   ngOnInit(): void {
@@ -55,9 +59,9 @@ export class Search implements OnInit {
         this.me.set(me);
       } catch { /* silencieux */ }
     })();
-    this.loadBrands();
+    /*this.loadBrands();*/
   }
-
+/*
   // ── Chargement et groupement par marque ──────────────────
   private loadBrands(): void {
     this.loadingBrands.set(true);
@@ -69,9 +73,9 @@ export class Search implements OnInit {
       },
       error: () => this.loadingBrands.set(false),
     });
-  }
+  }*/
 
-  public readonly totalMachines = computed(() =>
+  /*public readonly totalMachines = computed(() =>
     this.brandGroups().reduce((acc, g) => acc + g.machines.length, 0)
   );
 
@@ -86,7 +90,7 @@ export class Search implements OnInit {
     return Array.from(map.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([brand, machines]) => ({ brand, machines, expanded: true }));
-  }
+  }*/
 
   // ── Toggle accordéon ──────────────────────────────────────
   public toggleBrand(group: BrandGroup): void {
@@ -96,10 +100,10 @@ export class Search implements OnInit {
   }
 
   // ── Clic sur une machine dans le panneau ─────────────────
-  public selectMachine(serie: string): void {
+  /*public selectMachine(serie: string): void {
     this.query.set(serie);
     this.rechercher();
-  }
+  }*/
 
   // ── Logout ─────────────────────────────────────────────────
   public async logout(): Promise<void> {
@@ -108,7 +112,7 @@ export class Search implements OnInit {
   }
 
   // ── Recherche enrichie ─────────────────────────────────────
-  public rechercher(): void {
+  /*public rechercher(): void {
     const q = this.query().trim();
     if (!q) return;
 
@@ -127,11 +131,11 @@ export class Search implements OnInit {
         this.loading.set(false);
       },
     });
-  }
+  }*/
 
-  public voirDetail(rep: Reparation): void {
+  /*public voirDetail(rep: Reparation): void {
     this.router.navigate(['/history', rep.numero_serie]);
-  }
+  }*/
 
   public nouvelleReparation(): void {
     this.router.navigate(['/scan']);
@@ -140,4 +144,9 @@ export class Search implements OnInit {
   public ouvrirVueEclatee(url: string): void {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
+
+  public getImageUrl(path: string): string {
+  // path est déjà absolu (/static/...) → on préfixe avec l'URL backend
+  return `${this.backendUrl}${path}`;
+}
 }
