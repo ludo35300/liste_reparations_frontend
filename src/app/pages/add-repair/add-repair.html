@@ -45,7 +45,13 @@
 
       <section class="mode-content">
         @if (mode() === 'manual') {
-          <app-repair-manuel-form />
+          <app-repair-manuel-form
+            [techniciens]="techniciens()"
+            [marques]="marques()"
+            [modeles]="modeles()"
+            [currentTechnicienId]="currentTechnicienId()"
+            (submitted)="onManualRepairSubmitted($event)"
+          />
         }
 
         @if (mode() === 'scan') {

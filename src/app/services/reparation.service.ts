@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { OcrResult, Reparation, SearchResult, Stats } from '../models/reparation.model';
+import { Marque, Modele, OcrResult, Reparation, SearchResult, Stats, TechnicienOption } from '../models/reparation.model';
+
 
 @Injectable({ providedIn: 'root' })
 export class ReparationService {
@@ -43,5 +44,22 @@ export class ReparationService {
 
   search(query: string): Observable<SearchResult[]> {
     return this.http.get<SearchResult[]>(`${this.api}/reparations/search?q=${encodeURIComponent(query)}`);
+  }
+
+
+  public getTechniciens(): Observable<TechnicienOption[]> {
+    return this.http.get<TechnicienOption[]>(`${this.api}/techniciens`);
+  }
+
+  public getMarques(): Observable<Marque[]> {
+    return this.http.get<Marque[]>(`${this.api}/marques`);
+  }
+
+  public getMesReparations(): Observable<Reparation[]> {
+    return this.http.get<Reparation[]>(`${this.api}/reparations/mine`);
+  }
+
+  public getModeles(): Observable<Modele[]> {
+    return this.http.get<Modele[]>(`${this.api}/modeles`);
   }
 }

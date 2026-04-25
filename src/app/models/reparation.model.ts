@@ -46,6 +46,7 @@ export interface Reparation {
   machine?: Machine;
   // Snapshots retournés par l'API historique
   machine_snapshot?: string;
+  modele?: string;
   technicien_snapshot?: string;
   // Champs formulaire/OCR
   numero_serie?: string;
@@ -107,7 +108,8 @@ export interface BrandGroup {
   expanded: boolean;
 }
 
-/** @deprecated Utiliser Modele */
-export type MachineTypeRef = Modele & {
-  marque: string; modele: string; type_machine: string; label: string;
-};
+export interface TechnicienOption {
+  id: number;
+  nom: string;
+  email: string;
+}

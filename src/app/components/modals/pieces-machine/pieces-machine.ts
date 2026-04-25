@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output, signal, inject, OnChanges } from '@angular/core';
 import { ReferenceService } from '../../../services/references.services';
-import { MachineTypeRef, PieceRef } from '../../../models/reparation.model';
+import { Modele, PieceRef } from '../../../models/reparation.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus, faTrash, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +29,7 @@ export class PiecesMachine implements OnChanges{
   public readonly faWarning = faWarning;
 
   // Input : la machine sélectionnée (null = modale fermée)
-  machine = input<MachineTypeRef | null>(null);
+  machine = input<Modele | null>(null);
   // Output : demande de fermeture
   closeEvt = output<void>();
 

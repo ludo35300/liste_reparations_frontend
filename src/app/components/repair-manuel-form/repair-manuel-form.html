@@ -1,41 +1,267 @@
 <div class="form-card">
-  <h3 class="form-card-title">Saisie manuelle</h3>
+  <h3 class="form-card-title">Nouvelle réparation</h3>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <button
+      type="button"
+      class="stepper-btn"
+      [class.active]="currentStep() === 1"
+      (click)="previousStep()"
+    >
+      1. Identification
+    </button>
+
+    <div class="stepper-line" [class.done]="currentStep() === 2"></div>
+
+    <button
+      type="button"
+      class="stepper-btn"
+      [class.active]="currentStep() === 2"
+      [disabled]="currentStep() !== 2"
+    >
+      2. Intervention
+    </button>
+  </div>
 
   @if (error()) {
     <p class="field-error">{{ error() }}</p>
   }
 
-  <div class="form-row">
-    <label class="field-label">
-      Numéro de série
-      <input class="field-input" [(ngModel)]="form.numero_serie" />
-    </label>
+  <!-- ─── STEP 1 ─────────────────────────────────────── -->
+  @if (currentStep() === 1) {
 
-    <label class="field-label">
-      Date de réparation
-      <input class="field-input" type="date" [(ngModel)]="form.date_reparation" />
-    </label>
-  </div>
+    <!-- Saisie numéro de série -->
+    <div [formGroup]="serialForm">
+      <label class="field-label">
+        Numéro de série
+        <div class="serial-input-row">
+          <input
+            class="field-input"
+            formControlName="numero_serie"
+            placeholder="Ex : 1234567890"
+            [readonly]="machineStatus() !== 'idle'"
+          />
+          @if (machineStatus() === 'idle') {
+            <button type="button" class="btn btn-primary" (click)="checkNumeroSerie()">
+              Vérifier
+            </button>
+          } @else if (machineStatus() !== 'loading') {
+            <button type="button" class="btn btn-outline" (click)="resetSearch()">
+              Modifier
+            </button>
+          }
+        </div>
 
-  <div class="form-row">
-    <label class="field-label">
-      Machine
-      <input class="field-input" [(ngModel)]="form.machine_type" />
-    </label>
+        @if (serialForm.get('numero_serie')?.touched && serialForm.get('numero_serie')?.invalid) {
+          <small class="field-error">Numéro de série obligatoire (min. 3 caractères).</small>
+        }
+      </label>
+    </div>
 
-    <label class="field-label">
-      Technicien
-      <input class="field-input" [(ngModel)]="form.technicien" />
-    </label>
-  </div>
+    <!-- Loading -->
+    @if (machineStatus() === 'loading') {
+      <div class="check-loading">
+        <div class="check-spinner"></div>
+        <span>Recherche en cours…</span>
+      </div>
+    }
 
-  <label class="field-label">
-    Notes
-    <textarea class="field-input" [(ngModel)]="form.notes"></textarea>
-  </label>
+    <!-- ─── Machine inconnue ──────────────────────────── -->
+    @if (machineStatus() === 'not_found') {
+      <div class="machine-banner machine-banner--new">
+        <span class="machine-banner-icon">⚠️</span>
+        <div>
+          <strong>Machine inconnue</strong>
+          <span>Ce numéro de série n'existe pas encore. Complétez les informations ci-dessous.</span>
+        </div>
+      </div>
 
-  <div class="form-actions">
-    <button type="button" class="btn btn-outline" (click)="addPiece()">Ajouter une pièce</button>
-    <button type="button" class="btn btn-primary" (click)="submit()">Enregistrer</button>
-  </div>
+      <div [formGroup]="form">
+        <div class="form-row">
+          <label class="field-label">
+            Marque
+            <select class="field-input" formControlName="marque_id">
+              <option [ngValue]="null">Choisir une marque</option>
+              @for (marque of marques; track marque.id) {
+                <option [ngValue]="marque.id">{{ marque.nom }}</option>
+              }
+            </select>
+            @if (form.get('marque_id')?.touched && form.get('marque_id')?.invalid) {
+              <small class="field-error">Marque obligatoire.</small>
+            }
+          </label>
+
+          <label class="field-label">
+            Modèle
+            <select class="field-input" formControlName="modele_id"
+              [attr.disabled]="modelesFiltres().length === 0 ? true : null">
+              <option [ngValue]="null">Choisir un modèle</option>
+              @for (modele of modelesFiltres(); track modele.id) {
+                <option [ngValue]="modele.id">{{ modele.label || modele.nom }}</option>
+              }
+            </select>
+            @if (form.get('modele_id')?.touched && form.get('modele_id')?.invalid) {
+              <small class="field-error">Modèle obligatoire.</small>
+            }
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label">
+            Technicien
+            <select class="field-input" formControlName="technicien_id">
+              <option [ngValue]="null">Choisir un technicien</option>
+              @for (tech of techniciens; track tech.id) {
+                <option [ngValue]="tech.id">{{ tech.nom }}</option>
+              }
+            </select>
+            @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+              <small class="field-error">Technicien obligatoire.</small>
+            }
+          </label>
+
+          <label class="field-label">
+            Date de réparation
+            <input class="field-input" type="date" formControlName="date_reparation" />
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="nextStep()">Continuer</button>
+      </div>
+    }
+
+    <!-- ─── Machine trouvée ───────────────────────────── -->
+    @if (machineStatus() === 'found') {
+      <div class="machine-banner machine-banner--found">
+        <span class="machine-banner-icon">✅</span>
+        <div>
+          <strong>Machine trouvée</strong>
+          <span>
+            {{ foundMachine()?.modele?.marque?.nom }}
+            — {{ foundMachine()?.modele?.label || foundMachine()?.modele?.nom }}
+          </span>
+        </div>
+      </div>
+
+      <div [formGroup]="form">
+        <div class="form-row">
+          <label class="field-label">
+            Technicien
+            <select class="field-input" formControlName="technicien_id">
+              <option [ngValue]="null">Choisir un technicien</option>
+              @for (tech of techniciens; track tech.id) {
+                <option [ngValue]="tech.id">{{ tech.nom }}</option>
+              }
+            </select>
+            @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+              <small class="field-error">Technicien obligatoire.</small>
+            }
+          </label>
+
+          <label class="field-label">
+            Date de réparation
+            <input class="field-input" type="date" formControlName="date_reparation" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Historique -->
+      @if (machineHistory().length > 0) {
+        <div class="history-block">
+          <h4 class="history-title">
+            Historique — {{ machineHistory().length }} réparation(s)
+          </h4>
+          <div class="table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Technicien</th>
+                  <th>Pièces</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rep of machineHistory(); track rep.id) {
+                  <tr>
+                    <td>{{ rep.date_reparation | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ rep.technicien_snapshot || rep.technicien || '—' }}</td>
+                    <td>
+                      <span class="badge-count">{{ rep.pieces.length || 0 }}</span>
+                    </td>
+                    <td class="cell-notes">{{ rep.notes || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="no-history">Aucune réparation antérieure pour cette machine.</p>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="nextStep()">Continuer</button>
+      </div>
+    }
+  }
+
+  <!-- ─── STEP 2 ─────────────────────────────────────── -->
+  @if (currentStep() === 2) {
+    <div [formGroup]="form">
+      <label class="field-label">
+        Notes
+        <textarea
+          class="field-input field-textarea"
+          formControlName="notes"
+          placeholder="Observations, diagnostic…"
+        ></textarea>
+      </label>
+
+      <div class="section-block">
+        <div class="section-header">
+          <h4>Pièces changées</h4>
+          <button type="button" class="btn btn-outline btn-sm" (click)="addPiece()">
+            + Ajouter une pièce
+          </button>
+        </div>
+
+        <div formArrayName="pieces" class="pieces-list">
+          @if (pieces.length === 0) {
+            <div class="empty-pieces">Aucune pièce ajoutée pour le moment.</div>
+          }
+
+          @for (piece of pieces.controls; track $index) {
+            <div class="piece-card" [formGroupName]="$index">
+              <label class="field-label">
+                Référence
+                <input class="field-input" formControlName="ref_piece" placeholder="Ex: 123456" />
+              </label>
+              <label class="field-label">
+                Désignation
+                <input class="field-input" formControlName="designation" placeholder="Ex: Joint torique" />
+              </label>
+              <label class="field-label">
+                Qté
+                <input class="field-input" type="number" min="1" formControlName="quantite" />
+              </label>
+              <div class="piece-card-actions">
+                <button type="button" class="btn btn-danger btn-sm" (click)="removePiece($index)">
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="previousStep()">Retour</button>
+      <button type="button" class="btn btn-primary" (click)="submit()">Enregistrer</button>
+    </div>
+  }
 </div>
