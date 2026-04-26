@@ -21,7 +21,7 @@ export class ReparationService {
 
   historique(numeroSerie: string): Observable<Reparation[]> {
     return this.http.get<Reparation[]>(
-      `${this.api}/reparations/${numeroSerie.toUpperCase()}`
+      `${this.api}/machines/serie/${numeroSerie.toUpperCase()}`
     );
   }
 
@@ -35,11 +35,6 @@ export class ReparationService {
 
   stats(): Observable<Stats> {
     return this.http.get<Stats>(`${this.api}/stats`);
-  }
-
-  // Retourne toutes les machines distinctes
-  getAllMachines(): Observable<SearchResult[]> {
-    return this.http.get<SearchResult[]>(`${this.api}/machines`);
   }
 
   search(query: string): Observable<SearchResult[]> {
