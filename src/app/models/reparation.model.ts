@@ -1,10 +1,7 @@
 import { ReparationAction } from "./actions.model";
 import { Machine } from "./machine.model";
 import { PieceChangee } from "./piece.model";
-import { StatutMachine } from "./status.model";
-
-export type { StatutMachine };
-export type { ReparationAction };
+import { StatutMachine } from "./statut.model";
 
 
 export interface Reparation {

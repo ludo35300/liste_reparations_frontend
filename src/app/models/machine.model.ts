@@ -1,5 +1,5 @@
 import { Modele } from './modele.model';
-import { StatutMachine } from './status.model';
+import { StatutMachine } from './statut.model';
 
 export interface Machine {
   id: number;

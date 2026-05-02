@@ -1,5 +1,5 @@
 import { PieceChangee } from "./piece.model";
-import { StatutMachine } from "./status.model";
+import { StatutMachine } from "./statut.model";
 
 export type { StatutMachine };
 
