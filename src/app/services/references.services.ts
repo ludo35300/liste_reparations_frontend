@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { Marque } from '../models/marque.model';
 import { Modele } from '../models/modele.model';
 import { PieceRef } from '../models/piece.model';
+import { Machine } from '../models/machine.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {
@@ -66,34 +67,16 @@ export class ReferenceService {
       ))
     );
   }
-  /** @deprecated alias -> getModeleByLabel */
-  getMachineByLabel(label: string): Observable<Modele | undefined> {
-    return this.getModeleByLabel(label);
-  }
-  /** @deprecated alias -> addPieceToModele */
-  addPieceToMachine(modeleId: number, pieceId: number): Observable<void> {
-    return this.addPieceToModele(modeleId, pieceId);
-  }
 
-  getAllMachines(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/machines`);
+  getAllMachines(): Observable<Machine[]> {
+    return this.http.get<Machine[]>(`${this.api}/machines`);
   }
   deleteMachine(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/machines/${id}`);
   }
-  uploadLogo(machineId: number, file: File): Observable<any> {
+  uploadLogo(machineId: number, file: File): Observable<Machine> {
     const fd = new FormData();
     fd.append('logo', file);
-    return this.http.patch<any>(`${this.api}/machines/${machineId}/logo`, fd);
+    return this.http.patch<Machine>(`${this.api}/machines/${machineId}/logo`, fd);
   }
-
-  /** @deprecated → getPiecesByModele */
-getPiecesByMachine(modeleId: number): Observable<PieceRef[]> {
-  return this.getPiecesByModele(modeleId);
-}
-
-/** @deprecated → removePieceFromModele */
-removePieceFromMachine(modeleId: number, pieceId: number): Observable<void> {
-  return this.removePieceFromModele(modeleId, pieceId);
-}
 }

@@ -43,7 +43,7 @@ export class PiecesMachine implements OnChanges{
     if (!m) { this.showAddForm.set(false); return; }
     this.loading.set(true);
     this.error.set(null);
-    this.refService.getPiecesByMachine(m.id).subscribe({
+    this.refService.getPiecesByModele(m.id).subscribe({
       next: (data: PieceRef[]) => { this.pieces.set(data); this.loading.set(false); },
       error: ()    => { this.error.set('Impossible de charger les pièces.'); this.loading.set(false); },
     });
@@ -78,13 +78,13 @@ export class PiecesMachine implements OnChanges{
       return;
     }
     this.adding.set(true);
-    this.refService.addPieceToMachine(machineId, pieceId).subscribe({
+    this.refService.addPieceToModele(machineId, pieceId).subscribe({
       next: () => {
         this.adding.set(false);
         this.showAddForm.set(false);
         this.selectedPieceId.set(null);
         // Recharge les pièces de la machine
-        this.refService.getPiecesByMachine(machineId).subscribe({
+        this.refService.getPiecesByModele(machineId).subscribe({
           next: (data: PieceRef[]) => this.pieces.set(data),
         });
       },
@@ -98,7 +98,7 @@ export class PiecesMachine implements OnChanges{
   removePiece(pieceId: number): void {
     const machineId = this.machine()?.id;
     if (!machineId || !confirm('Retirer cette pièce ?')) return;
-    this.refService.removePieceFromMachine(machineId, pieceId).subscribe({
+    this.refService.removePieceFromModele(machineId, pieceId).subscribe({
       next: () => {
         this.pieces.update(list => list.filter(p => p.id !== pieceId));
       },
