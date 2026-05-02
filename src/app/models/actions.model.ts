@@ -1,4 +1,4 @@
-import { PieceChangee } from "./reparation.model";
+import { PieceChangee } from "./piece.model";
 import { StatutMachine } from "./status.model";
 
 export type { StatutMachine };

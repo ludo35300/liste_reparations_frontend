@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Machine, Marque, Modele, Reparation } from '../models/reparation.model';
+import { Reparation } from '../models/reparation.model';
+import { Marque } from '../models/marque.model';
+import { Modele } from '../models/modele.model';
+import { Machine } from '../models/machine.model';
 
 export interface CreateMachinePayload {
   numero_serie: string;

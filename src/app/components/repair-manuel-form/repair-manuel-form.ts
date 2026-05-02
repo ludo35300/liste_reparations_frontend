@@ -2,8 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { Machine, Marque, Modele, PieceChangee, Reparation, TechnicienOption } from '../../models/reparation.model';
+import { Reparation } from '../../models/reparation.model';
 import { MachineService } from '../../services/machine.service';
+import { Marque } from '../../models/marque.model';
+import { Modele } from '../../models/modele.model';
+import { Machine } from '../../models/machine.model';
+import { TechnicienOption } from '../../models/user.model';
+import { PieceChangee } from '../../models/piece.model';
 
 
 export interface RepairManualSubmit {

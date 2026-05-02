@@ -7,11 +7,13 @@ import { firstValueFrom } from 'rxjs';
 import { ReparationService } from '../../services/reparation.service';
 import { AuthService }       from '../../auth-lib/services/auth.service';
 import { MeResponse }        from '../../auth-lib/models/auth.model';
-import { BrandGroup, Reparation, SearchResult } from '../../models/reparation.model';
+import { Reparation } from '../../models/reparation.model';
 import { Topbar }            from '../../components/topbar/topbar';
 import { NavService }        from '../../core/nav.service';
 import { faBookOpen, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { environment }       from '../../../environments/environment';
+import { BrandGroup } from '../../models/modele.model';
+import { SearchResult } from '../../models/search.model';
 
 @Component({
   selector: 'app-search',

@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Marque, Modele, PieceRef } from '../models/reparation.model';
+import { Marque } from '../models/marque.model';
+import { Modele } from '../models/modele.model';
+import { PieceRef } from '../models/piece.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {

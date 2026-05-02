@@ -12,9 +12,11 @@ import { switchMap, catchError } from 'rxjs/operators';
 import { ReparationService } from '../../services/reparation.service';
 import { AuthService }       from '../../auth-lib/services/auth.service';
 import { MeResponse }        from '../../auth-lib/models/auth.model';
-import { Reparation, PieceChangee, OcrResult } from '../../models/reparation.model';
+import { Reparation } from '../../models/reparation.model';
 import { NavService }        from '../../core/nav.service';
 import { ReferenceService } from '../../services/references.services';
+import { OcrResult } from '../../models/ocr.model';
+import { PieceChangee } from '../../models/piece.model';
 
 type ScanState = 'idle' | 'loading-image' | 'analysing' | 'success' | 'ocr-failed';
 

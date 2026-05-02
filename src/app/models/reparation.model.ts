@@ -1,49 +1,11 @@
-import { ReparationAction } from "./actions.models";
+import { ReparationAction } from "./actions.model";
+import { Machine } from "./machine.model";
+import { PieceChangee } from "./piece.model";
 import { StatutMachine } from "./status.model";
 
 export type { StatutMachine };
+export type { ReparationAction };
 
-export interface Marque {
-  id: number;
-  nom: string;
-  url_logo?: string | null;
-}
-
-export interface Modele {
-  id: number;
-  nom: string;
-  type_machine: string;
-  marque_id: number;
-  marque?: Marque;
-  label: string;
-}
-
-export interface PieceRef {
-  id: number;
-  ref_piece: string;
-  designation: string;
-  marque_id?: number;
-}
-
-export interface Machine {
-  id: number;
-  numero_serie: string;
-  modele_id?: number | null;
-  modele?: Modele | null;
-  statut: StatutMachine;
-  date_entree?: string | null;
-  notes?: string;
-  created_at?: string;
-}
-
-export interface PieceChangee {
-  id?: number;
-  piece_ref_id?: number;
-  ref_piece: string;
-  designation: string;
-  quantite: number;
-  is_new?: boolean;
-}
 
 export interface Reparation {
   id?: number;
@@ -68,57 +30,4 @@ export interface Reparation {
   date_fin?: string | null;
   actions?: ReparationAction[];
   pieces: PieceChangee[];
-}
-
-export interface OcrResult {
-  technicien:      string;
-  date:            string;
-  numero_serie:    string;
-  machine_type:    string;
-  is_new_machine:  boolean;
-  pieces:          PieceChangee[];
-  nb_pieces_total: number;
-  erreur?:         string;
-}
-
-export interface Stats {
-  total_reparations: number;
-  total_pieces:      number;
-  machines_uniques:  number;
-  pieces_les_plus_changees: { ref: string; designation: string; total: number }[];
-  reparations: Reparation[];
-}
-
-export interface ExplodedView {
-  label:      string;
-  pdf_url:    string;
-  image_url?: string;  // ← ajouté
-  note?:      string;
-}
-
-export interface SearchResult {
-  found:              boolean;
-  numero_serie:       string;
-  machine_type?:      string;
-  nombre_reparations: number;
-  reparations:        Reparation[];
-  machine_info?: {
-    brand:        string;
-    model:        string;
-    description?: string;
-    specs:        Record<string, string>;
-    exploded_view?: ExplodedView | null;  // ← utilise l'interface
-  };
-}
-
-export interface BrandGroup {
-  marque: Marque;
-  modeles: Modele[];
-  expanded: boolean;
-}
-
-export interface TechnicienOption {
-  id: number;
-  nom: string;
-  email: string;
 }

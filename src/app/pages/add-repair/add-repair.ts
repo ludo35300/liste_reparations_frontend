@@ -14,10 +14,14 @@ import {
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { NavService } from '../../core/nav.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
-import { Machine, Marque, Modele, Reparation, TechnicienOption } from '../../models/reparation.model';
+import { Reparation, } from '../../models/reparation.model';
 import { ReparationService } from '../../services/reparation.service';
-import { MachineService, CreateMachinePayload } from '../../services/machine.service';
+import { MachineService } from '../../services/machine.service';
 import { TechnicienService } from '../../services/techniciens.service';
+import { Marque } from '../../models/marque.model';
+import { Modele } from '../../models/modele.model';
+import { Machine } from '../../models/machine.model';
+import { TechnicienOption } from '../../models/user.model';
 
 @Component({
   selector: 'app-add-repair',

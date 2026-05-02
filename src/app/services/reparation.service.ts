@@ -1,7 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Marque, Modele, OcrResult, Reparation, SearchResult, Stats, TechnicienOption } from '../models/reparation.model';
+import { Reparation } from '../models/reparation.model';
+import { Marque } from '../models/marque.model';
+import { Modele } from '../models/modele.model';
+import { OcrResult } from '../models/ocr.model';
+import { SearchResult } from '../models/search.model';
+import { Stats } from '../models/stats.model';
+import { TechnicienOption } from '../models/user.model';
 
 
 @Injectable({ providedIn: 'root' })

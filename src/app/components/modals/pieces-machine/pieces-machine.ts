@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output, signal, inject, OnChanges } from '@angular/core';
 import { ReferenceService } from '../../../services/references.services';
-import { Modele, PieceRef } from '../../../models/reparation.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus, faTrash, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
+import { Modele } from '../../../models/modele.model';
+import { PieceRef } from '../../../models/piece.model';
 
 
 @Component({

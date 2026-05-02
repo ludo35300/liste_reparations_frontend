@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TechnicienOption } from '../models/reparation.model';
+import { TechnicienOption } from '../models/user.model';
 
 
 

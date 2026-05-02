@@ -10,8 +10,9 @@ import { AuthService }     from '../../auth-lib/services/auth.service';
 import { MeResponse }      from '../../auth-lib/models/auth.model';
 import { Topbar }          from '../../components/topbar/topbar';
 import { NavService }      from '../../core/nav.service';
-import { Marque, Modele, BrandGroup } from '../../models/reparation.model';
 import { ReferenceService } from '../../services/references.services';
+import { Marque } from '../../models/marque.model';
+import { BrandGroup, Modele } from '../../models/modele.model';
 
 
 @Component({
