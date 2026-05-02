@@ -43,8 +43,8 @@ export class ReparationService {
     return this.http.get<Stats>(`${this.api}/stats`);
   }
 
-  search(query: string): Observable<SearchResult[]> {
-    return this.http.get<SearchResult[]>(`${this.api}/machines/serie/${encodeURIComponent(query)}`);
+  search(query: string): Observable<SearchResult> {
+    return this.http.get<SearchResult>(`${this.api}/machines/serie/${encodeURIComponent(query)}`);
   }
 
 

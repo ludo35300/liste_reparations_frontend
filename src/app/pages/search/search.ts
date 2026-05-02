@@ -59,15 +59,20 @@ export class Search implements OnInit {
     this.searchResult.set(null);
 
     this.service.search(q).subscribe({
-      next: (data: SearchResult[]) => {
-        this.searchResult.set(data[0] ?? null);
+      next: (data: SearchResult) => {
+        this.searchResult.set(data);
         this.searched.set(true);
         this.loading.set(false);
       },
-      error: () => {
-        this.errorMessage.set('Erreur lors de la recherche.');
+      error: (err: any) => {
+        if (err.status === 404) {
+          this.searchResult.set({ found: false, numero_serie: this.query(), nombre_reparations: 0, reparations: [] });
+          this.searched.set(true);
+        } else {
+          this.errorMessage.set('Erreur lors de la recherche.');
+        }
         this.loading.set(false);
-      },
+            },
     });
   }
 
@@ -86,7 +91,7 @@ export class Search implements OnInit {
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
 
-  nouvelleReparation(): void { this.router.navigate(['/scan']); }
+  nouvelleReparation(): void { this.router.navigate(['/history']); }
 
   ouvrirVueEclatee(url: string): void {
     window.open(url, '_blank', 'noopener,noreferrer');
