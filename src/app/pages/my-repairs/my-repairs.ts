@@ -35,9 +35,7 @@ export class MyRepairs implements OnInit {
   public readonly activeTab = signal<Tab>('en_cours');
 
   // Statuts considérés "en cours"
-  private readonly STATUTS_EN_COURS = new Set([
-    'en_attente', 'en_reparation', 'diagnostic', 'devis', 'test'
-  ]);
+  private readonly STATUTS_EN_COURS = new Set(['en_attente', 'en_reparation']);
 
  
 
@@ -89,11 +87,7 @@ export class MyRepairs implements OnInit {
     const labels: Record<string, string> = {
       en_attente: 'En attente',
       en_reparation: 'En réparation',
-      diagnostic: 'Diagnostic',
-      devis: 'Devis',
-      test: 'Test',
       pret: 'Prêt',
-      livre: 'Livré',
       termine: 'Terminé',
     };
     return labels[statut ?? ''] ?? statut ?? '—';
@@ -103,7 +97,7 @@ export class MyRepairs implements OnInit {
     if (!statut) return '';
     if (this.STATUTS_EN_COURS.has(statut)) return 'badge--progress';
     if (statut === 'pret') return 'badge--ready';
-    if (statut === 'termine' || statut === 'livre') return 'badge--done';
+    if (statut === 'termine') return 'badge--done';
     return '';
   }
 
