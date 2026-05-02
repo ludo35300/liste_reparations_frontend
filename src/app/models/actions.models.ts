@@ -2,20 +2,16 @@ import { Machine, PieceChangee } from "./reparation.model";
 
 export type StatutMachine =
   | 'en_attente'
-  | 'diagnostic'
-  | 'devis'
   | 'en_reparation'
-  | 'test'
   | 'pret'
-  | 'livree'
-  | 'terminee';
+  | 'termine';
 
 export interface ReparationAction {
   id?: number;
   reparation_id?: number;
   type: 'diagnostic' | 'demontage' | 'remplacement_piece' | 'nettoyage' | 'test' | 'commentaire' | 'statut';
   titre: string;
-  विवरण?: string;
+  description?: string;
   technicien?: string;
   technicien_id?: number;
   date_action: string;

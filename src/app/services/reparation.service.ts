@@ -38,7 +38,7 @@ export class ReparationService {
   }
 
   search(query: string): Observable<SearchResult[]> {
-    return this.http.get<SearchResult[]>(`${this.api}/reparations/search?q=${encodeURIComponent(query)}`);
+    return this.http.get<SearchResult[]>(`${this.api}/machines/serie/${encodeURIComponent(query)}`);
   }
 
 
