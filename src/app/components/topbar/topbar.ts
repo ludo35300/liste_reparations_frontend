@@ -17,7 +17,7 @@ export interface NavItem {
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [FontAwesomeModule, RouterLink, RouterLinkActive, FontAwesomeModule],
+  imports: [FontAwesomeModule, RouterLink, RouterLinkActive],
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss',
 })

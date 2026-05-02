@@ -14,6 +14,7 @@ import { ReparationAction }  from '../../models/actions.model';
 import { StatutMachine }     from '../../models/statut.model';
 import { Topbar }            from '../../components/topbar/topbar';
 import { NavService }        from '../../core/nav.service';
+import { faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 
 type ActiveTab = 'pieces' | 'actions';
 
@@ -63,6 +64,10 @@ export class History implements OnInit {
   readonly actions      = signal<ReparationAction[]>([]);
   readonly loadingAct   = signal(false);
 
+  // ── iCONES ────────────────────────────────
+  readonly faTrash = faTrash;
+  readonly faWarning = faWarning;
+
   // ── Formulaire ajout action ────────────────────────────────
   readonly showForm     = signal(false);
   readonly saving       = signal(false);
@@ -90,7 +95,9 @@ export class History implements OnInit {
       next: (result) => {
         const data = result.reparations ?? [];
         this.reparations.set(data);
+        console.log('Réparations chargées :', data);
         if (data.length > 0) this.selectionner(data[0]);
+
       },
       error: () => this.errorMessage.set('Impossible de charger l\'historique.'),
     });

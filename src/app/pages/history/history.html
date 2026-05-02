@@ -10,12 +10,14 @@
     <main class="main-content">
 
       @if (errorMessage()) {
-        <div class="alert-error" role="alert">⚠️ {{ errorMessage() }}</div>
+        <div class="alert-error" role="alert">
+          <fa-icon [icon]="faWarning"></fa-icon> &nbsp; {{ errorMessage() }}
+        </div>
       }
 
-      <div class="page-header">
+      <div class="page-header m-2">
         <div class="page-header-left">
-          
+
           <div>
             <h2 class="page-title">Historique — {{ numeroSerie() }}</h2>
             <p class="page-sub">Toutes les interventions enregistrées</p>
@@ -42,10 +44,10 @@
               [class.active]="selected()?.id === rep.id"
               (click)="selectionner(rep)"
               [attr.aria-pressed]="selected()?.id === rep.id"
-              [attr.aria-label]="'Intervention du ' + rep.date_reparation"
+              [attr.aria-label]="'Intervention du ' + rep.date_reparation | date:'d/MM/y'"
             >
-              <div class="item-date">{{ rep.date_reparation }}</div>
-              <div class="item-tech">{{ rep.technicien || 'Technicien N/A' }}</div>
+              <div class="item-date">Du {{ rep.date_reparation | date:'d/MM/y'}}</div>
+              <div class="item-tech">Par {{ rep.technicien || 'Technicien N/A' }}</div>
               <div class="item-badges">
                 <span class="item-badge">
                   {{ rep.pieces.length }} pièce{{ rep.pieces.length > 1 ? 's' : '' }}
@@ -69,11 +71,11 @@
               <div class="detail-meta">
                 <div class="meta-row">
                   <span class="meta-label">Date</span>
-                  <span class="meta-value">{{ rep.date_reparation }}</span>
+                  <span class="meta-value">Le {{ rep.date_reparation | date:'d/MM/y' }}</span>
                 </div>
                 <div class="meta-row">
                   <span class="meta-label">Machine</span>
-                  <span class="meta-value">{{ rep.machine_type || '—' }}</span>
+                  <span class="meta-value">{{ rep.machine?.modele?.label }}</span>
                 </div>
                 <div class="meta-row">
                   <span class="meta-label">Technicien</span>
@@ -87,7 +89,7 @@
                 }
               </div>
               <button class="btn-delete" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
-                🗑 Supprimer
+                <fa-icon [icon]="faTrash"></fa-icon> &nbsp; Supprimer
               </button>
             </div>
 

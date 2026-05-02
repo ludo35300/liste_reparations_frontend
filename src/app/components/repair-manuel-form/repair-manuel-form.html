@@ -1,180 +1,194 @@
 <div class="form-card">
-  <h3 class="form-card-title">Nouvelle réparation</h3>
 
-  <!-- Stepper -->
-  <div class="stepper">
-    <button
-      type="button"
-      class="stepper-btn"
-      [class.active]="currentStep() === 1"
-      (click)="previousStep()"
-    >
-      1. Identification
-    </button>
+  <!-- ── Titre + Stepper ─────────────────────────────────── -->
+  <div class="form-header">
+    <h3 class="form-title">Nouvelle réparation</h3>
 
-    <div class="stepper-line" [class.done]="currentStep() === 2"></div>
-
-    <button
-      type="button"
-      class="stepper-btn"
-      [class.active]="currentStep() === 2"
-      [disabled]="currentStep() !== 2"
-    >
-      2. Intervention
-    </button>
+    <div class="stepper" role="list">
+      <div class="step" [class.step--active]="currentStep() === 1" [class.step--done]="currentStep() === 2" role="listitem">
+        <div class="step-dot">
+          @if (currentStep() === 2) { <span class="step-check">✓</span> }
+          @else { <span>1</span> }
+        </div>
+        <span class="step-label">Identification</span>
+      </div>
+      <div class="step-connector" [class.step-connector--done]="currentStep() === 2"></div>
+      <div class="step" [class.step--active]="currentStep() === 2" role="listitem">
+        <div class="step-dot"><span>2</span></div>
+        <span class="step-label">Intervention</span>
+      </div>
+    </div>
   </div>
 
+  <!-- ── Erreur globale ──────────────────────────────────── -->
   @if (error()) {
-    <p class="field-error">{{ error() }}</p>
+    <div class="alert-error" role="alert">⚠️ {{ error() }}</div>
   }
 
-  <!-- ─── STEP 1 ─────────────────────────────────────── -->
+  <!-- ═══════════════════════════════════════════════════════
+       ÉTAPE 1 — Identification machine
+  ════════════════════════════════════════════════════════ -->
   @if (currentStep() === 1) {
 
-    <!-- Saisie numéro de série -->
-    <div [formGroup]="serialForm">
-      <label class="field-label">
-        Numéro de série
-        <div class="serial-input-row">
-          <input
-            class="field-input"
-            formControlName="numero_serie"
-            placeholder="Ex : 1234567890"
-            [readonly]="machineStatus() !== 'idle'"
-          />
-          @if (machineStatus() === 'idle') {
-            <button type="button" class="btn btn-primary" (click)="checkNumeroSerie()">
-              Vérifier
-            </button>
-          } @else if (machineStatus() !== 'loading') {
-            <button type="button" class="btn btn-outline" (click)="resetSearch()">
-              Modifier
-            </button>
-          }
-        </div>
-
-        @if (serialForm.get('numero_serie')?.touched && serialForm.get('numero_serie')?.invalid) {
-          <small class="field-error">Numéro de série obligatoire (min. 3 caractères).</small>
-        }
+    <!-- Champ numéro de série -->
+    <div [formGroup]="serialForm" class="field-group">
+      <label class="field-label" for="numero_serie">
+        Numéro de série <span class="required">*</span>
       </label>
+      <div class="serial-row">
+        <input
+          id="numero_serie"
+          class="field-input"
+          formControlName="numero_serie"
+          placeholder="Ex : 1234567890"
+          [class.field-input--readonly]="machineStatus() !== 'idle'"
+          [readonly]="machineStatus() !== 'idle'"
+          autocomplete="off"
+        />
+        @if (machineStatus() === 'idle') {
+          <button type="button" class="btn btn-primary" (click)="checkNumeroSerie()">
+            Vérifier
+          </button>
+        } @else if (machineStatus() !== 'loading') {
+          <button type="button" class="btn btn-ghost" (click)="resetSearch()">
+            ✕ Modifier
+          </button>
+        }
+      </div>
+      @if (serialForm.get('numero_serie')?.touched && serialForm.get('numero_serie')?.invalid) {
+        <small class="field-hint field-hint--error">Numéro de série obligatoire (min. 3 caractères).</small>
+      }
     </div>
 
-    <!-- Loading -->
+    <!-- Loader -->
     @if (machineStatus() === 'loading') {
-      <div class="check-loading">
-        <div class="check-spinner"></div>
+      <div class="status-loader">
+        <div class="spinner"></div>
         <span>Recherche en cours…</span>
       </div>
     }
 
-    <!-- ─── Machine inconnue ──────────────────────────── -->
+    <!-- ── Machine inconnue ──────────────────────────────── -->
     @if (machineStatus() === 'not_found') {
-      <div class="machine-banner machine-banner--new">
+
+      <div class="machine-banner machine-banner--warn">
         <span class="machine-banner-icon">⚠️</span>
         <div>
           <strong>Machine inconnue</strong>
-          <span>Ce numéro de série n'existe pas encore. Complétez les informations ci-dessous.</span>
+          <p>Ce numéro de série n'existe pas encore. Complétez les informations ci-dessous pour créer la machine.</p>
         </div>
       </div>
 
-      <div [formGroup]="form">
-        <div class="form-row">
-          <label class="field-label">
-            Marque
-            <select class="field-input" formControlName="marque_id">
-              <option [ngValue]="null">Choisir une marque</option>
-              @for (marque of marques; track marque.id) {
-                <option [ngValue]="marque.id">{{ marque.nom }}</option>
-              }
-            </select>
-            @if (form.get('marque_id')?.touched && form.get('marque_id')?.invalid) {
-              <small class="field-error">Marque obligatoire.</small>
-            }
-          </label>
+      <div [formGroup]="form" class="fields-grid">
 
-          <label class="field-label">
-            Modèle
-            <select class="field-input" formControlName="modele_id"
-              [attr.disabled]="modelesFiltres().length === 0 ? true : null">
-              <option [ngValue]="null">Choisir un modèle</option>
-              @for (modele of modelesFiltres(); track modele.id) {
-                <option [ngValue]="modele.id">{{ modele.label || modele.nom }}</option>
-              }
-            </select>
-            @if (form.get('modele_id')?.touched && form.get('modele_id')?.invalid) {
-              <small class="field-error">Modèle obligatoire.</small>
+        <div class="field-group">
+          <label class="field-label" for="marque_id">Marque <span class="required">*</span></label>
+          <select id="marque_id" class="field-input" formControlName="marque_id">
+            <option [ngValue]="null">— Choisir une marque —</option>
+            @for (marque of marques; track marque.id) {
+              <option [ngValue]="marque.id">{{ marque.nom }}</option>
             }
-          </label>
+          </select>
+          @if (form.get('marque_id')?.touched && form.get('marque_id')?.invalid) {
+            <small class="field-hint field-hint--error">Marque obligatoire.</small>
+          }
         </div>
 
-        <div class="form-row">
-          <label class="field-label">
-            Technicien
-            <select class="field-input" formControlName="technicien_id">
-              <option [ngValue]="null">Choisir un technicien</option>
-              @for (tech of techniciens; track tech.id) {
-                <option [ngValue]="tech.id">{{ tech.nom }}</option>
-              }
-            </select>
-            @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
-              <small class="field-error">Technicien obligatoire.</small>
+        <div class="field-group">
+          <label class="field-label" for="modele_id_new">Modèle <span class="required">*</span></label>
+          <select id="modele_id_new" class="field-input" formControlName="modele_id"
+            [class.field-input--disabled]="modelesFiltres().length === 0"
+            [attr.disabled]="modelesFiltres().length === 0 ? true : null">
+            <option [ngValue]="null">— Choisir un modèle —</option>
+            @for (modele of modelesFiltres(); track modele.id) {
+              <option [ngValue]="modele.id">{{ modele.label || modele.nom }}</option>
             }
-          </label>
-
-          <label class="field-label">
-            Date de réparation
-            <input class="field-input" type="date" formControlName="date_reparation" />
-          </label>
+          </select>
+          @if (modelesFiltres().length === 0) {
+            <small class="field-hint">Sélectionnez d'abord une marque.</small>
+          }
+          @if (form.get('modele_id')?.touched && form.get('modele_id')?.invalid) {
+            <small class="field-hint field-hint--error">Modèle obligatoire.</small>
+          }
         </div>
+
+        <div class="field-group">
+          <label class="field-label" for="technicien_id_new">Technicien <span class="required">*</span></label>
+          <select id="technicien_id_new" class="field-input" formControlName="technicien_id">
+            <option [ngValue]="null">— Choisir un technicien —</option>
+            @for (tech of techniciens; track tech.id) {
+              <option [ngValue]="tech.id">{{ tech.nom }}</option>
+            }
+          </select>
+          @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+            <small class="field-hint field-hint--error">Technicien obligatoire.</small>
+          }
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="date_reparation_new">Date d'intervention <span class="required">*</span></label>
+          <input id="date_reparation_new" class="field-input" type="date" formControlName="date_reparation" />
+          @if (form.get('date_reparation')?.touched && form.get('date_reparation')?.invalid) {
+            <small class="field-hint field-hint--error">Date obligatoire.</small>
+          }
+        </div>
+
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-primary" (click)="nextStep()">Continuer</button>
+        <button type="button" class="btn btn-primary" (click)="nextStep()">
+          Continuer →
+        </button>
       </div>
     }
 
-    <!-- ─── Machine trouvée ───────────────────────────── -->
+    <!-- ── Machine trouvée ───────────────────────────────── -->
     @if (machineStatus() === 'found') {
+
       <div class="machine-banner machine-banner--found">
         <span class="machine-banner-icon">✅</span>
         <div>
-          <strong>Machine trouvée</strong>
-          <span>
+          <strong>Machine identifiée</strong>
+          <p>
             {{ foundMachine()?.modele?.marque?.nom }}
             — {{ foundMachine()?.modele?.label || foundMachine()?.modele?.nom }}
-          </span>
+          </p>
         </div>
       </div>
 
-      <div [formGroup]="form">
-        <div class="form-row">
-          <label class="field-label">
-            Technicien
-            <select class="field-input" formControlName="technicien_id">
-              <option [ngValue]="null">Choisir un technicien</option>
-              @for (tech of techniciens; track tech.id) {
-                <option [ngValue]="tech.id">{{ tech.nom }}</option>
-              }
-            </select>
-            @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
-              <small class="field-error">Technicien obligatoire.</small>
+      <div [formGroup]="form" class="fields-grid">
+
+        <div class="field-group">
+          <label class="field-label" for="technicien_id_found">Technicien <span class="required">*</span></label>
+          <select id="technicien_id_found" class="field-input" formControlName="technicien_id">
+            <option [ngValue]="null">— Choisir un technicien —</option>
+            @for (tech of techniciens; track tech.id) {
+              <option [ngValue]="tech.id">{{ tech.nom }}</option>
             }
-          </label>
-
-          <label class="field-label">
-            Date de réparation
-            <input class="field-input" type="date" formControlName="date_reparation" />
-          </label>
+          </select>
+          @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+            <small class="field-hint field-hint--error">Technicien obligatoire.</small>
+          }
         </div>
+
+        <div class="field-group">
+          <label class="field-label" for="date_reparation_found">Date d'intervention <span class="required">*</span></label>
+          <input id="date_reparation_found" class="field-input" type="date" formControlName="date_reparation" />
+          @if (form.get('date_reparation')?.touched && form.get('date_reparation')?.invalid) {
+            <small class="field-hint field-hint--error">Date obligatoire.</small>
+          }
+        </div>
+
       </div>
 
-      <!-- Historique -->
+      <!-- Historique interventions -->
       @if (machineHistory().length > 0) {
         <div class="history-block">
-          <h4 class="history-title">
-            Historique — {{ machineHistory().length }} réparation(s)
-          </h4>
-          <div class="table-wrapper">
+          <div class="history-block-header">
+            <h4>Historique</h4>
+            <span class="history-badge">{{ machineHistory().length }} intervention{{ machineHistory().length > 1 ? 's' : '' }}</span>
+          </div>
+          <div class="table-scroll">
             <table class="history-table">
               <thead>
                 <tr>
@@ -187,11 +201,9 @@
               <tbody>
                 @for (rep of machineHistory(); track rep.id) {
                   <tr>
-                    <td>{{ rep.date_reparation | date:'dd/MM/yyyy' }}</td>
+                    <td class="cell-date">{{ rep.date_reparation | date:'dd/MM/yyyy' }}</td>
                     <td>{{ rep.technicien_snapshot || rep.technicien || '—' }}</td>
-                    <td>
-                      <span class="badge-count">{{ rep.pieces.length || 0 }}</span>
-                    </td>
+                    <td><span class="piece-count">{{ rep.pieces.length || 0 }}</span></td>
                     <td class="cell-notes">{{ rep.notes || '—' }}</td>
                   </tr>
                 }
@@ -200,68 +212,78 @@
           </div>
         </div>
       } @else {
-        <p class="no-history">Aucune réparation antérieure pour cette machine.</p>
+        <p class="no-history">Aucune intervention antérieure pour cette machine.</p>
       }
 
       <div class="form-actions">
-        <button type="button" class="btn btn-primary" (click)="nextStep()">Continuer</button>
+        <button type="button" class="btn btn-primary" (click)="nextStep()">
+          Continuer →
+        </button>
       </div>
     }
+
   }
 
-  <!-- ─── STEP 2 ─────────────────────────────────────── -->
+  <!-- ═══════════════════════════════════════════════════════
+       ÉTAPE 2 — Pièces & Notes
+  ════════════════════════════════════════════════════════ -->
   @if (currentStep() === 2) {
-    <div [formGroup]="form">
-      <label class="field-label">
-        Notes
-        <textarea
-          class="field-input field-textarea"
-          formControlName="notes"
-          placeholder="Observations, diagnostic…"
-        ></textarea>
-      </label>
 
-      <div class="section-block">
-        <div class="section-header">
-          <h4>Pièces changées</h4>
-          <button type="button" class="btn btn-outline btn-sm" (click)="addPiece()">
-            + Ajouter une pièce
-          </button>
-        </div>
+    <div [formGroup]="form" class="field-group">
+      <label class="field-label" for="notes">Notes / Observations</label>
+      <textarea
+        id="notes"
+        class="field-input field-textarea"
+        formControlName="notes"
+        placeholder="Diagnostic, remarques, symptômes…"
+      ></textarea>
+    </div>
 
-        <div formArrayName="pieces" class="pieces-list">
-          @if (pieces.length === 0) {
-            <div class="empty-pieces">Aucune pièce ajoutée pour le moment.</div>
-          }
+    <!-- Pièces changées -->
+    <div class="pieces-block">
+      <div class="pieces-block-header">
+        <h4>Pièces changées</h4>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="addPiece()">
+          + Ajouter une pièce
+        </button>
+      </div>
 
-          @for (piece of pieces.controls; track $index) {
-            <div class="piece-card" [formGroupName]="$index">
-              <label class="field-label">
-                Référence
-                <input class="field-input" formControlName="ref_piece" placeholder="Ex: 123456" />
-              </label>
-              <label class="field-label">
-                Désignation
-                <input class="field-input" formControlName="designation" placeholder="Ex: Joint torique" />
-              </label>
-              <label class="field-label">
-                Qté
-                <input class="field-input" type="number" min="1" formControlName="quantite" />
-              </label>
-              <div class="piece-card-actions">
-                <button type="button" class="btn btn-danger btn-sm" (click)="removePiece($index)">
-                  Supprimer
-                </button>
-              </div>
+      <div formArrayName="pieces" class="pieces-list" [formGroup]="form">
+        @if (pieces.length === 0) {
+          <div class="empty-pieces">
+            <span>🔩</span>
+            <p>Aucune pièce ajoutée.<br>Cliquez sur « + Ajouter une pièce » si nécessaire.</p>
+          </div>
+        }
+        @for (piece of pieces.controls; track $index) {
+          <div class="piece-row" [formGroupName]="$index">
+            <div class="field-group">
+              <label class="field-label" [for]="'ref_' + $index">Référence <span class="required">*</span></label>
+              <input [id]="'ref_' + $index" class="field-input" formControlName="ref_piece" placeholder="Ex : 40A-001" />
             </div>
-          }
-        </div>
+            <div class="field-group piece-row-desig">
+              <label class="field-label" [for]="'desig_' + $index">Désignation <span class="required">*</span></label>
+              <input [id]="'desig_' + $index" class="field-input" formControlName="designation" placeholder="Ex : Joint torique" />
+            </div>
+            <div class="field-group piece-row-qty">
+              <label class="field-label" [for]="'qty_' + $index">Qté</label>
+              <input [id]="'qty_' + $index" class="field-input" type="number" min="1" formControlName="quantite" />
+            </div>
+            <div class="piece-row-del">
+              <button type="button" class="btn-delete-piece" (click)="removePiece($index)" aria-label="Supprimer la pièce">✕</button>
+            </div>
+          </div>
+        }
       </div>
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-outline" (click)="previousStep()">Retour</button>
-      <button type="button" class="btn btn-primary" (click)="submit()">Enregistrer</button>
+      <button type="button" class="btn btn-ghost" (click)="previousStep()">← Retour</button>
+      <button type="button" class="btn btn-primary" (click)="submit()">
+        <fa-icon [icon]="faFloppyDisk"></fa-icon> Enregistrer
+      </button>
     </div>
+
   }
+
 </div>

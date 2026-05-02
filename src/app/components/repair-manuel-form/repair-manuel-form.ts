@@ -9,6 +9,8 @@ import { Modele } from '../../models/modele.model';
 import { Machine } from '../../models/machine.model';
 import { TechnicienOption } from '../../models/user.model';
 import { PieceChangee } from '../../models/piece.model';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 
 
 export interface RepairManualSubmit {
@@ -28,7 +30,7 @@ export type MachineStatus = 'idle' | 'loading' | 'found' | 'not_found';
 @Component({
   selector: 'app-repair-manuel-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './repair-manuel-form.html',
   styleUrl: './repair-manuel-form.scss',
 })
@@ -51,6 +53,8 @@ export class RepairManuelForm implements OnInit {
   public readonly currentStep = signal<1 | 2>(1);
 
   public readonly today = this.getTodayLocal();
+
+  public readonly faFloppyDisk = faFloppyDisk;
 
   // Formulaire de vérification (étape 1a)
   public readonly serialForm = this.fb.group({

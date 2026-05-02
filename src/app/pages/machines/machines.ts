@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faXmark, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService }     from '../../auth-lib/services/auth.service';
 import { MeResponse }      from '../../auth-lib/models/auth.model';
@@ -30,33 +30,35 @@ export class Machines implements OnInit {
   protected readonly navItems = inject(NavService).navItems;
 
   // ── State général ──────────────────────────────────────────
-  readonly me           = signal<MeResponse | null>(null);
-  readonly errorMessage = signal<string | null>(null);
-  readonly loading      = signal(false);
-  readonly brandGroups  = signal<BrandGroup[]>([]);
-  readonly faTrash      = faTrash;
-  readonly faPlus       = faPlus;
+  public readonly me           = signal<MeResponse | null>(null);
+  public readonly errorMessage = signal<string | null>(null);
+  public readonly loading      = signal(false);
+  public readonly brandGroups  = signal<BrandGroup[]>([]);
+  public readonly faTrash      = faTrash;
+  public readonly faPlus       = faPlus;
+  public readonly faXmark      = faXmark;
+  public readonly faFloppyDisk = faFloppyDisk;
 
   // ── Formulaire ajout marque ────────────────────────────────
-  readonly showMarqueForm  = signal(false);
-  readonly formMarqueNom   = signal('');
-  readonly savingMarque    = signal(false);
-  readonly errorMarque     = signal<string | null>(null);
+  public readonly showMarqueForm  = signal(false);
+  public readonly formMarqueNom   = signal('');
+  public readonly savingMarque    = signal(false);
+  public readonly errorMarque     = signal<string | null>(null);
 
   // ── Formulaire ajout modèle ────────────────────────────────
-  readonly showModeleForm   = signal(false);
-  readonly activeMarqueId   = signal<number | null>(null);   // marque cible
-  readonly formModeleNom    = signal('');
-  readonly formModeleType   = signal('');
-  readonly savingModele     = signal(false);
-  readonly errorModele      = signal<string | null>(null);
+  public readonly showModeleForm   = signal(false);
+  public readonly activeMarqueId   = signal<number | null>(null);   // marque cible
+  public readonly formModeleNom    = signal('');
+  public readonly formModeleType   = signal('');
+  public readonly savingModele     = signal(false);
+  public readonly errorModele      = signal<string | null>(null);
 
   // ── Sélection modèle (modale pièces) ──────────────────────
-  readonly selectedModele = signal<Modele | null>(null);
+  public readonly selectedModele = signal<Modele | null>(null);
 
   // ── Computed ───────────────────────────────────────────────
-  readonly totalBrands  = computed(() => this.brandGroups().length);
-  readonly totalModeles = computed(() =>
+  public readonly totalBrands  = computed(() => this.brandGroups().length);
+  public readonly totalModeles = computed(() =>
     this.brandGroups().reduce((acc, g) => acc + g.modeles.length, 0)
   );
 
