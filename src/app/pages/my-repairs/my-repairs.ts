@@ -75,7 +75,7 @@ export class MyRepairs implements OnInit {
   }
 
   public goToSearch(numeroSerie: string): void {
-    this.router.navigate(['/search'], { queryParams: { q: numeroSerie } });
+    this.router.navigate(['/history/'+numeroSerie], );
   }
 
   public async logout(): Promise<void> {

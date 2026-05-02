@@ -1,7 +1,5 @@
 <div class="layout">
-
   <div class="layout-right">
-
     <app-topbar
       [me]="me()"
       pageTitle="Tableau de bord"
@@ -11,12 +9,13 @@
 
     <main class="main-content">
 
-      <!-- Page Header -->
+      @if (errorMessage()) {
+        <div class="alert-error" role="alert">⚠️ {{ errorMessage() }}</div>
+      }
+
       <div class="page-header">
         <div class="page-header-left">
-          <button class="btn-back" (click)="retour()">
-            <span aria-hidden="true">←</span> Retour
-          </button>
+          
           <div>
             <h2 class="page-title">Historique — {{ numeroSerie() }}</h2>
             <p class="page-sub">Toutes les interventions enregistrées</p>
@@ -27,10 +26,9 @@
         </span>
       </div>
 
-      <!-- Layout deux colonnes -->
       <div class="history-layout">
 
-        <!-- Liste -->
+        <!-- ── Liste interventions ─────────────────────────── -->
         <aside class="history-list">
           @if (reparations().length === 0) {
             <div class="empty-state">
@@ -38,7 +36,6 @@
               <p>Aucune intervention trouvée</p>
             </div>
           }
-
           @for (rep of reparations(); track rep.id) {
             <button
               class="history-item"
@@ -49,17 +46,25 @@
             >
               <div class="item-date">{{ rep.date_reparation }}</div>
               <div class="item-tech">{{ rep.technicien || 'Technicien N/A' }}</div>
-              <span class="item-badge">
-                {{ rep.pieces.length }} pièce{{ (rep.pieces.length) > 1 ? 's' : '' }}
-              </span>
+              <div class="item-badges">
+                <span class="item-badge">
+                  {{ rep.pieces.length }} pièce{{ rep.pieces.length > 1 ? 's' : '' }}
+                </span>
+                @if (rep.actions && rep.actions.length > 0) {
+                  <span class="item-badge item-badge--actions">
+                    {{ rep.actions.length }} action{{ rep.actions.length > 1 ? 's' : '' }}
+                  </span>
+                }
+              </div>
             </button>
           }
         </aside>
 
-        <!-- Détail -->
+        <!-- ── Panneau détail ──────────────────────────────── -->
         @if (selected(); as rep) {
           <section class="history-detail" aria-label="Détail de l'intervention">
 
+            <!-- Meta + bouton supprimer -->
             <div class="detail-header">
               <div class="detail-meta">
                 <div class="meta-row">
@@ -81,43 +86,177 @@
                   </div>
                 }
               </div>
-
-              <button
-                class="btn-delete"
-                (click)="supprimer(rep.id!)"
-                aria-label="Supprimer cette intervention"
-              >
+              <button class="btn-delete" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
                 🗑 Supprimer
               </button>
             </div>
 
-            @if (rep.pieces && rep.pieces.length > 0) {
-              <div class="pieces-section">
-                <h3 class="pieces-title">🔩 Pièces changées</h3>
-                <div class="table-wrapper">
-                  <table class="pieces-table">
-                    <thead>
-                      <tr>
-                        <th>Référence</th>
-                        <th>Désignation</th>
-                        <th>Quantité</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (p of rep.pieces; track p.ref_piece) {
+            <!-- Onglets -->
+            <div class="tabs">
+              <button
+                class="tab-btn"
+                [class.tab-active]="activeTab() === 'pieces'"
+                (click)="setTab('pieces')">
+                🔩 Pièces ({{ rep.pieces.length }})
+              </button>
+              <button
+                class="tab-btn"
+                [class.tab-active]="activeTab() === 'actions'"
+                (click)="setTab('actions')">
+                📋 Actions ({{ actions().length }})
+              </button>
+            </div>
+
+            <!-- ── Onglet Pièces ──────────────────────────── -->
+            @if (activeTab() === 'pieces') {
+              @if (rep.pieces && rep.pieces.length > 0) {
+                <div class="pieces-section">
+                  <div class="table-wrapper">
+                    <table class="pieces-table">
+                      <thead>
                         <tr>
-                          <td class="cell-ref">{{ p.ref_piece }}</td>
-                          <td>{{ p.designation }}</td>
-                          <td class="cell-qty">{{ p.quantite }}</td>
+                          <th>Référence</th>
+                          <th>Désignation</th>
+                          <th>Qté</th>
                         </tr>
-                      }
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        @for (p of rep.pieces; track p.ref_piece) {
+                          <tr>
+                            <td class="cell-ref">{{ p.ref_piece }}</td>
+                            <td>{{ p.designation }}</td>
+                            <td class="cell-qty">{{ p.quantite }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            } @else {
-              <div class="no-pieces">
-                <span>Aucune pièce enregistrée pour cette intervention</span>
+              } @else {
+                <div class="no-pieces">Aucune pièce enregistrée pour cette intervention.</div>
+              }
+            }
+
+            <!-- ── Onglet Actions ─────────────────────────── -->
+            @if (activeTab() === 'actions') {
+              <div class="actions-section">
+
+                <div class="actions-toolbar">
+                  <span class="actions-count">{{ actions().length }} action{{ actions().length > 1 ? 's' : '' }}</span>
+                  <button class="btn btn-primary-sm" (click)="openForm()">+ Ajouter une action</button>
+                </div>
+
+                <!-- Formulaire ajout -->
+                @if (showForm()) {
+                  <div class="action-form-card">
+                    <h4 class="form-title">Nouvelle action</h4>
+
+                    @if (formError()) {
+                      <div class="form-error">⚠️ {{ formError() }}</div>
+                    }
+
+                    <div class="form-grid">
+                      <div class="form-group">
+                        <label for="act-type">Type *</label>
+                        <select id="act-type" [(ngModel)]="form.type">
+                          @for (t of typesAction; track t.value) {
+                            <option [value]="t.value">{{ t.label }}</option>
+                          }
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="act-date">Date *</label>
+                        <input id="act-date" type="date" [(ngModel)]="form.date_action" />
+                      </div>
+
+                      <div class="form-group form-group--full">
+                        <label for="act-titre">Titre *</label>
+                        <input id="act-titre" type="text" placeholder="Ex: Diagnostic frein moulin" [(ngModel)]="form.titre" />
+                      </div>
+
+                      <div class="form-group form-group--full">
+                        <label for="act-desc">Description</label>
+                        <textarea id="act-desc" rows="3" placeholder="Détails de l'intervention…" [(ngModel)]="form.description"></textarea>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="act-duree">Durée (min)</label>
+                        <input id="act-duree" type="number" min="1" placeholder="30" [(ngModel)]="form.duree_minutes" />
+                      </div>
+
+                      @if (needsStatutApres()) {
+                        <div class="form-group">
+                          <label for="act-avant">Statut avant</label>
+                          <select id="act-avant" [(ngModel)]="form.statut_avant">
+                            <option [value]="undefined">— aucun —</option>
+                            @for (s of statuts; track s.value) {
+                              <option [value]="s.value">{{ s.label }}</option>
+                            }
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="act-apres">Statut après *</label>
+                          <select id="act-apres" [(ngModel)]="form.statut_apres">
+                            <option [value]="undefined">— choisir —</option>
+                            @for (s of statuts; track s.value) {
+                              <option [value]="s.value">{{ s.label }}</option>
+                            }
+                          </select>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="form-actions">
+                      <button class="btn btn-ghost" (click)="cancelForm()" [disabled]="saving()">Annuler</button>
+                      <button class="btn btn-primary-sm" (click)="submitAction()" [disabled]="saving()">
+                        @if (saving()) { Enregistrement… } @else { Enregistrer }
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- Timeline des actions -->
+                @if (loadingAct()) {
+                  <div class="timeline-loading">Chargement des actions…</div>
+                } @else if (actions().length === 0) {
+                  <div class="no-pieces">Aucune action enregistrée. Ajoutez la première ci-dessus.</div>
+                } @else {
+                  <ol class="timeline" aria-label="Historique des actions">
+                    @for (action of actions(); track action.id) {
+                      <li class="timeline-item">
+                        <div class="timeline-dot" [attr.data-type]="action.type"></div>
+                        <div class="timeline-content">
+                          <div class="timeline-header">
+                            <span class="timeline-type">{{ labelType(action.type) }}</span>
+                            <span class="timeline-date">{{ action.date_action }}</span>
+                            @if (action.duree_minutes) {
+                              <span class="timeline-duration">⏱ {{ action.duree_minutes }} min</span>
+                            }
+                            <button class="btn-del-action" (click)="supprimerAction(action.id!)" aria-label="Supprimer cette action">✕</button>
+                          </div>
+                          <p class="timeline-titre">{{ action.titre }}</p>
+                          @if (action.description) {
+                            <p class="timeline-desc">{{ action.description }}</p>
+                          }
+                          @if (action.statut_apres) {
+                            <div class="timeline-statut">
+                              @if (action.statut_avant) {
+                                <span class="statut-badge statut-avant">{{ labelStatut(action.statut_avant) }}</span>
+                                <span class="statut-arrow">→</span>
+                              }
+                              <span class="statut-badge statut-apres">{{ labelStatut(action.statut_apres) }}</span>
+                            </div>
+                          }
+                          @if (action.technicien) {
+                            <p class="timeline-tech">👤 {{ action.technicien }}</p>
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ol>
+                }
+
               </div>
             }
 
@@ -130,7 +269,6 @@
         }
 
       </div>
-
     </main>
   </div>
 </div>

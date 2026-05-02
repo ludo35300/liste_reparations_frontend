@@ -100,27 +100,20 @@ export class RepairManuelForm implements OnInit {
     try {
       const result = await firstValueFrom(this.machineService.getByNumeroSerie(numeroSerie));
 
-      // Backend renvoie [] ou null au lieu de 404 → traiter comme not_found
-      const machine = Array.isArray(result) || !result || !(result as Machine).id
-        ? null
-        : (result as Machine);
+      // getByNumeroSerie retourne maintenant un SearchResult
+      const searchResult = result as any;
+      const firstRep = searchResult?.reparations?.[0];
+      const machine: Machine | null = firstRep?.machine ?? null;
 
-      if (!machine) {
+      if (!machine?.id) {
         this.machineStatus.set('not_found');
         return;
       }
 
       this.foundMachine.set(machine);
 
-      // Historique uniquement si on a un id valide
-      if (machine.id) {
-        try {
-          const history = await firstValueFrom(this.machineService.getHistory(machine.id));
-          this.machineHistory.set(Array.isArray(history) ? history : []);
-        } catch {
-          this.machineHistory.set([]);
-        }
-      }
+      // Historique : on l'a déjà dans searchResult.reparations
+      this.machineHistory.set(searchResult.reparations ?? []);
 
       const marqueId = machine.modele?.marque_id ?? null;
       if (marqueId) {
