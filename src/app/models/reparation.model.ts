@@ -1,3 +1,8 @@
+import { ReparationAction } from "./actions.models";
+import { StatutMachine } from "./status.model";
+
+export type { StatutMachine };
+
 export interface Marque {
   id: number;
   nom: string;
@@ -25,7 +30,7 @@ export interface Machine {
   numero_serie: string;
   modele_id?: number | null;
   modele?: Modele | null;
-  statut: 'en_attente' | 'en_reparation' | 'pret' | 'termine';
+  statut: StatutMachine;
   date_entree?: string | null;
   notes?: string;
   created_at?: string;
@@ -58,6 +63,10 @@ export interface Reparation {
   date_reparation: string;
   description?: string;
   created_at?: string;
+  // Feature actions
+  statut?: StatutMachine;
+  date_fin?: string | null;
+  actions?: ReparationAction[];
   pieces: PieceChangee[];
 }
 
