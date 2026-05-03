@@ -145,16 +145,13 @@ export class RepairManuelForm implements OnInit {
         return;
       }
 
-      // Machine trouvée → extraire depuis les réparations ou machine_info
+      // Machine trouvée → priorité au champ machine direct, sinon via reparations
       const machine: Machine | null =
-        result.machine ??                    // ← direct si dispo
-        result.reparations?.[0]?.machine ??  // ← sinon via historique
-        null;
+        result.machine ?? result.reparations?.[0]?.machine ?? null;
 
       if (!machine?.id) {
-        // Machine existe mais sans réparations → on a quand même found=true
-        // On recrée un objet Machine minimal pour continuer
-        this.machineStatus.set('not_found'); // sera créée au submit
+        // found=true mais pas d'id exploitable (ne devrait pas arriver)
+        this.machineStatus.set('not_found');
         return;
       }
 

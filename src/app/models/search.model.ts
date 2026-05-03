@@ -16,6 +16,7 @@ export interface SearchResult {
   reparations:        Reparation[];
   machine?:           Machine;
   machine_info?: {
+    id: number,
     brand:        string;
     model:        string;
     description?: string;

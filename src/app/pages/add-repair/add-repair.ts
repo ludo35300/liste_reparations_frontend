@@ -111,7 +111,7 @@ export class AddRepair implements OnInit {
       };
 
       await firstValueFrom(this.reparationService.enregistrer(repairPayload));
-      await this.router.navigate(['/search']);
+      await this.router.navigate(['/history/'+payload.numero_serie]);
     } catch (error) {
       console.error('onManualRepairSubmitted error:', error);
       this.errorMessage.set("Erreur lors de l'enregistrement de la réparation.");
@@ -123,11 +123,11 @@ export class AddRepair implements OnInit {
   public onRepairSubmitted(payload: Reparation): void {
     this.saving.set(true);
     this.errorMessage.set(null);
-
+    console.log('Submitting repair:', payload.numero_serie);
     this.reparationService.enregistrer(payload).subscribe({
       next: () => {
         this.saving.set(false);
-        this.router.navigate(['/search']);
+        this.router.navigate(['/history/'+payload.numero_serie]);
       },
       error: () => {
         this.saving.set(false);
@@ -149,7 +149,7 @@ export class AddRepair implements OnInit {
         this.machineService.create({
           numero_serie: numeroSerie,
           modele_id: payload.modele_id,
-          statut: 'en_reparation',
+          statut: 'en_attente',
           notes: payload.notes ?? '',
         })
       );
@@ -159,13 +159,11 @@ export class AddRepair implements OnInit {
         const existing = err?.error?.existing ?? err?.error?.machine ?? err?.error ?? null;
         if (existing?.id) return existing as Machine;
 
-        // Sinon, cherche via les réparations
         const result = await firstValueFrom(
           this.machineService.getByNumeroSerie(numeroSerie)
         ) as any;
 
-        const machine: Machine | null =
-          result?.reparations?.[0]?.machine ?? null;
+        const machine: Machine | null = result?.machine ?? null;
 
         if (machine?.id) return machine;
 
