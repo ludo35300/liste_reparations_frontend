@@ -119,7 +119,7 @@ export class Scan implements OnInit {
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
 
-  goSearch(): void { this.router.navigate(['/search']); }
+  goHistory(numero_serie: string): void { this.router.navigate(['/history/', numero_serie]); }
 
   onDragOver(event: DragEvent): void { event.preventDefault(); this.isDragging.set(true); }
   onDragLeave(): void { this.isDragging.set(false); }
@@ -210,15 +210,24 @@ export class Scan implements OnInit {
 
           // Technicien : priorité OCR, sinon technicien connecté
           if (result.technicien) {
-            this.form.technicien = result.technicien;
+            const prenomOcr = result.technicien.trim().toLowerCase();
             const tech = this.techniciens.find(
-              t => t.nom === result.technicien
+              t => t.nom.trim().toLowerCase().startsWith(prenomOcr)  // "ludovic randu".startsWith("ludovic")
             );
-            this.form.technicien_id = tech?.id ?? this.currentTechnicienId;
+            if (tech) {
+              this.form.technicien_id = tech.id;
+              this.form.technicien    = tech.nom;  // nom complet depuis la liste
+            } else {
+              // Prénom OCR non reconnu → fallback technicien connecté
+              this.form.technicien_id = this.currentTechnicienId;
+              const fallback = this.techniciens.find(t => t.id === this.currentTechnicienId);
+              this.form.technicien = fallback?.nom ?? result.technicien;
+            }
           } else {
+            // Pas de technicien OCR → technicien connecté
             this.form.technicien_id = this.currentTechnicienId;
-            const tech = this.techniciens.find(t => t.id === this.currentTechnicienId);
-            if (tech) this.form.technicien = tech.nom;
+            const fallback = this.techniciens.find(t => t.id === this.currentTechnicienId);
+            this.form.technicien = fallback?.nom ?? '';
           }
 
           this.isNewMachine.set(result.is_new_machine ?? false);

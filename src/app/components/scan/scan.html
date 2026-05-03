@@ -262,7 +262,7 @@
               <p>La fiche a été sauvegardée avec succès dans la base de données.</p>
               <div class="result-actions">
                 <button class="btn btn-primary" (click)="reinitialiser()">➕ Nouvelle réparation</button>
-                <button class="btn btn-outline" (click)="goSearch()">🔍 Voir les réparations</button>
+                <button class="btn btn-outline" (click)="goHistory(form.numero_serie)">🔍 Voir les réparations</button>
               </div>
             </div>
           } @else {
