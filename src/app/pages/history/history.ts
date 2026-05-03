@@ -10,11 +10,12 @@ import { ActionsService }    from '../../services/actions.service';
 import { AuthService }       from '../../auth-lib/services/auth.service';
 import { MeResponse }        from '../../auth-lib/models/auth.model';
 import { Reparation }        from '../../models/reparation.model';
+import { PieceChangee, PieceRef } from '../../models/piece.model';
 import { ReparationAction }  from '../../models/actions.model';
 import { StatutMachine }     from '../../models/statut.model';
 import { Topbar }            from '../../components/topbar/topbar';
 import { NavService }        from '../../core/nav.service';
-import { faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faWarning, faPen, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 type ActiveTab = 'pieces' | 'actions';
 
@@ -28,11 +29,11 @@ const TYPES_ACTION = [
   { value: 'statut',              label: '🔄 Changement de statut' },
 ] as const;
 
-const STATUTS: { value: StatutMachine; label: string }[] = [
-  { value: 'en_attente',    label: 'En attente' },
-  { value: 'en_reparation', label: 'En réparation' },
-  { value: 'pret',          label: 'Prêt' },
-  { value: 'termine',       label: 'Terminé' },
+const STATUTS: { value: StatutMachine; label: string; cls: string }[] = [
+  { value: 'en_attente',    label: 'En attente',    cls: 'badge--waiting' },
+  { value: 'en_reparation', label: 'En réparation', cls: 'badge--progress' },
+  { value: 'pret',          label: 'Prêt',          cls: 'badge--ready' },
+  { value: 'termine',       label: 'Terminé',       cls: 'badge--done' },
 ];
 
 @Component({
@@ -52,62 +53,91 @@ export class History implements OnInit {
   private readonly router   = inject(Router);
   protected readonly navItems = inject(NavService).navItems;
 
-  // ── Signals UI ─────────────────────────────────────────────
-  readonly me           = signal<MeResponse | null>(null);
-  readonly errorMessage = signal<string | null>(null);
-  readonly activeTab    = signal<ActiveTab>('pieces');
-
-  // ── Signals métier ─────────────────────────────────────────
-  readonly reparations  = signal<Reparation[]>([]);
-  readonly selected     = signal<Reparation | null>(null);
-  readonly numeroSerie  = signal<string>('');
-  readonly actions      = signal<ReparationAction[]>([]);
-  readonly loadingAct   = signal(false);
-
-  // ── iCONES ────────────────────────────────
-  readonly faTrash = faTrash;
+  // ── Icons ──────────────────────────────────────────────────
+  readonly faTrash   = faTrash;
   readonly faWarning = faWarning;
+  readonly faPen     = faPen;
+  readonly faCheck   = faCheck;
+  readonly faXmark   = faXmark;
 
-  // ── Formulaire ajout action ────────────────────────────────
-  readonly showForm     = signal(false);
-  readonly saving       = signal(false);
-  readonly formError    = signal<string | null>(null);
-
-  form: Partial<ReparationAction> = this.emptyForm();
-
-  // ── Constantes exposées au template ───────────────────────
+  // ── Constantes template ────────────────────────────────────
   readonly typesAction = TYPES_ACTION;
   readonly statuts     = STATUTS;
 
-  // ── Computed ───────────────────────────────────────────────
+  // ── State ──────────────────────────────────────────────────
+  readonly me           = signal<MeResponse | null>(null);
+  readonly errorMessage = signal<string | null>(null);
+  readonly reparations  = signal<Reparation[]>([]);
+  readonly selected     = signal<Reparation | null>(null);
+  readonly numeroSerie  = signal('');
+  readonly activeTab    = signal<ActiveTab>('pieces');
+
+  // ── Actions ────────────────────────────────────────────────
+  readonly actions     = signal<ReparationAction[]>([]);
+  readonly loadingAct  = signal(false);
+  readonly showForm    = signal(false);
+  readonly saving      = signal(false);
+  readonly formError   = signal<string | null>(null);
+  form: Partial<ReparationAction> = this.emptyForm();
   readonly needsStatutApres = computed(() => this.form.type === 'statut');
+
+  // ── Édition pièces ─────────────────────────────────────────
+  readonly editingPieces  = signal(false);
+  readonly piecesEdit     = signal<PieceChangee[]>([]);
+  readonly allPieces      = signal<PieceRef[]>([]);
+  readonly searchPiece    = signal('');
+  readonly savingPieces   = signal(false);
+  readonly piecesError    = signal<string | null>(null);
+
+  readonly filteredPieces = computed(() => {
+    const q = this.searchPiece().trim().toLowerCase();
+    if (q.length < 2) return [];
+    const linkedRefs = new Set(this.piecesEdit().map(p => p.ref_piece));
+    return this.allPieces().filter(p =>
+      !linkedRefs.has(p.ref_piece) &&
+      (p.ref_piece.toLowerCase().includes(q) || p.designation.toLowerCase().includes(q))
+    );
+  });
+
+  // ── Édition statut machine ─────────────────────────────────
+  readonly editingStatut  = signal(false);
+  readonly statutEdit     = signal<StatutMachine>('en_attente');
+  readonly savingStatut   = signal(false);
 
   // ── Lifecycle ──────────────────────────────────────────────
   ngOnInit(): void {
-    firstValueFrom(this.auth.getMeHttp())
-      .then(me => this.me.set(me))
-      .catch(() => {});
+    firstValueFrom(this.auth.getMeHttp()).then(me => this.me.set(me)).catch(() => {});
+    const serie = this.route.snapshot.paramMap.get('numeroSerie') ?? '';
+    this.numeroSerie.set(serie.toUpperCase());
+    this.loadHistory(serie);
+    this.loadAllPieces();
+  }
 
-    const num = this.route.snapshot.paramMap.get('numeroSerie') ?? '';
-    this.numeroSerie.set(num);
-
-    this.service.search(num).subscribe({
-      next: (result) => {
-        const data = result.reparations ?? [];
-        this.reparations.set(data);
-        console.log('Réparations chargées :', data);
-        if (data.length > 0) this.selectionner(data[0]);
-
+  private loadHistory(serie: string): void {
+    this.service.search(serie).subscribe({
+      next: (res: any) => {
+        const reps: Reparation[] = res.reparations ?? res ?? [];
+        this.reparations.set(reps);
+        if (reps.length > 0) this.selectionner(reps[0]);
       },
       error: () => this.errorMessage.set('Impossible de charger l\'historique.'),
     });
   }
 
-  // ── Navigation ────────────────────────────────────────────
+  private loadAllPieces(): void {
+    this.service.getAllPieces().subscribe({
+      next: (pieces) => this.allPieces.set(pieces),
+      error: () => {}
+    });
+  }
+
+  // ── Navigation ─────────────────────────────────────────────
   selectionner(rep: Reparation): void {
     this.selected.set(rep);
     this.activeTab.set('pieces');
     this.showForm.set(false);
+    this.editingPieces.set(false);
+    this.editingStatut.set(false);
     this.loadActions(rep.id!);
   }
 
@@ -121,6 +151,106 @@ export class History implements OnInit {
   async logout(): Promise<void> {
     await firstValueFrom(this.auth.logoutHttp());
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
+  }
+
+  // ── Statut machine ─────────────────────────────────────────
+  getStatutCls(statut?: string): string {
+    return STATUTS.find(s => s.value === statut)?.cls ?? '';
+  }
+
+  openEditStatut(): void {
+    const rep = this.selected();
+    if (!rep?.machine) return;
+    this.statutEdit.set((rep.machine.statut ?? 'en_attente') as StatutMachine);
+    this.editingStatut.set(true);
+  }
+
+  cancelEditStatut(): void { this.editingStatut.set(false); }
+
+  saveStatut(): void {
+    const rep = this.selected();
+    if (!rep?.machine?.id) return;
+    this.savingStatut.set(true);
+    this.service.updateMachine(rep.machine.id, { statut: this.statutEdit() }).subscribe({
+      next: (machine) => {
+        // Mettre à jour le signal localement
+        this.selected.update(r => r ? { ...r, machine: { ...r.machine!, statut: this.statutEdit() } } : r);
+        this.reparations.update(list =>
+          list.map(r => r.id === rep.id ? { ...r, machine: { ...r.machine!, statut: this.statutEdit() } } : r)
+        );
+        this.savingStatut.set(false);
+        this.editingStatut.set(false);
+      },
+      error: () => { this.savingStatut.set(false); this.errorMessage.set('Erreur lors de la mise à jour du statut.'); }
+    });
+  }
+
+  // ── Édition pièces ─────────────────────────────────────────
+  openEditPieces(): void {
+    const rep = this.selected();
+    if (!rep) return;
+    // Copie profonde des pièces actuelles
+    this.piecesEdit.set(rep.pieces.map(p => ({ ...p })));
+    this.searchPiece.set('');
+    this.piecesError.set(null);
+    this.editingPieces.set(true);
+  }
+
+  cancelEditPieces(): void {
+    this.editingPieces.set(false);
+    this.searchPiece.set('');
+    this.piecesError.set(null);
+  }
+
+  updateQty(piece: PieceChangee, delta: number): void {
+    const newQty = (piece.quantite ?? 1) + delta;
+    if (newQty < 1) return;
+    this.piecesEdit.update(list =>
+      list.map(p => p.ref_piece === piece.ref_piece ? { ...p, quantite: newQty } : p)
+    );
+  }
+
+  setQty(piece: PieceChangee, qty: number): void {
+    if (qty < 1) return;
+    this.piecesEdit.update(list =>
+      list.map(p => p.ref_piece === piece.ref_piece ? { ...p, quantite: qty } : p)
+    );
+  }
+
+  removePieceEdit(ref: string): void {
+    this.piecesEdit.update(list => list.filter(p => p.ref_piece !== ref));
+  }
+
+  addPieceFromCatalog(piece: PieceRef): void {
+    const already = this.piecesEdit().some(p => p.ref_piece === piece.ref_piece);
+    if (already) return;
+    this.piecesEdit.update(list => [...list, {
+      ref_piece: piece.ref_piece,
+      designation: piece.designation,
+      quantite: 1,
+    }]);
+    this.searchPiece.set('');
+  }
+
+  savePieces(): void {
+    const rep = this.selected();
+    if (!rep?.id) return;
+    this.savingPieces.set(true);
+    this.piecesError.set(null);
+
+    this.service.modifier(rep.id, { pieces: this.piecesEdit() }).subscribe({
+      next: (updated) => {
+        // Mettre à jour la réparation dans les deux signaux
+        this.selected.set(updated);
+        this.reparations.update(list => list.map(r => r.id === updated.id ? updated : r));
+        this.savingPieces.set(false);
+        this.editingPieces.set(false);
+      },
+      error: (err) => {
+        this.piecesError.set(err?.error?.message ?? 'Erreur lors de la sauvegarde.');
+        this.savingPieces.set(false);
+      }
+    });
   }
 
   // ── Actions ───────────────────────────────────────────────
@@ -143,7 +273,6 @@ export class History implements OnInit {
   submitAction(): void {
     const rep = this.selected();
     if (!rep?.id) return;
-
     if (!this.form.type || !this.form.titre || !this.form.date_action) {
       this.formError.set('Type, titre et date sont obligatoires.');
       return;
@@ -152,10 +281,8 @@ export class History implements OnInit {
       this.formError.set('Statut après est obligatoire pour un changement de statut.');
       return;
     }
-
     this.saving.set(true);
     this.formError.set(null);
-
     this.actSvc.addAction(rep.id, this.form).subscribe({
       next: (action) => {
         this.actions.update(list => [...list, action]);
@@ -201,9 +328,7 @@ export class History implements OnInit {
     return STATUTS.find(s => s.value === statut)?.label ?? statut ?? '';
   }
 
-  today(): string {
-    return new Date().toISOString().split('T')[0];
-  }
+  today(): string { return new Date().toISOString().split('T')[0]; }
 
   private emptyForm(): Partial<ReparationAction> {
     return {

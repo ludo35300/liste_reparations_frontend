@@ -8,6 +8,7 @@ import { OcrResult } from '../models/ocr.model';
 import { SearchResult } from '../models/search.model';
 import { Stats } from '../models/stats.model';
 import { TechnicienOption } from '../models/user.model';
+import { PieceRef } from '../models/piece.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -62,5 +63,27 @@ export class ReparationService {
 
   public getModeles(): Observable<Modele[]> {
     return this.http.get<Modele[]>(`${this.api}/modeles`);
+  }
+   /**
+   * PATCH /api/reparations/:id
+   * Données partielles : technicien, date_reparation, description, pieces[]
+   */
+  modifier(id: number, data: Partial<Reparation>): Observable<Reparation> {
+    return this.http.patch<Reparation>(`${this.api}/reparations/${id}`, data);
+  }
+
+  /**
+   * PATCH /api/machines/:id
+   * Pour modifier le statut ou les notes d'une machine
+   */
+  updateMachine(machineId: number, data: { statut?: string; notes?: string }): Observable<any> {
+    return this.http.patch(`${this.api}/machines/${machineId}`, data);
+  }
+
+  /**
+   * GET /api/pieces  — catalogue complet pour l'autocomplete
+   */
+  getAllPieces(): Observable<PieceRef[]> {
+    return this.http.get<PieceRef[]>(`${this.api}/pieces`);
   }
 }
