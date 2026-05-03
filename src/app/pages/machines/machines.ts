@@ -251,11 +251,11 @@ export class Machines implements OnInit {
     const modele = this.selectedModele();
     if (!ref || !desig) { this.errorNewPiece.set('Référence et désignation obligatoires.'); return; }
     if (!modele) return;
-    const marqueId = modele.id;
+    const marqueId = modele.marque_id;
 
     this.savingNewPiece.set(true);
     this.errorNewPiece.set(null);
-    this.refService.createPiece(ref, desig).subscribe({
+    this.refService.createPiece(ref, desig, marqueId).subscribe({
       next: (newPiece) => {
         this.refService.addPieceToModele(modele.id, newPiece.id).subscribe({
           next: () => {

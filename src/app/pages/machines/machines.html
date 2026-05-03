@@ -176,11 +176,11 @@
      DRAWER — Pièces du modèle
 ════════════════════════════════════════════════════════════ -->
 @if (selectedModele()) {
-  <div class="drawer-backdrop" (click)="closePiecesDrawer()" aria-hidden="true"></div>
+  <div class="drawer-backdrop pt-4" (click)="closePiecesDrawer()" aria-hidden="true"></div>
 
   <aside class="drawer" role="dialog" [attr.aria-label]="'Pièces de ' + selectedModele()!.nom">
 
-    <div class="drawer-header">
+    <div class="drawer-header mt-4">
       <div class="drawer-header-info">
         <span class="drawer-header-type">{{ selectedModele()!.type_machine }}</span>
         <h3 class="drawer-header-title">{{ selectedModele()!.nom }}</h3>
@@ -201,7 +201,7 @@
       @if (!piecesLoading()) {
 
         <!-- Pièces associées -->
-        <div class="drawer-section">
+        <div class="drawer-section mt-2">
           <div class="drawer-section-header">
             <h4>Pièces associées</h4>
             <span class="piece-badge">{{ piecesDuModele().length }}</span>
