@@ -1,23 +1,21 @@
 import { Routes } from '@angular/router';
 import { authUiRoutes } from './auth-lib/auth-ui.routes';
-import { Home } from './pages/home/home';
 import { authGuard } from './auth-lib/guards/auth.guard';
-import { Machines } from './pages/machines/machines';
 
 export const routes: Routes = [
   { path: 'auth', children: authUiRoutes },
 
   {
     path: 'home',
-    component: Home,
     title: 'Accueil',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/home/home').then(m => m.Home)
   },
   {
     path: 'scan',
     title: 'Scanner une fiche',
     canActivate: [authGuard],
-    loadComponent: () => import('./pages/scan/scan').then(m => m.Scan)
+    loadComponent: () => import('./components/scan/scan').then(m => m.Scan)
   },
   {
     path: 'search',
@@ -41,6 +39,16 @@ export const routes: Routes = [
     title: 'Machines', 
     canActivate: [authGuard],
     loadComponent: () => import('./pages/machines/machines').then(m => m.Machines)
+  },
+  { path: 'ajout-repair', 
+    title: 'Ajouter une réparation', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/add-repair/add-repair').then(m => m.AddRepair)
+  },
+  { path: 'my-repairs', 
+    title: 'Mes réparations', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/my-repairs/my-repairs').then(m => m.MyRepairs)
   },
   { path: '',   redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' },

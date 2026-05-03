@@ -90,7 +90,7 @@
                       <td>{{ rep.technicien || '—' }}</td>
                       <td>
                         <span class="badge-pieces">
-                          {{ rep.pieces?.length ?? 0 }} pièce(s)
+                          {{ rep.pieces.length }} pièce(s)
                         </span>
                       </td>
                       <td class="cell-notes">{{ rep.notes || '—' }}</td>
@@ -137,15 +137,38 @@
 
               @if (info.exploded_view; as view) {
                 <div class="aside-section aside-exploded">
-                  <p class="aside-label">Documentation</p>
+                  <p class="aside-label">Vue éclatée — {{ view.label }}</p>
+
                   @if (view.note) {
                     <p class="aside-desc">{{ view.note }}</p>
                   }
-                  <button
-                    class="btn btn-exploded"
-                    (click)="ouvrirVueEclatee(view.pdf_url)">
-                    <fa-icon [icon]="faBookOpen" class="nav-icon" aria-hidden="true"></fa-icon> Manuel d'utilisation et d'entretien
-                  </button>
+
+                  <!-- Image incrustée directement dans la card -->
+                  @if (view.image_url) {
+                    <div class="exploded-img-wrapper">
+                      <img
+                        [src]="getImageUrl(view.image_url)"
+                        [alt]="'Vue éclatée ' + view.label"
+                        class="exploded-img"
+                        loading="lazy"
+                      />
+                      <!-- Clic = ouverture plein écran -->
+                      <button
+                        class="exploded-img-zoom"
+                        (click)="ouvrirVueEclatee(view.image_url)"
+                        title="Agrandir">
+                        <i class="fas fa-expand-alt"></i>
+                      </button>
+                    </div>
+                  }
+
+                  @if (view.pdf_url) {
+                    <button
+                      class="btn btn-exploded"
+                      (click)="ouvrirVueEclatee(view.pdf_url!)">
+                      <i class="fas fa-file-pdf"></i> Télécharger PDF
+                    </button>
+                  }
                 </div>
               }
 

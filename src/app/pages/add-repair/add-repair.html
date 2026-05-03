@@ -1,0 +1,68 @@
+<div class="layout">
+  <div class="layout-right">
+    <app-topbar
+      [me]="me()"
+      pageTitle="Ajouter une réparation"
+      [navItems]="navItems"
+      (logoutEvt)="logout()"
+    />
+
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Ajouter une réparation</h2>
+          <p class="page-sub">
+            Choisissez un mode de saisie : manuel ou scan OCR
+          </p>
+        </div>
+      </div>
+
+      <section class="mode-selector">
+        <button
+          type="button"
+          class="mode-card"
+          [class.active]="mode() === 'manual'"
+          (click)="setMode('manual')">
+          <div class="mode-card-icon">✍️</div>
+          <div class="mode-card-body">
+            <h3>Saisie manuelle</h3>
+            <p>Créer une réparation en remplissant le formulaire.</p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          class="mode-card"
+          [class.active]="mode() === 'scan'"
+          (click)="setMode('scan')">
+          <div class="mode-card-icon">📄</div>
+          <div class="mode-card-body">
+            <h3>Scan OCR</h3>
+            <p>Importer une fiche pour préremplir automatiquement les données.</p>
+          </div>
+        </button>
+      </section>
+
+      <section class="mode-content">
+        @if (mode() === 'manual') {
+          <app-repair-manuel-form
+            [techniciens]="techniciens()"
+            [marques]="marques()"
+            [modeles]="modeles()"
+            [currentTechnicienId]="currentTechnicienId()"
+            (submitted)="onManualRepairSubmitted($event)"
+          />
+        }
+
+        @if (mode() === 'scan') {
+          <app-scan
+            [techniciens]="techniciens()"
+            [marques]="marques()"
+            [modeles]="modeles()"
+            [currentTechnicienId]="currentTechnicienId()"
+          />
+        }
+      </section>
+    </main>
+  </div>
+</div>

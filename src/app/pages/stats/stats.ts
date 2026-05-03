@@ -6,9 +6,9 @@ import { firstValueFrom } from 'rxjs';
 import { ReparationService } from '../../services/reparation.service';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
-import { Reparation, Stats } from '../../models/reparation.model';
 import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
+import { Stats } from '../../models/stats.model';
 
 @Component({
   selector: 'app-stats',
@@ -51,9 +51,9 @@ export class StatsPage implements OnInit {
     });
   }
 
-  public voirDetail(rep: Reparation): void {
+  /*public voirDetail(rep: Reparation): void {
     this.router.navigate(['/history', rep.numero_serie]);
-  }
+  }*/
 
   // ── Logout ─────────────────────────────────────────────────
   public async logout(): Promise<void> {

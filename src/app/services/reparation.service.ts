@@ -1,7 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Reparation, OcrResult, Stats, MachineTypeRef, SearchResult } from '../models/reparation.model';
+import { Reparation } from '../models/reparation.model';
+import { Marque } from '../models/marque.model';
+import { Modele } from '../models/modele.model';
+import { OcrResult } from '../models/ocr.model';
+import { SearchResult } from '../models/search.model';
+import { Stats } from '../models/stats.model';
+import { TechnicienOption } from '../models/user.model';
+import { PieceRef } from '../models/piece.model';
+
 
 @Injectable({ providedIn: 'root' })
 export class ReparationService {
@@ -20,7 +28,7 @@ export class ReparationService {
 
   historique(numeroSerie: string): Observable<Reparation[]> {
     return this.http.get<Reparation[]>(
-      `${this.api}/reparations/${numeroSerie.toUpperCase()}`
+      `${this.api}/machines/serie/${numeroSerie.toUpperCase()}`
     );
   }
 
@@ -36,12 +44,46 @@ export class ReparationService {
     return this.http.get<Stats>(`${this.api}/stats`);
   }
 
-  // Retourne toutes les machines distinctes
-  getAllMachines(): Observable<MachineTypeRef[]> {
-    return this.http.get<MachineTypeRef[]>(`${this.api}/machines`);
+  search(query: string): Observable<SearchResult> {
+    return this.http.get<SearchResult>(`${this.api}/machines/serie/${encodeURIComponent(query)}`);
   }
 
-  search(query: string): Observable<SearchResult> {
-    return this.http.get<SearchResult>(`${this.api}/reparations/search`, { params: { q: query } });
+
+  public getTechniciens(): Observable<TechnicienOption[]> {
+    return this.http.get<TechnicienOption[]>(`${this.api}/techniciens`);
+  }
+
+  public getMarques(): Observable<Marque[]> {
+    return this.http.get<Marque[]>(`${this.api}/marques`);
+  }
+
+  public getMesReparations(): Observable<Reparation[]> {
+    return this.http.get<Reparation[]>(`${this.api}/reparations/mine`);
+  }
+
+  public getModeles(): Observable<Modele[]> {
+    return this.http.get<Modele[]>(`${this.api}/modeles`);
+  }
+   /**
+   * PATCH /api/reparations/:id
+   * Données partielles : technicien, date_reparation, description, pieces[]
+   */
+  modifier(id: number, data: Partial<Reparation>): Observable<Reparation> {
+    return this.http.patch<Reparation>(`${this.api}/reparations/${id}`, data);
+  }
+
+  /**
+   * PATCH /api/machines/:id
+   * Pour modifier le statut ou les notes d'une machine
+   */
+  updateMachine(machineId: number, data: { statut?: string; notes?: string }): Observable<any> {
+    return this.http.patch(`${this.api}/machines/${machineId}`, data);
+  }
+
+  /**
+   * GET /api/pieces  — catalogue complet pour l'autocomplete
+   */
+  getAllPieces(): Observable<PieceRef[]> {
+    return this.http.get<PieceRef[]>(`${this.api}/pieces`);
   }
 }

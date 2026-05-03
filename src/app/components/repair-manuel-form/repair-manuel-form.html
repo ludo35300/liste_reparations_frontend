@@ -1,0 +1,410 @@
+<div class="form-card">
+
+  <!-- ── Titre + Stepper ─────────────────────────────────── -->
+  <div class="form-header">
+    <h3 class="form-title">Nouvelle réparation</h3>
+
+    <div class="stepper" role="list">
+      <div class="step" [class.step--active]="currentStep() === 1" [class.step--done]="currentStep() === 2" role="listitem">
+        <div class="step-dot">
+          @if (currentStep() === 2) { <span class="step-check">✓</span> }
+          @else { <span>1</span> }
+        </div>
+        <span class="step-label">Identification</span>
+      </div>
+      <div class="step-connector" [class.step-connector--done]="currentStep() === 2"></div>
+      <div class="step" [class.step--active]="currentStep() === 2" role="listitem">
+        <div class="step-dot"><span>2</span></div>
+        <span class="step-label">Intervention</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Erreur globale ──────────────────────────────────── -->
+  @if (error()) {
+    <div class="alert-error" role="alert">⚠️ {{ error() }}</div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+       ÉTAPE 1 — Identification machine
+  ════════════════════════════════════════════════════════ -->
+  @if (currentStep() === 1) {
+
+    <!-- Champ numéro de série -->
+    <div [formGroup]="serialForm" class="field-group">
+      <label class="field-label" for="numero_serie">
+        Numéro de série <span class="required">*</span>
+      </label>
+      <div class="serial-row">
+        <input
+          id="numero_serie"
+          class="field-input"
+          formControlName="numero_serie"
+          placeholder="Ex : 1234567890"
+          [class.field-input--readonly]="machineStatus() !== 'idle'"
+          [readonly]="machineStatus() !== 'idle'"
+          autocomplete="off"
+        />
+        @if (machineStatus() === 'idle') {
+          <button type="button" class="btn btn-primary" (click)="checkNumeroSerie()">
+            Vérifier
+          </button>
+        } @else if (machineStatus() !== 'loading') {
+          <button type="button" class="btn btn-ghost" (click)="resetSearch()">
+            ✕ Modifier
+          </button>
+        }
+      </div>
+      @if (serialForm.get('numero_serie')?.touched && serialForm.get('numero_serie')?.invalid) {
+        <small class="field-hint field-hint--error">Numéro de série obligatoire (min. 3 caractères).</small>
+      }
+    </div>
+
+    <!-- Loader -->
+    @if (machineStatus() === 'loading') {
+      <div class="status-loader">
+        <div class="spinner"></div>
+        <span>Recherche en cours…</span>
+      </div>
+    }
+
+    <!-- ── Machine inconnue ──────────────────────────────── -->
+    @if (machineStatus() === 'not_found') {
+
+      <div class="machine-banner machine-banner--warn">
+        <span class="machine-banner-icon">⚠️</span>
+        <div>
+          <strong>Machine inconnue</strong>
+          <p>Ce numéro de série n'existe pas encore. Complétez les informations ci-dessous pour créer la machine.</p>
+        </div>
+      </div>
+
+      <div [formGroup]="form" class="fields-grid">
+
+        <div class="field-group">
+          <label class="field-label" for="marque_id">Marque <span class="required">*</span></label>
+          <select id="marque_id" class="field-input" formControlName="marque_id">
+            <option [ngValue]="null">— Choisir une marque —</option>
+            @for (marque of marques; track marque.id) {
+              <option [ngValue]="marque.id">{{ marque.nom }}</option>
+            }
+          </select>
+          @if (form.get('marque_id')?.touched && form.get('marque_id')?.invalid) {
+            <small class="field-hint field-hint--error">Marque obligatoire.</small>
+          }
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="modele_id_new">Modèle <span class="required">*</span></label>
+          <select id="modele_id_new" class="field-input" formControlName="modele_id"
+            [class.field-input--disabled]="modelesFiltres().length === 0"
+            [attr.disabled]="modelesFiltres().length === 0 ? true : null">
+            <option [ngValue]="null">— Choisir un modèle —</option>
+            @for (modele of modelesFiltres(); track modele.id) {
+              <option [ngValue]="modele.id">{{ modele.label || modele.nom }}</option>
+            }
+          </select>
+          @if (modelesFiltres().length === 0) {
+            <small class="field-hint">Sélectionnez d'abord une marque.</small>
+          }
+          @if (form.get('modele_id')?.touched && form.get('modele_id')?.invalid) {
+            <small class="field-hint field-hint--error">Modèle obligatoire.</small>
+          }
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="technicien_id_new">Technicien <span class="required">*</span></label>
+          <select id="technicien_id_new" class="field-input" formControlName="technicien_id">
+            <option [ngValue]="null">— Choisir un technicien —</option>
+            @for (tech of techniciens; track tech.id) {
+              <option [ngValue]="tech.id">{{ tech.nom }}</option>
+            }
+          </select>
+          @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+            <small class="field-hint field-hint--error">Technicien obligatoire.</small>
+          }
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="date_reparation_new">Date d'intervention <span class="required">*</span></label>
+          <input id="date_reparation_new" class="field-input" type="date" formControlName="date_reparation" />
+          @if (form.get('date_reparation')?.touched && form.get('date_reparation')?.invalid) {
+            <small class="field-hint field-hint--error">Date obligatoire.</small>
+          }
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="nextStep()">
+          Continuer →
+        </button>
+      </div>
+    }
+
+    <!-- ── Machine trouvée ───────────────────────────────── -->
+    @if (machineStatus() === 'found') {
+
+      <div class="machine-banner machine-banner--found">
+        <span class="machine-banner-icon">✅</span>
+        <div>
+          <strong>Machine identifiée</strong>
+          <p>
+            {{ foundMachine()?.modele?.marque?.nom }}
+            — {{ foundMachine()?.modele?.label || foundMachine()?.modele?.nom }}
+          </p>
+        </div>
+      </div>
+
+      @if (machineAlreadyInRepair()) {
+        <div class="machine-banner machine-banner--danger" role="alert">
+          <span class="machine-banner-icon">⛔</span>
+          <div>
+            <strong>Réparation déjà ouverte</strong>
+            <p>Cette machine est déjà en réparation. Vous devez d’abord terminer la réparation en cours.</p>
+          </div>
+        </div>
+      }
+      @if (!machineAlreadyInRepair()) {
+        <div [formGroup]="form" class="fields-grid">
+
+          <div class="field-group">
+            <label class="field-label" for="technicien_id_found">Technicien <span class="required">*</span></label>
+            <select id="technicien_id_found" class="field-input" formControlName="technicien_id">
+              <option [ngValue]="null">— Choisir un technicien —</option>
+              @for (tech of techniciens; track tech.id) {
+                <option [ngValue]="tech.id">{{ tech.nom }}</option>
+              }
+            </select>
+            @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+              <small class="field-hint field-hint--error">Technicien obligatoire.</small>
+            }
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="date_reparation_found">Date d'intervention <span class="required">*</span></label>
+            <input id="date_reparation_found" class="field-input" type="date" formControlName="date_reparation" />
+            @if (form.get('date_reparation')?.touched && form.get('date_reparation')?.invalid) {
+              <small class="field-hint field-hint--error">Date obligatoire.</small>
+            }
+          </div>
+
+        </div>
+      }
+      <!-- Historique interventions -->
+      @if (machineHistory().length > 0) {
+        <div class="history-block">
+          <div class="history-block-header">
+            <h4>Historique</h4>
+            <span class="history-badge">{{ machineHistory().length }} intervention{{ machineHistory().length > 1 ? 's' : '' }}</span>
+          </div>
+          <div class="table-scroll">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Technicien</th>
+                  <th>Pièces</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rep of machineHistory(); track rep.id) {
+                  <tr>
+                    <td class="cell-date">{{ rep.date_reparation | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ rep.technicien_snapshot || rep.technicien || '—' }}</td>
+                    <td><span class="piece-count">{{ rep.pieces.length || 0 }}</span></td>
+                    <td class="cell-notes">{{ rep.notes || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="no-history">Aucune intervention antérieure pour cette machine.</p>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="machineAlreadyInRepair()">
+          Continuer →
+        </button>
+      </div>
+    }
+
+  }
+
+  <!-- ═══════════════════════════════════════════════════════
+      ÉTAPE 2 — Pièces & Notes
+  ════════════════════════════════════════════════════════ -->
+  @if (currentStep() === 2) {
+
+    <div [formGroup]="form">
+
+      <!-- Notes -->
+      <div class="field-group">
+        <label class="field-label" for="notes">Notes / Observations</label>
+        <textarea
+          id="notes"
+          class="field-input field-textarea"
+          formControlName="notes"
+          placeholder="Diagnostic, remarques, symptômes…"
+        ></textarea>
+      </div>
+
+      <!-- Pièces changées -->
+      <div class="pieces-block">
+
+        <div class="pieces-block-header">
+          <h4>Pièces changées</h4>
+          <span class="pieces-count-badge">
+            {{ pieces.length }} pièce{{ pieces.length > 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <!-- Liste pièces ajoutées -->
+        @if (pieces.length > 0) {
+          <div formArrayName="pieces">
+            <ul class="added-pieces-list">
+              @for (piece of pieces.controls; track $index) {
+                <li class="added-piece-item" [formGroupName]="$index">
+                  <div class="added-piece-info">
+                    <span class="added-piece-ref">{{ piece.get('ref_piece')?.value }}</span>
+                    <span class="added-piece-desig">{{ piece.get('designation')?.value }}</span>
+                  </div>
+                  <div class="added-piece-qty">
+                    <button type="button" class="qty-btn"
+                      (click)="decrementQty($index)"
+                      [disabled]="piece.get('quantite')?.value <= 1"
+                      aria-label="Diminuer">−</button>
+                    <span class="qty-value">{{ piece.get('quantite')?.value }}</span>
+                    <button type="button" class="qty-btn"
+                      (click)="incrementQty($index)"
+                      aria-label="Augmenter">+</button>
+                  </div>
+                  <button type="button" class="piece-remove-btn"
+                    (click)="removePiece($index)"
+                    aria-label="Retirer cette pièce">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </button>
+                </li>
+              }
+            </ul>
+          </div>
+        } @else {
+          <div class="empty-pieces">
+            <span class="empty-pieces-icon">🔩</span>
+            <p>Aucune pièce ajoutée. Recherchez une pièce ci-dessous.</p>
+          </div>
+        }
+
+        <!-- Zone recherche — hors formArrayName, ngModel standalone -->
+        <div class="pieces-add-zone">
+
+          <div class="search-piece-wrapper">
+            <i class="fas fa-search search-piece-icon"></i>
+            <input
+              class="field-input search-piece-input"
+              [ngModel]="pieceSearchQuery()"
+              (ngModelChange)="onPieceSearch($event)"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Rechercher une pièce par référence ou désignation…"
+              autocomplete="off"
+              (keyup.escape)="clearPieceSearch()"
+            />
+            @if (pieceSearchQuery().length > 0) {
+              <button type="button" class="search-clear-btn"
+                (click)="clearPieceSearch()" aria-label="Effacer">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            }
+          </div>
+
+          @if (pieceSearchQuery().length >= 2) {
+
+            @if (filteredPiecesModele().length > 0) {
+              <ul class="pieces-catalog">
+                @for (piece of filteredPiecesModele(); track piece.id) {
+                  <li class="catalog-item"
+                    [class.catalog-item--added]="isPieceAdded(piece.ref_piece)"
+                    (click)="!isPieceAdded(piece.ref_piece) && addPieceFromCatalog(piece)">
+                    <div class="piece-item-info">
+                      <span class="piece-ref">{{ piece.ref_piece }}</span>
+                      <span class="piece-desig">{{ piece.designation }}</span>
+                    </div>
+                    @if (isPieceAdded(piece.ref_piece)) {
+                      <span class="catalog-linked-tag">
+                        <fa-icon [icon]="faCheck"></fa-icon> Ajoutée
+                      </span>
+                    } @else {
+                      <span class="catalog-add-hint">
+                        <fa-icon [icon]="faPlus"></fa-icon> Ajouter
+                      </span>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (filteredPiecesModele().length === 0) {
+              <div class="create-inline-prompt">
+                <div class="create-inline-prompt__header">
+                  <fa-icon [icon]="faPlus" class="create-inline-prompt__icon"></fa-icon>
+                  <div>
+                    <p class="create-inline-prompt__title">Pièce introuvable dans le catalogue</p>
+                    <p class="create-inline-prompt__sub">
+                      Saisir les informations pour ajouter « <strong>{{ pieceSearchQuery() }}</strong> »
+                    </p>
+                  </div>
+                </div>
+                <div class="create-inline-fields">
+                  <div class="field-group">
+                    <label class="field-label-sm">Référence <span class="required">*</span></label>
+                    <input class="field-input"
+                      [ngModel]="newPieceRefInput()"
+                      (ngModelChange)="newPieceRefInput.set($event)"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="Ex : 40A-001" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label-sm">Désignation <span class="required">*</span></label>
+                    <input class="field-input"
+                      [ngModel]="newPieceDesigInput()"
+                      (ngModelChange)="newPieceDesigInput.set($event)"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="Ex : Joint torique"
+                      (keyup.enter)="addCustomPiece()" />
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-create-link"
+                  (click)="addCustomPiece()"
+                  [disabled]="!newPieceRefInput() || !newPieceDesigInput()">
+                  <fa-icon [icon]="faPlus"></fa-icon> Ajouter cette pièce
+                </button>
+              </div>
+            }
+          }
+
+          @if (pieceSearchQuery().length < 2 && pieces.length === 0) {
+            <p class="search-hint">
+              <fa-icon [icon]="faSearch"></fa-icon>
+              Tapez au moins 2 caractères pour rechercher dans le catalogue du modèle
+            </p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="previousStep()">← Retour</button>
+        <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="machineAlreadyInRepair()">
+          <fa-icon [icon]="faFloppyDisk"></fa-icon> Enregistrer
+        </button>
+      </div>
+
+    </div><!-- fin [formGroup]="form" -->
+
+  }
+
+</div>

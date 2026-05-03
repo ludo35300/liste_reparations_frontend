@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output, signal, inject, OnChanges } from '@angular/core';
 import { ReferenceService } from '../../../services/references.services';
-import { MachineTypeRef, PieceRef } from '../../../models/reparation.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus, faTrash, faWarning, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
+import { Modele } from '../../../models/modele.model';
+import { PieceRef } from '../../../models/piece.model';
+
 
 @Component({
   selector: 'app-pieces-machine',
@@ -28,7 +30,7 @@ export class PiecesMachine implements OnChanges{
   public readonly faWarning = faWarning;
 
   // Input : la machine sélectionnée (null = modale fermée)
-  machine = input<MachineTypeRef | null>(null);
+  machine = input<Modele | null>(null);
   // Output : demande de fermeture
   closeEvt = output<void>();
 
@@ -41,8 +43,8 @@ export class PiecesMachine implements OnChanges{
     if (!m) { this.showAddForm.set(false); return; }
     this.loading.set(true);
     this.error.set(null);
-    this.refService.getPiecesByMachine(m.id).subscribe({
-      next: (data) => { this.pieces.set(data); this.loading.set(false); },
+    this.refService.getPiecesByModele(m.id).subscribe({
+      next: (data: PieceRef[]) => { this.pieces.set(data); this.loading.set(false); },
       error: ()    => { this.error.set('Impossible de charger les pièces.'); this.loading.set(false); },
     });
     // Charge toutes les pièces disponibles pour le select
@@ -76,14 +78,14 @@ export class PiecesMachine implements OnChanges{
       return;
     }
     this.adding.set(true);
-    this.refService.addPieceToMachine(machineId, pieceId).subscribe({
+    this.refService.addPieceToModele(machineId, pieceId).subscribe({
       next: () => {
         this.adding.set(false);
         this.showAddForm.set(false);
         this.selectedPieceId.set(null);
         // Recharge les pièces de la machine
-        this.refService.getPiecesByMachine(machineId).subscribe({
-          next: (data) => this.pieces.set(data),
+        this.refService.getPiecesByModele(machineId).subscribe({
+          next: (data: PieceRef[]) => this.pieces.set(data),
         });
       },
       error: () => {
@@ -96,7 +98,7 @@ export class PiecesMachine implements OnChanges{
   removePiece(pieceId: number): void {
     const machineId = this.machine()?.id;
     if (!machineId || !confirm('Retirer cette pièce ?')) return;
-    this.refService.removePieceFromMachine(machineId, pieceId).subscribe({
+    this.refService.removePieceFromModele(machineId, pieceId).subscribe({
       next: () => {
         this.pieces.update(list => list.filter(p => p.id !== pieceId));
       },

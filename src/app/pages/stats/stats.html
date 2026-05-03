@@ -57,23 +57,22 @@
                     <th>Date</th>
                     <th>Technicien</th>
                     <th>Pièces</th>
-                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (r of s.reparations; track r.id; let i = $index) {
-                    <tr (click)="voirDetail(r)" class="row-clickable">
+                    <tr  class="row-clickable">
+                      <!--<tr (click)="voirDetail(r)" class="row-clickable"></tr>-->
                       <td class="col-rank">{{ i + 1 }}</td>
-                      <td class="cell-ref">{{ r.numero_serie }}</td>
-                      <td>{{ r.machine_type }}</td>
+                      <td class="cell-ref">{{ r.machine }}</td>
+                      <td>{{ r.modele }}</td>
                       <td class="cell-date">{{ r.date_reparation }}</td>
                       <td>{{ r.technicien ?? '—' }}</td>
                       <td>
                         <span class="pieces-count">
-                          {{ r.pieces?.length ?? 0 }}
+                          {{ r.pieces.length }}
                         </span>
                       </td>
-                      <td class="cell-notes">{{ r.notes ?? '—' }}</td>
                     </tr>
                   }
                 </tbody>

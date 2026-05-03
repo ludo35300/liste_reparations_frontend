@@ -1,0 +1,1 @@
+export type StatutMachine = 'en_attente' | 'en_reparation' | 'pret' | 'termine';
