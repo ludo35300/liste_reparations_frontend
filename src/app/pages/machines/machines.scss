@@ -596,7 +596,7 @@
 
 .drawer {
   position: fixed;
-  top: 0;
+  top: calc(var(--topbar-top-h) + var(--navbar-h));
   right: 0;
   width: min(480px, 100vw);
   height: 100dvh;
