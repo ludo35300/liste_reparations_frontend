@@ -76,6 +76,7 @@ export class AddRepair implements OnInit {
     ]);
   }
 
+
   public setMode(mode: 'manual' | 'scan'): void {
     this.mode.set(mode);
     this.errorMessage.set(null);
@@ -93,6 +94,11 @@ export class AddRepair implements OnInit {
     try {
       const machine = await this.findOrCreateMachine(payload);
 
+      // Vérifie que machine.id est bien défini
+      if(!machine?.id) {
+        throw new Error('machine_id introuvable après création/résolution.');
+      }
+
       const repairPayload: Reparation = {
         machine_id: machine.id,
         numero_serie: payload.numero_serie,
@@ -107,7 +113,7 @@ export class AddRepair implements OnInit {
       await firstValueFrom(this.reparationService.enregistrer(repairPayload));
       await this.router.navigate(['/search']);
     } catch (error) {
-      console.error(error);
+      console.error('onManualRepairSubmitted error:', error);
       this.errorMessage.set("Erreur lors de l'enregistrement de la réparation.");
     } finally {
       this.saving.set(false);
@@ -131,7 +137,6 @@ export class AddRepair implements OnInit {
   }
 
   private async findOrCreateMachine(payload: RepairManualSubmit): Promise<Machine> {
-    // Machine déjà résolue côté formulaire → on évite un appel inutile
     if (payload.machine_id) {
       return { id: payload.machine_id } as Machine;
     }
@@ -140,16 +145,33 @@ export class AddRepair implements OnInit {
     if (!numeroSerie) throw new Error('Numéro de série manquant.');
 
     try {
-      return await firstValueFrom(this.machineService.getByNumeroSerie(numeroSerie));
-    } catch {
       return await firstValueFrom(
         this.machineService.create({
           numero_serie: numeroSerie,
           modele_id: payload.modele_id,
           statut: 'en_reparation',
           notes: payload.notes ?? '',
-        }),
+        })
       );
+    } catch (err: any) {
+      if (err?.status === 409) {
+        // Le body du 409 contient souvent l'id de la ressource existante
+        const existing = err?.error?.existing ?? err?.error?.machine ?? err?.error ?? null;
+        if (existing?.id) return existing as Machine;
+
+        // Sinon, cherche via les réparations
+        const result = await firstValueFrom(
+          this.machineService.getByNumeroSerie(numeroSerie)
+        ) as any;
+
+        const machine: Machine | null =
+          result?.reparations?.[0]?.machine ?? null;
+
+        if (machine?.id) return machine;
+
+        throw new Error(`Machine introuvable pour le numéro de série "${numeroSerie}".`);
+      }
+      throw err;
     }
   }
 

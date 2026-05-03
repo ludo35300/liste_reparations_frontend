@@ -1,3 +1,4 @@
+import { Machine } from './machine.model';
 import { Reparation } from './reparation.model';
 
 export interface ExplodedView {
@@ -13,6 +14,7 @@ export interface SearchResult {
   machine_type?:      string;
   nombre_reparations: number;
   reparations:        Reparation[];
+  machine?:           Machine;
   machine_info?: {
     brand:        string;
     model:        string;

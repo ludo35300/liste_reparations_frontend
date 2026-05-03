@@ -4,6 +4,8 @@ import { FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators } 
 import { firstValueFrom } from 'rxjs';
 import { Reparation } from '../../models/reparation.model';
 import { MachineService } from '../../services/machine.service';
+import { ReferenceService } from '../../services/references.services';
+import { ReparationService } from '../../services/reparation.service';
 import { Marque } from '../../models/marque.model';
 import { Modele } from '../../models/modele.model';
 import { Machine } from '../../models/machine.model';
@@ -44,6 +46,8 @@ export class RepairManuelForm implements OnInit {
 
   private readonly fb = inject(FormBuilder);
   private readonly machineService = inject(MachineService);
+  private readonly referenceService = inject(ReferenceService);
+  private readonly reparationService = inject(ReparationService);
 
   public readonly machineStatus = signal<MachineStatus>('idle');
   public readonly foundMachine = signal<Machine | null>(null);
@@ -131,40 +135,48 @@ export class RepairManuelForm implements OnInit {
     this.error.set(null);
 
     try {
-      const result = await firstValueFrom(this.machineService.getByNumeroSerie(numeroSerie));
+      const result = await firstValueFrom(
+        this.reparationService.search(numeroSerie)  // ← même service que search page
+      );
 
-      // getByNumeroSerie retourne maintenant un SearchResult
-      const searchResult = result as any;
-      const firstRep = searchResult?.reparations?.[0];
-      const machine: Machine | null = firstRep?.machine ?? null;
-
-      if (!machine?.id) {
+      // Machine introuvable
+      if (!result?.found) {
         this.machineStatus.set('not_found');
         return;
       }
 
-      this.foundMachine.set(machine);
-      // Historique : on l'a déjà dans searchResult.reparations
-      this.machineHistory.set(searchResult.reparations ?? []);
+      // Machine trouvée → extraire depuis les réparations ou machine_info
+      const machine: Machine | null =
+        result.machine ??                    // ← direct si dispo
+        result.reparations?.[0]?.machine ??  // ← sinon via historique
+        null;
 
-      const marqueId = machine.modele?.marque_id ?? null;
-      const modeleId = machine.modele?.id ?? null;
-      /*if (marqueId) {
-        this.modelesFiltres.set(this.modeles.filter((m) => m.marque_id === Number(marqueId)));
-      }*/
+      if (!machine?.id) {
+        // Machine existe mais sans réparations → on a quand même found=true
+        // On recrée un objet Machine minimal pour continuer
+        this.machineStatus.set('not_found'); // sera créée au submit
+        return;
+      }
+
+      this.foundMachine.set(machine);
+      this.machineHistory.set(result.reparations ?? []);
 
       this.form.patchValue({
-        marque_id: marqueId,
-        modele_id: modeleId,
+        marque_id:    machine.modele?.marque_id ?? null,
+        modele_id:    machine.modele?.id        ?? null,
         technicien_id: this.currentTechnicienId,
       });
 
       if (this.currentTechnicienId) this.syncTechnicienName(this.currentTechnicienId);
-
       this.machineStatus.set('found');
-    } catch {
-      // Vrai 404 ou erreur réseau → not_found
-      this.machineStatus.set('not_found');
+
+    } catch (err: any) {
+      if (err?.status === 404) {
+        this.machineStatus.set('not_found');
+      } else {
+        this.error.set('Erreur lors de la recherche.');
+        this.machineStatus.set('idle');
+      }
     }
   }
 
@@ -179,11 +191,11 @@ export class RepairManuelForm implements OnInit {
     this.machineHistory.set([]);
     this.modelesFiltres.set([]);
     this.machineStatus.set('idle');
+    this.piecesModele.set([]);
+    this.pieceSearchQuery.set('');
     this.currentStep.set(1);
     this.error.set(null);
   }
-
-
 
   public previousStep(): void {
     this.error.set(null);
@@ -286,6 +298,16 @@ export class RepairManuelForm implements OnInit {
         this.error.set('Merci de renseigner les champs obligatoires.');
         return;
       }
+    }
+    // ── Charger le catalogue de pièces du modèle ──────────────
+    const modeleId = Number(this.form.get('modele_id')?.value)
+      || this.foundMachine()?.modele?.id;
+
+    if (modeleId) {
+      this.referenceService.getPiecesByModele(modeleId).subscribe({
+        next:  (pieces) => this.piecesModele.set(pieces),
+        error: ()       => this.piecesModele.set([])
+      });
     }
 
     this.currentStep.set(2);
