@@ -45,7 +45,7 @@ export class ReferenceService {
     return this.http.get<PieceRef[]>(`${this.api}/pieces`);
   }
   createPiece(ref_piece: string, designation: string): Observable<PieceRef> {
-    return this.http.post<PieceRef>(`${this.api}/pieces`, { ref_piece, designation });
+    return this.http.post<PieceRef>(`${this.api}/pieces`, { ref_piece, designation});
   }
   deletePiece(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/pieces/${id}`);

@@ -19,23 +19,19 @@
         <div>
           <h2 class="page-title">Machines</h2>
           <p class="page-sub">
-            <span class="stat-pill"><i class="fas fa-industry me-1"></i>{{ totalBrands() }} marque{{ totalBrands() > 1 ? 's' : '' }}</span>
-            <span class="stat-pill"><i class="fas fa-mug-hot me-1"></i>{{ totalModeles() }} modèle{{ totalModeles() > 1 ? 's' : '' }}</span>
+            <span class="stat-pill">{{ totalBrands() }} marque{{ totalBrands() > 1 ? 's' : '' }}</span>
+            <span class="stat-pill">{{ totalModeles() }} modèle{{ totalModeles() > 1 ? 's' : '' }}</span>
           </p>
         </div>
-        @if(!showMarqueForm()) {
-          <button class="btn btn-primary" (click)="toggleMarqueForm()">
-            <fa-icon [icon]="faPlus"></fa-icon> &nbsp; Nouvelle marque
-          </button>
-        }
+        <button class="btn btn-primary" (click)="toggleMarqueForm()">
+          @if (showMarqueForm()) { Annuler } @else { + Nouvelle marque }
+        </button>
       </div>
 
       <!-- Formulaire ajout marque -->
       @if (showMarqueForm()) {
         <div class="form-card">
-          <h3 class="form-card-title">
-            <fa-icon [icon]="faPlus"></fa-icon> Ajouter une marque
-          </h3>
+          <h3 class="form-card-title">Ajouter une marque</h3>
           <div class="form-row">
             <label class="field-label">
               <span>Nom de la marque <span class="required">*</span></span>
@@ -46,31 +42,18 @@
                      (keyup.enter)="saveMarque()" />
             </label>
           </div>
-          @if (errorMarque()) {
-            <p class="field-error">{{ errorMarque() }}</p>
-          }
+          @if (errorMarque()) { <p class="field-error">{{ errorMarque() }}</p> }
           <div class="form-actions">
-            <button class="btn btn-outline" (click)="toggleMarqueForm()">
-              <fa-icon [icon]="faXmark"></fa-icon> Annuler
-            </button>
-            <button class="btn btn-primary" (click)="saveMarque()" [disabled]="savingMarque()">
-              @if (savingMarque()) {
-                <span class="spinner-border spinner-border-sm me-1"></span>
-              } @else {
-                <fa-icon [icon]="faFloppyDisk"></fa-icon>
-              }
-              Enregistrer
-            </button>
+            <button class="btn btn-outline" (click)="toggleMarqueForm()">Annuler</button>
+            <button class="btn btn-primary" (click)="saveMarque()" [disabled]="savingMarque()">Enregistrer</button>
           </div>
         </div>
       }
 
-      <!-- Formulaire ajout modèle (inline dans la card) -->
+      <!-- Formulaire ajout modèle -->
       @if (showModeleForm()) {
         <div class="form-card form-card--modele">
-          <h3 class="form-card-title">
-            <i class="fas fa-plus-circle me-2"></i>Ajouter un modèle
-          </h3>
+          <h3 class="form-card-title">Ajouter un modèle</h3>
           <div class="form-row">
             <label class="field-label">
               <span>Type <span class="required">*</span></span>
@@ -91,24 +74,15 @@
                      (keyup.enter)="saveModele()" />
             </label>
           </div>
-          @if (errorModele()) {
-            <p class="field-error">{{ errorModele() }}</p>
-          }
+          @if (errorModele()) { <p class="field-error">{{ errorModele() }}</p> }
           <div class="form-actions">
             <button class="btn btn-outline" (click)="closeModeleForm()">Annuler</button>
-            <button class="btn btn-primary" (click)="saveModele()" [disabled]="savingModele()">
-              @if (savingModele()) {
-                <span class="spinner-border spinner-border-sm me-1"></span>
-              } @else {
-                <i class="fas fa-save me-1"></i>
-              }
-              Enregistrer
-            </button>
+            <button class="btn btn-primary" (click)="saveModele()" [disabled]="savingModele()">Enregistrer</button>
           </div>
         </div>
       }
 
-      <!-- Skeleton chargement -->
+      <!-- Skeleton -->
       @if (loading()) {
         <div class="brands-cards-grid">
           @for (i of [1,2,3]; track i) {
@@ -121,24 +95,19 @@
         </div>
       }
 
-      <!-- Liste par marques -->
+      <!-- Liste marques -->
       @if (!loading() && brandGroups().length > 0) {
         <div class="brands-cards-grid">
           @for (group of brandGroups(); track group.marque.id) {
             <article class="brand-card">
               <div class="brand-card__media" [class.brand-card__media--logo]="group.marque.url_logo">
                 @if (group.marque.url_logo) {
-                  <img
-                    [src]="group.marque.url_logo"
-                    [alt]="group.marque.nom"
-                    class="brand-card__logo"
-                    loading="lazy" />
+                  <img [src]="group.marque.url_logo" [alt]="group.marque.nom" class="brand-card__logo" loading="lazy" />
                 } @else {
                   <div class="brand-card__placeholder">
                     <span class="brand-card__placeholder-text">{{ group.marque.nom }}</span>
                   </div>
                 }
-
                 <div class="brand-card__overlay"></div>
               </div>
 
@@ -146,27 +115,17 @@
                 <header class="brand-card__header">
                   <div class="brand-card__title-wrap">
                     <h4 class="brand-card__title">{{ group.marque.nom }}</h4>
-                    <p class="brand-card__meta">
-                      {{ group.modeles.length }} modèle{{ group.modeles.length > 1 ? 's' : '' }}
-                    </p>
+                    <p class="brand-card__meta">{{ group.modeles.length }} modèle{{ group.modeles.length > 1 ? 's' : '' }}</p>
                   </div>
-
                   <div class="brand-card__actions">
-                    <button
-                      type="button"
-                      class="icon-btn icon-btn--primary"
+                    <button type="button" class="icon-btn icon-btn--primary"
                       (click)="openModeleForm(group.marque.id)"
-                      title="Ajouter un modèle"
-                      aria-label="Ajouter un modèle">
+                      title="Ajouter un modèle" aria-label="Ajouter un modèle">
                       <fa-icon [icon]="faPlus"></fa-icon>
                     </button>
-
-                    <button
-                      type="button"
-                      class="icon-btn icon-btn--danger"
+                    <button type="button" class="icon-btn icon-btn--danger"
                       (click)="deleteMarque(group.marque, $event)"
-                      title="Supprimer la marque"
-                      aria-label="Supprimer la marque">
+                      title="Supprimer la marque" aria-label="Supprimer la marque">
                       <fa-icon [icon]="faTrash"></fa-icon>
                     </button>
                   </div>
@@ -174,36 +133,23 @@
 
                 <ul class="brand-model-list">
                   @for (modele of group.modeles; track modele.id) {
-                    <li class="brand-model-item">
-                      <button
-                        type="button"
-                        class="brand-model-item__main"
-                        (click)="openPiecesModal(modele)"
+                    <li class="brand-model-item" [class.brand-model-item--active]="selectedModele()?.id === modele.id">
+                      <button type="button" class="brand-model-item__main" (click)="openPiecesDrawer(modele)"
                         [attr.aria-label]="'Voir les pièces de ' + modele.nom">
                         <span class="brand-model-name">{{ modele.nom }}</span>
                         <span class="brand-model-type">{{ modele.type_machine }}</span>
                       </button>
-
-                      <button
-                        type="button"
-                        class="icon-btn icon-btn--ghost-danger"
+                      <button type="button" class="icon-btn icon-btn--ghost-danger"
                         (click)="deleteModele(modele, $event)"
-                        title="Supprimer"
                         [attr.aria-label]="'Supprimer ' + modele.nom">
                         <fa-icon [icon]="faTrash"></fa-icon>
                       </button>
                     </li>
                   }
-
                   @if (group.modeles.length === 0) {
                     <li class="brand-model-empty">
                       <span>Aucun modèle</span>
-                      <button
-                        type="button"
-                        class="brand-model-empty__link"
-                        (click)="openModeleForm(group.marque.id)">
-                        Ajouter
-                      </button>
+                      <button type="button" class="brand-model-empty__link" (click)="openModeleForm(group.marque.id)">Ajouter</button>
                     </li>
                   }
                 </ul>
@@ -213,18 +159,154 @@
         </div>
       }
 
-      <!-- État vide -->
       @if (!loading() && brandGroups().length === 0) {
         <div class="empty-state">
           <i class="fas fa-industry empty-icon-fa"></i>
           <h3>Aucune marque enregistrée</h3>
           <p>Ajoutez votre première marque pour commencer.</p>
-          <button class="btn btn-primary" (click)="toggleMarqueForm()">
-            <i class="fas fa-plus me-1"></i> Ajouter une marque
-          </button>
+          <button class="btn btn-primary" (click)="toggleMarqueForm()">+ Ajouter une marque</button>
         </div>
       }
 
     </main>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DRAWER — Pièces du modèle
+════════════════════════════════════════════════════════════ -->
+@if (selectedModele()) {
+  <div class="drawer-backdrop" (click)="closePiecesDrawer()" aria-hidden="true"></div>
+
+  <aside class="drawer" role="dialog" [attr.aria-label]="'Pièces de ' + selectedModele()!.nom">
+
+    <div class="drawer-header">
+      <div class="drawer-header-info">
+        <span class="drawer-header-type">{{ selectedModele()!.type_machine }}</span>
+        <h3 class="drawer-header-title">{{ selectedModele()!.nom }}</h3>
+      </div>
+      <button class="drawer-close" (click)="closePiecesDrawer()" aria-label="Fermer">✕</button>
+    </div>
+
+    <div class="drawer-body">
+
+      @if (piecesLoading()) {
+        <div class="pieces-skeleton">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="skeleton skeleton-piece-row"></div>
+          }
+        </div>
+      }
+
+      @if (!piecesLoading()) {
+
+        <!-- Pièces associées -->
+        <div class="drawer-section">
+          <div class="drawer-section-header">
+            <h4>Pièces associées</h4>
+            <span class="piece-badge">{{ piecesDuModele().length }}</span>
+          </div>
+
+          @if (piecesDuModele().length === 0) {
+            <div class="pieces-empty">
+              <span>🔩</span>
+              <p>Aucune pièce associée à ce modèle.</p>
+            </div>
+          } @else {
+            <ul class="pieces-list">
+              @for (piece of piecesDuModele(); track piece.id) {
+                <li class="piece-item">
+                  <div class="piece-item-info">
+                    <span class="piece-ref">{{ piece.ref_piece }}</span>
+                    <span class="piece-desig">{{ piece.designation }}</span>
+                  </div>
+                  <button class="piece-remove-btn"
+                    (click)="removePiece(piece)"
+                    [disabled]="removingPieceId() === piece.id"
+                    aria-label="Retirer cette pièce">
+                    @if (removingPieceId() === piece.id) { … } @else { ✕ }
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <hr class="drawer-divider" />
+
+        <!-- Associer pièce existante -->
+        <div class="drawer-section">
+          <div class="drawer-section-header">
+            <h4>Associer une pièce existante</h4>
+          </div>
+          <div class="search-piece-row">
+            <input class="field-input"
+              [ngModel]="searchPieceQuery()"
+              (ngModelChange)="searchPieceQuery.set($event)"
+              placeholder="Filtrer par référence ou désignation…" />
+          </div>
+          @if (filteredAllPieces().length > 0) {
+            <ul class="pieces-catalog">
+              @for (piece of filteredAllPieces(); track piece.id) {
+                <li class="catalog-item" [class.catalog-item--linked]="isPieceLinked(piece.id)">
+                  <div class="piece-item-info">
+                    <span class="piece-ref">{{ piece.ref_piece }}</span>
+                    <span class="piece-desig">{{ piece.designation }}</span>
+                  </div>
+                  @if (isPieceLinked(piece.id)) {
+                    <span class="catalog-linked-tag">✓ associée</span>
+                  } @else {
+                    <button class="btn btn-sm btn-outline" (click)="linkPiece(piece)" [disabled]="linkingPieceId() === piece.id">
+                      @if (linkingPieceId() === piece.id) { … } @else { + Associer }
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          } @else if (searchPieceQuery().length > 1) {
+            <p class="no-results">Aucune pièce trouvée pour « {{ searchPieceQuery() }} »</p>
+          }
+        </div>
+
+        <hr class="drawer-divider" />
+
+        <!-- Créer et associer -->
+        <div class="drawer-section">
+          <div class="drawer-section-header">
+            <h4>Créer et associer une nouvelle pièce</h4>
+            <button class="btn btn-sm btn-ghost" (click)="toggleNewPieceForm()">
+              {{ showNewPieceForm() ? 'Annuler' : '+ Créer' }}
+            </button>
+          </div>
+          @if (showNewPieceForm()) {
+            <div class="new-piece-form">
+              <div class="form-row-2">
+                <div class="field-group">
+                  <label class="field-label-sm">Référence <span class="required">*</span></label>
+                  <input class="field-input"
+                    [ngModel]="newPieceRef()"
+                    (ngModelChange)="newPieceRef.set($event)"
+                    placeholder="Ex : 40A-001" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label-sm">Désignation <span class="required">*</span></label>
+                  <input class="field-input"
+                    [ngModel]="newPieceDesig()"
+                    (ngModelChange)="newPieceDesig.set($event)"
+                    placeholder="Ex : Joint torique" />
+                </div>
+              </div>
+              @if (errorNewPiece()) { <p class="field-error">{{ errorNewPiece() }}</p> }
+              <div class="new-piece-actions">
+                <button class="btn btn-primary btn-sm" (click)="createAndLinkPiece()" [disabled]="savingNewPiece()">
+                  @if (savingNewPiece()) { Création… } @else { Créer et associer }
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      }
+    </div>
+  </aside>
+}

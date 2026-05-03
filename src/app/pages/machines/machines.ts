@@ -4,16 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { faPlus, faTrash, faXmark, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
-import { AuthService }     from '../../auth-lib/services/auth.service';
-import { MeResponse }      from '../../auth-lib/models/auth.model';
-import { Topbar }          from '../../components/topbar/topbar';
-import { NavService }      from '../../core/nav.service';
+import { AuthService }      from '../../auth-lib/services/auth.service';
+import { MeResponse }       from '../../auth-lib/models/auth.model';
+import { Topbar }           from '../../components/topbar/topbar';
+import { NavService }       from '../../core/nav.service';
 import { ReferenceService } from '../../services/references.services';
-import { Marque } from '../../models/marque.model';
+import { Marque }           from '../../models/marque.model';
 import { BrandGroup, Modele } from '../../models/modele.model';
-
+import { PieceRef }         from '../../models/piece.model';
 
 @Component({
   selector: 'app-machines',
@@ -30,37 +30,57 @@ export class Machines implements OnInit {
   protected readonly navItems = inject(NavService).navItems;
 
   // ── State général ──────────────────────────────────────────
-  public readonly me           = signal<MeResponse | null>(null);
-  public readonly errorMessage = signal<string | null>(null);
-  public readonly loading      = signal(false);
-  public readonly brandGroups  = signal<BrandGroup[]>([]);
-  public readonly faTrash      = faTrash;
-  public readonly faPlus       = faPlus;
-  public readonly faXmark      = faXmark;
-  public readonly faFloppyDisk = faFloppyDisk;
+  readonly me           = signal<MeResponse | null>(null);
+  readonly errorMessage = signal<string | null>(null);
+  readonly loading      = signal(false);
+  readonly brandGroups  = signal<BrandGroup[]>([]);
+  readonly faTrash      = faTrash;
+  readonly faPlus       = faPlus;
 
   // ── Formulaire ajout marque ────────────────────────────────
-  public readonly showMarqueForm  = signal(false);
-  public readonly formMarqueNom   = signal('');
-  public readonly savingMarque    = signal(false);
-  public readonly errorMarque     = signal<string | null>(null);
+  readonly showMarqueForm  = signal(false);
+  readonly formMarqueNom   = signal('');
+  readonly savingMarque    = signal(false);
+  readonly errorMarque     = signal<string | null>(null);
 
   // ── Formulaire ajout modèle ────────────────────────────────
-  public readonly showModeleForm   = signal(false);
-  public readonly activeMarqueId   = signal<number | null>(null);   // marque cible
-  public readonly formModeleNom    = signal('');
-  public readonly formModeleType   = signal('');
-  public readonly savingModele     = signal(false);
-  public readonly errorModele      = signal<string | null>(null);
+  readonly showModeleForm  = signal(false);
+  readonly activeMarqueId  = signal<number | null>(null);
+  readonly formModeleNom   = signal('');
+  readonly formModeleType  = signal('');
+  readonly savingModele    = signal(false);
+  readonly errorModele     = signal<string | null>(null);
 
-  // ── Sélection modèle (modale pièces) ──────────────────────
-  public readonly selectedModele = signal<Modele | null>(null);
+  // ── Drawer pièces ──────────────────────────────────────────
+  readonly selectedModele    = signal<Modele | null>(null);
+  readonly piecesDuModele    = signal<PieceRef[]>([]);
+  readonly allPieces         = signal<PieceRef[]>([]);
+  readonly piecesLoading     = signal(false);
+  readonly searchPieceQuery  = signal('');
+  readonly removingPieceId   = signal<number | null>(null);
+  readonly linkingPieceId    = signal<number | null>(null);
+
+  // ── Formulaire nouvelle pièce ──────────────────────────────
+  readonly showNewPieceForm  = signal(false);
+  readonly newPieceRef       = signal('');
+  readonly newPieceDesig     = signal('');
+  readonly savingNewPiece    = signal(false);
+  readonly errorNewPiece     = signal<string | null>(null);
 
   // ── Computed ───────────────────────────────────────────────
-  public readonly totalBrands  = computed(() => this.brandGroups().length);
-  public readonly totalModeles = computed(() =>
+  readonly totalBrands  = computed(() => this.brandGroups().length);
+  readonly totalModeles = computed(() =>
     this.brandGroups().reduce((acc, g) => acc + g.modeles.length, 0)
   );
+
+  readonly filteredAllPieces = computed(() => {
+    const q = this.searchPieceQuery().trim().toLowerCase();
+    if (q.length < 2) return [];
+    return this.allPieces().filter(p =>
+      p.ref_piece.toLowerCase().includes(q) ||
+      p.designation.toLowerCase().includes(q)
+    );
+  });
 
   // ── Lifecycle ──────────────────────────────────────────────
   ngOnInit(): void {
@@ -109,12 +129,7 @@ export class Machines implements OnInit {
     if (!nom) { this.errorMarque.set('Nom requis.'); return; }
     this.savingMarque.set(true);
     this.refService.createMarque(nom).subscribe({
-      next: () => {
-        this.savingMarque.set(false);
-        this.showMarqueForm.set(false);
-        this.formMarqueNom.set('');
-        this.loadAll();
-      },
+      next: () => { this.savingMarque.set(false); this.showMarqueForm.set(false); this.formMarqueNom.set(''); this.loadAll(); },
       error: () => { this.errorMarque.set('Erreur lors de la création.'); this.savingMarque.set(false); }
     });
   }
@@ -149,11 +164,7 @@ export class Machines implements OnInit {
     if (!nom || !type || !mid) { this.errorModele.set('Tous les champs sont requis.'); return; }
     this.savingModele.set(true);
     this.refService.createModele(mid, nom, type).subscribe({
-      next: () => {
-        this.savingModele.set(false);
-        this.closeModeleForm();
-        this.loadAll();
-      },
+      next: () => { this.savingModele.set(false); this.closeModeleForm(); this.loadAll(); },
       error: () => { this.errorModele.set('Erreur lors de la création.'); this.savingModele.set(false); }
     });
   }
@@ -162,7 +173,7 @@ export class Machines implements OnInit {
     event.stopPropagation();
     if (!confirm(`Supprimer le modèle "${modele.nom}" ?`)) return;
     this.refService.deleteModele(modele.id).subscribe({
-      next: () => this.loadAll(),
+      next: () => { if (this.selectedModele()?.id === modele.id) this.closePiecesDrawer(); this.loadAll(); },
       error: () => this.errorMessage.set('Erreur lors de la suppression.')
     });
   }
@@ -172,11 +183,103 @@ export class Machines implements OnInit {
     this.brandGroups.update(g => [...g]);
   }
 
-  openPiecesModal(modele: Modele): void { this.selectedModele.set(modele); }
-  closePiecesModal(): void { this.selectedModele.set(null); }
+  // ── Drawer pièces ──────────────────────────────────────────
+  openPiecesDrawer(modele: Modele): void {
+    this.selectedModele.set(modele);
+    this.searchPieceQuery.set('');
+    this.showNewPieceForm.set(false);
+    this.errorNewPiece.set(null);
+    this.loadPiecesDrawer(modele.id);
+  }
 
+  closePiecesDrawer(): void {
+    this.selectedModele.set(null);
+    this.piecesDuModele.set([]);
+    this.allPieces.set([]);
+    this.searchPieceQuery.set('');
+  }
+
+  private loadPiecesDrawer(modeleId: number): void {
+    this.piecesLoading.set(true);
+    this.refService.getPiecesByModele(modeleId).subscribe({
+      next: (pieces) => {
+        this.piecesDuModele.set(pieces);
+        this.refService.getAllPieces().subscribe({
+          next: (all) => { this.allPieces.set(all); this.piecesLoading.set(false); },
+          error: () => this.piecesLoading.set(false)
+        });
+      },
+      error: () => this.piecesLoading.set(false)
+    });
+  }
+
+  isPieceLinked(pieceId: number): boolean {
+    return this.piecesDuModele().some(p => p.id === pieceId);
+  }
+
+  removePiece(piece: PieceRef): void {
+    const modele = this.selectedModele();
+    if (!modele) return;
+    this.removingPieceId.set(piece.id);
+    this.refService.removePieceFromModele(modele.id, piece.id).subscribe({
+      next: () => { this.piecesDuModele.update(list => list.filter(p => p.id !== piece.id)); this.removingPieceId.set(null); },
+      error: () => this.removingPieceId.set(null)
+    });
+  }
+
+  linkPiece(piece: PieceRef): void {
+    const modele = this.selectedModele();
+    if (!modele) return;
+    this.linkingPieceId.set(piece.id);
+    this.refService.addPieceToModele(modele.id, piece.id).subscribe({
+      next: () => { this.piecesDuModele.update(list => [...list, piece]); this.linkingPieceId.set(null); this.searchPieceQuery.set(''); },
+      error: () => this.linkingPieceId.set(null)
+    });
+  }
+
+  // ── Nouvelle pièce ─────────────────────────────────────────
+  toggleNewPieceForm(): void {
+    this.showNewPieceForm.update(v => !v);
+    this.newPieceRef.set('');
+    this.newPieceDesig.set('');
+    this.errorNewPiece.set(null);
+  }
+
+  createAndLinkPiece(): void {
+    const ref    = this.newPieceRef().trim().toUpperCase();
+    const desig  = this.newPieceDesig().trim();
+    const modele = this.selectedModele();
+    if (!ref || !desig) { this.errorNewPiece.set('Référence et désignation obligatoires.'); return; }
+    if (!modele) return;
+    const marqueId = modele.id;
+
+    this.savingNewPiece.set(true);
+    this.errorNewPiece.set(null);
+    this.refService.createPiece(ref, desig).subscribe({
+      next: (newPiece) => {
+        this.refService.addPieceToModele(modele.id, newPiece.id).subscribe({
+          next: () => {
+            this.piecesDuModele.update(list => [...list, newPiece]);
+            this.allPieces.update(list => [...list, newPiece]);
+            this.savingNewPiece.set(false);
+            this.showNewPieceForm.set(false);
+            this.newPieceRef.set('');
+            this.newPieceDesig.set('');
+          },
+          error: () => { this.errorNewPiece.set('Pièce créée mais association échouée.'); this.savingNewPiece.set(false); }
+        });
+      },
+      error: () => { this.errorNewPiece.set('Erreur lors de la création de la pièce.'); this.savingNewPiece.set(false); }
+    });
+  }
+
+  // ── Auth ───────────────────────────────────────────────────
   async logout(): Promise<void> {
     await firstValueFrom(this.auth.logoutHttp());
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
+
+  // Alias rétrocompatibilité
+  openPiecesModal = this.openPiecesDrawer.bind(this);
+  closePiecesModal = this.closePiecesDrawer.bind(this);
 }
