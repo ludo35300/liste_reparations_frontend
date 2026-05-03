@@ -524,4 +524,16 @@ select.field-input { appearance: none; cursor: pointer; background-image: url("d
     flex-direction: column-reverse;
     .btn { width: 100%; }
   }
+  .machine-banner--danger {
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.18);
+    color: #991b1b;
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
 }

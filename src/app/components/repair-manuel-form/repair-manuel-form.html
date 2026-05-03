@@ -156,31 +156,41 @@
         </div>
       </div>
 
-      <div [formGroup]="form" class="fields-grid">
+      @if (machineAlreadyInRepair()) {
+        <div class="machine-banner machine-banner--danger" role="alert">
+          <span class="machine-banner-icon">⛔</span>
+          <div>
+            <strong>Réparation déjà ouverte</strong>
+            <p>Cette machine est déjà en réparation. Vous devez d’abord terminer la réparation en cours.</p>
+          </div>
+        </div>
+      }
+      @if (!machineAlreadyInRepair()) {
+        <div [formGroup]="form" class="fields-grid">
 
-        <div class="field-group">
-          <label class="field-label" for="technicien_id_found">Technicien <span class="required">*</span></label>
-          <select id="technicien_id_found" class="field-input" formControlName="technicien_id">
-            <option [ngValue]="null">— Choisir un technicien —</option>
-            @for (tech of techniciens; track tech.id) {
-              <option [ngValue]="tech.id">{{ tech.nom }}</option>
+          <div class="field-group">
+            <label class="field-label" for="technicien_id_found">Technicien <span class="required">*</span></label>
+            <select id="technicien_id_found" class="field-input" formControlName="technicien_id">
+              <option [ngValue]="null">— Choisir un technicien —</option>
+              @for (tech of techniciens; track tech.id) {
+                <option [ngValue]="tech.id">{{ tech.nom }}</option>
+              }
+            </select>
+            @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
+              <small class="field-hint field-hint--error">Technicien obligatoire.</small>
             }
-          </select>
-          @if (form.get('technicien_id')?.touched && form.get('technicien_id')?.invalid) {
-            <small class="field-hint field-hint--error">Technicien obligatoire.</small>
-          }
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="date_reparation_found">Date d'intervention <span class="required">*</span></label>
+            <input id="date_reparation_found" class="field-input" type="date" formControlName="date_reparation" />
+            @if (form.get('date_reparation')?.touched && form.get('date_reparation')?.invalid) {
+              <small class="field-hint field-hint--error">Date obligatoire.</small>
+            }
+          </div>
+
         </div>
-
-        <div class="field-group">
-          <label class="field-label" for="date_reparation_found">Date d'intervention <span class="required">*</span></label>
-          <input id="date_reparation_found" class="field-input" type="date" formControlName="date_reparation" />
-          @if (form.get('date_reparation')?.touched && form.get('date_reparation')?.invalid) {
-            <small class="field-hint field-hint--error">Date obligatoire.</small>
-          }
-        </div>
-
-      </div>
-
+      }
       <!-- Historique interventions -->
       @if (machineHistory().length > 0) {
         <div class="history-block">
@@ -216,7 +226,7 @@
       }
 
       <div class="form-actions">
-        <button type="button" class="btn btn-primary" (click)="nextStep()">
+        <button type="button" class="btn btn-primary" (click)="nextStep()" [disabled]="machineAlreadyInRepair()">
           Continuer →
         </button>
       </div>
@@ -279,7 +289,7 @@
 
     <div class="form-actions">
       <button type="button" class="btn btn-ghost" (click)="previousStep()">← Retour</button>
-      <button type="button" class="btn btn-primary" (click)="submit()">
+      <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="machineAlreadyInRepair()">
         <fa-icon [icon]="faFloppyDisk"></fa-icon> Enregistrer
       </button>
     </div>

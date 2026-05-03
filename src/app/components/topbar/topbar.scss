@@ -366,11 +366,8 @@
 
 // ── Responsive
 @media (max-width: 768px) {
-  .topbar-top {
-    height: 50px;
-    padding: 0 1rem;
-  }
-  .topbar-nav { height: 42px; padding: 0 0.75rem; }
+  .topbar-top { height: 56px; padding: 0 1rem; }
+  .topbar-nav { height: 40px; padding: 0 0.75rem; }
   .brand-name  { font-size: 0.82rem; }
   .brand-icon  { width: 24px; height: 24px; font-size: 0.85rem; }
   .topbar-tools { gap: 0.15rem; }

@@ -79,6 +79,13 @@
   --t-fast:   0.14s cubic-bezier(0.16, 1, 0.3, 1);
   --t-base:   0.20s cubic-bezier(0.16, 1, 0.3, 1);
   --t-slow:   0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media (max-width: 768px) {
+    :root {
+      --topbar-top-h: 56px;
+      --navbar-h:     40px;
+    }
+  }
 }
 
 // ── Reset & Base ──────────────────────────────────────────────────
@@ -305,3 +312,4 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
   body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .topbar-top, .topbar-nav { display: none; }
 }
+
