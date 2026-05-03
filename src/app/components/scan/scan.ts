@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,28 +10,35 @@ import { firstValueFrom, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 
 import { ReparationService } from '../../services/reparation.service';
+import { MachineService }    from '../../services/machine.service';
 import { AuthService }       from '../../auth-lib/services/auth.service';
 import { MeResponse }        from '../../auth-lib/models/auth.model';
-import { Reparation } from '../../models/reparation.model';
+import { Reparation }        from '../../models/reparation.model';
+import { Marque }            from '../../models/marque.model';
+import { Modele }            from '../../models/modele.model';
+import { TechnicienOption }  from '../../models/user.model';
 import { NavService }        from '../../core/nav.service';
-import { ReferenceService } from '../../services/references.services';
-import { OcrResult } from '../../models/ocr.model';
-import { PieceChangee } from '../../models/piece.model';
+import { ReferenceService }  from '../../services/references.services';
+import { OcrResult }         from '../../models/ocr.model';
+import { PieceChangee }      from '../../models/piece.model';
 
 type ScanState = 'idle' | 'loading-image' | 'analysing' | 'success' | 'ocr-failed';
 
 interface ScanForm {
   numero_serie:    string;
   machine_type:    string;
+  modele_id:       number | null;
+  marque_id:       number | null;
   technicien:      string;
+  technicien_id:   number | null;
   date_reparation: string;
   notes:           string;
   pieces:          PieceChangee[];
 }
 
 const EMPTY_FORM = (): ScanForm => ({
-  numero_serie: '', machine_type: '', technicien: '',
-  date_reparation: '', notes: '', pieces: [],
+  numero_serie: '', machine_type: '', modele_id: null, marque_id: null,
+  technicien: '', technicien_id: null, date_reparation: '', notes: '', pieces: [],
 });
 
 @Component({
@@ -44,16 +51,24 @@ const EMPTY_FORM = (): ScanForm => ({
 export class Scan implements OnInit {
   @Output() submitted = new EventEmitter<Reparation>();
 
+  // Inputs transmis depuis add-repair (même pattern que RepairManuelForm)
+  @Input({ required: true }) techniciens: TechnicienOption[] = [];
+  @Input({ required: true }) marques: Marque[] = [];
+  @Input({ required: true }) modeles: Modele[] = [];
+  @Input() currentTechnicienId: number | null = null;
+
   // ── Services ───────────────────────────────────────────────
 
-  private readonly service    = inject(ReparationService);
-  private readonly auth       = inject(AuthService);
-  private readonly router     = inject(Router);
-  private readonly refService = inject(ReferenceService);
-  protected readonly navItems = inject(NavService).navItems;
+  private readonly service      = inject(ReparationService);
+  private readonly machineService = inject(MachineService);
+  private readonly auth         = inject(AuthService);
+  private readonly router       = inject(Router);
+  private readonly refService   = inject(ReferenceService);
+  protected readonly navItems   = inject(NavService).navItems;
 
   readonly me           = signal<MeResponse | null>(null);
   readonly errorMessage = signal<string | null>(null);
+  readonly saving       = signal(false);
 
   readonly faFolderOpen      = faFolderOpen;
   readonly faMagnifyingGlass = faMagnifyingGlass;
@@ -61,8 +76,8 @@ export class Scan implements OnInit {
   readonly faImage           = faImage;
   readonly faFlagCheckered   = faFlagCheckered;
 
-  readonly currentStep = signal<number>(1);
-  readonly analyseStep = signal<number>(0);
+  readonly currentStep  = signal<number>(1);
+  readonly analyseStep  = signal<number>(0);
   private _analyseTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly scanState    = signal<ScanState>('idle');
@@ -86,7 +101,17 @@ export class Scan implements OnInit {
   form: ScanForm = EMPTY_FORM();
 
   ngOnInit(): void {
-    firstValueFrom(this.auth.getMeHttp()).then(me => this.me.set(me)).catch(() => {});
+    firstValueFrom(this.auth.getMeHttp())
+      .then(me => {
+        this.me.set(me);
+        // Pré-remplir le technicien connecté
+        if (this.currentTechnicienId) {
+          this.form.technicien_id = this.currentTechnicienId;
+          const tech = this.techniciens.find(t => t.id === this.currentTechnicienId);
+          if (tech) this.form.technicien = tech.nom;
+        }
+      })
+      .catch(() => {});
   }
 
   async logout(): Promise<void> {
@@ -174,11 +199,28 @@ export class Scan implements OnInit {
       this.service.scanFiche(compressed).subscribe({
         next: (result: OcrResult) => {
           this._stopperAnimationAnalyse();
+
+          // Pré-remplir le formulaire avec les données OCR
           this.form.numero_serie    = result.numero_serie;
-          this.form.date_reparation = result.date;
-          this.form.technicien      = result.technicien;
+          this.form.date_reparation = this._normaliserDate(result.date);
           this.form.machine_type    = result.machine_type;
+          this.form.modele_id       = result.modele_id   ?? null;
+          this.form.marque_id       = result.marque_id   ?? null;
           this.form.pieces          = result.pieces;
+
+          // Technicien : priorité OCR, sinon technicien connecté
+          if (result.technicien) {
+            this.form.technicien = result.technicien;
+            const tech = this.techniciens.find(
+              t => t.nom === result.technicien
+            );
+            this.form.technicien_id = tech?.id ?? this.currentTechnicienId;
+          } else {
+            this.form.technicien_id = this.currentTechnicienId;
+            const tech = this.techniciens.find(t => t.id === this.currentTechnicienId);
+            if (tech) this.form.technicien = tech.nom;
+          }
+
           this.isNewMachine.set(result.is_new_machine ?? false);
           const nouvelles = new Set<string>(
             result.pieces.filter(p => p.is_new).map(p => p.ref_piece)
@@ -190,7 +232,12 @@ export class Scan implements OnInit {
         error: () => {
           this._stopperAnimationAnalyse();
           this.form = EMPTY_FORM();
-          this.error.set("L'OCR n'a pas pu extraire les données. Remplissez manuellement.");
+          if (this.currentTechnicienId) {
+            this.form.technicien_id = this.currentTechnicienId;
+            const tech = this.techniciens.find(t => t.id === this.currentTechnicienId);
+            if (tech) this.form.technicien = tech.nom;
+          }
+          this.error.set("L\'OCR n\'a pas pu extraire les données. Remplissez manuellement.");
           this.scanState.set('ocr-failed');
           this.currentStep.set(3);
         },
@@ -203,6 +250,18 @@ export class Scan implements OnInit {
     this.scanState.set('analysing');
     this._demarrerAnimationAnalyse();
     this._analyser();
+  }
+
+  private _normaliserDate(date: string): string {
+    if (!date) return '';
+    // Convertit DD/MM/YYYY ou DD/MM/YY → YYYY-MM-DD attendu par le backend
+    const match = date.match(/^(\d{2})\/(\d{2})\/(\d{2,4})$/);
+    if (match) {
+      const [, day, month, year] = match;
+      const fullYear = year.length === 2 ? `20${year}` : year;
+      return `${fullYear}-${month}-${day}`;
+    }
+    return date; // déjà au bon format
   }
 
   reinitialiser(): void {
@@ -248,26 +307,76 @@ export class Scan implements OnInit {
     ).subscribe();
   }
 
-  enregistrer(): void {
+  async enregistrer(): Promise<void> {
     if (!this.form.numero_serie || !this.form.date_reparation) {
       this.error.set('Numéro de série et date sont obligatoires.');
       return;
     }
     if (this.avertissementActif()) {
-      this.error.set("Veuillez valider toutes les nouvelles pièces avant d'enregistrer.");
+      this.error.set("Veuillez valider toutes les nouvelles pièces avant d\'enregistrer.");
       return;
     }
-    const payload: Reparation = {
-      numero_serie:    this.form.numero_serie,
-      machine_type:    this.form.machine_type,
-      technicien:      this.form.technicien,
-      date_reparation: this.form.date_reparation,
-      notes:           this.form.notes,
-      pieces:          this.form.pieces.filter(p => p.quantite > 0),
-    };
-    this.service.enregistrer(payload).subscribe({
-      next: () => { this.saved.set(true); this.currentStep.set(4); },
-      error: () => { this.error.set("Erreur lors de l'enregistrement."); this.currentStep.set(4); },
-    });
+
+    this.saving.set(true);
+    this.error.set('');
+
+    try {
+      // Résoudre machine_id depuis le numéro de série
+      const machine_id = await this._resoudreMachineId();
+
+      const payload: Reparation = {
+        machine_id,
+        numero_serie:    this.form.numero_serie,
+        machine_type:    this.form.machine_type,
+        technicien:      this.form.technicien,
+        technicien_id:   this.form.technicien_id ?? undefined,
+        date_reparation: this.form.date_reparation,
+        notes:           this.form.notes,
+        pieces:          this.form.pieces.filter(p => p.quantite > 0),
+      };
+
+      await firstValueFrom(this.service.enregistrer(payload));
+      this.saved.set(true);
+      this.currentStep.set(4);
+    } catch {
+      this.error.set("Erreur lors de l\'enregistrement.");
+      this.currentStep.set(4);
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  /**
+   * Résout le machine_id :
+   * 1. Machine trouvée via l\'OCR (modele_id connu) → cherche via numéro de série
+   * 2. Machine inconnue → crée la machine avec modele_id + statut en_attente
+   */
+  private async _resoudreMachineId(): Promise<number> {
+    const numeroSerie = this.form.numero_serie.trim().toUpperCase();
+
+    // Cherche d\'abord si la machine existe déjà en base
+    try {
+      const result = await firstValueFrom(this.service.search(numeroSerie)) as any;
+      if (result?.found && result?.machine?.id) {
+        return result.machine.id;
+      }
+    } catch (err: any) {
+      if (err?.status !== 404) throw err;
+    }
+
+    // Machine inconnue → créer avec le modele_id résolu par l\'OCR
+    if (!this.form.modele_id) {
+      throw new Error('modele_id manquant — impossible de créer la machine.');
+    }
+
+    const machine = await firstValueFrom(
+      this.machineService.create({
+        numero_serie: numeroSerie,
+        modele_id:    this.form.modele_id,
+        statut:       'en_attente',
+        notes:        this.form.notes ?? '',
+      })
+    );
+    return machine.id;
   }
 }

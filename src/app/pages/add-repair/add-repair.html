@@ -55,7 +55,12 @@
         }
 
         @if (mode() === 'scan') {
-          <app-scan />
+          <app-scan
+            [techniciens]="techniciens()"
+            [marques]="marques()"
+            [modeles]="modeles()"
+            [currentTechnicienId]="currentTechnicienId()"
+          />
         }
       </section>
     </main>
