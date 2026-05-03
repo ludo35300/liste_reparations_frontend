@@ -939,3 +939,133 @@
   .drawer { width: 100vw; }
   .form-row-2 { grid-template-columns: 1fr; }
 }
+// ── Champ de recherche unifié ────────────────────────────────
+.search-piece-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-piece-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.search-piece-input {
+  width: 100%;
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.5rem;
+  width: 24px; height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+
+  &:hover {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+}
+
+.search-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0.25rem 0 0;
+  padding: 0.75rem;
+
+  fa-icon { opacity: 0.5; }
+}
+
+// ── Prompt création inline ────────────────────────────────────
+.create-inline-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1rem;
+  background: rgba(68, 96, 241, 0.04);
+  border: 1px dashed rgba(68, 96, 241, 0.25);
+  border-radius: var(--radius-sm);
+  margin-top: 0.25rem;
+  animation: fadeSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.create-inline-prompt__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.create-inline-prompt__icon {
+  margin-top: 0.1rem;
+  color: var(--primary);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.create-inline-prompt__title {
+  margin: 0 0 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.create-inline-prompt__sub {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.create-inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 0.75rem;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.btn-create-link {
+  width: 100%;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+// ── Spinner bouton sm ─────────────────────────────────────────
+.btn-spinner-sm {
+  width: 12px; height: 12px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Overrides pour les btn-sm dans le catalog ─────────────────
+.btn.btn-sm {
+  fa-icon { font-size: 0.68rem; }
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}

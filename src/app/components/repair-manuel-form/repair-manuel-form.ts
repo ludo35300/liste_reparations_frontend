@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { Reparation } from '../../models/reparation.model';
 import { MachineService } from '../../services/machine.service';
@@ -8,9 +8,9 @@ import { Marque } from '../../models/marque.model';
 import { Modele } from '../../models/modele.model';
 import { Machine } from '../../models/machine.model';
 import { TechnicienOption } from '../../models/user.model';
-import { PieceChangee } from '../../models/piece.model';
+import { PieceChangee, PieceRef } from '../../models/piece.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faFloppyDisk, faPlus, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
 export interface RepairManualSubmit {
@@ -30,7 +30,7 @@ export type MachineStatus = 'idle' | 'loading' | 'found' | 'not_found';
 @Component({
   selector: 'app-repair-manuel-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, FormsModule],
   templateUrl: './repair-manuel-form.html',
   styleUrl: './repair-manuel-form.scss',
 })
@@ -54,10 +54,20 @@ export class RepairManuelForm implements OnInit {
 
   public readonly today = this.getTodayLocal();
 
+  // Icônes
+  public readonly faTimes  = faTimes;
+  public readonly faCheck  = faCheck;
+  public readonly faSearch = faSearch;
   public readonly faFloppyDisk = faFloppyDisk;
+  public readonly faPlus   = faPlus;
 
   // Formulaire de vérification (étape 1a)
   public readonly serialForm = this.fb.group({ numero_serie: ['', [Validators.required, Validators.minLength(3)]],});
+
+  // Recherche pièces étape 2
+  readonly pieceSearchQuery  = signal('');
+  readonly newPieceRefInput  = signal('');
+  readonly newPieceDesigInput = signal('');
 
   // Formulaire principal (étapes 1b/1c + étape 2)
   public readonly form = this.fb.group({
@@ -69,6 +79,10 @@ export class RepairManuelForm implements OnInit {
     notes: [''],
     pieces: this.fb.array([]),
   });
+
+  // Pièces du modèle sélectionné (chargées depuis le service)
+  readonly piecesModele = signal<PieceRef[]>([]);
+
   // dans la classe
   public readonly machineAlreadyInRepair = computed(() => {
     const statut = this.foundMachine()?.statut?.trim().toLowerCase();
@@ -80,6 +94,16 @@ export class RepairManuelForm implements OnInit {
   get pieces(): FormArray {
     return this.form.get('pieces') as FormArray;
   }
+
+  // Computed : filtre le catalogue selon la query
+  readonly filteredPiecesModele = computed((): PieceRef[] => {
+    const q = this.pieceSearchQuery().trim().toLowerCase();
+    if (q.length < 2) return [];
+    return this.piecesModele().filter(p =>
+      p.ref_piece.toLowerCase().includes(q) ||
+      p.designation.toLowerCase().includes(q)
+    );
+  });
 
   ngOnInit(): void {
     if (this.currentTechnicienId) {
@@ -265,5 +289,65 @@ export class RepairManuelForm implements OnInit {
     }
 
     this.currentStep.set(2);
+  }
+
+  onPieceSearch(value: string): void {
+    this.pieceSearchQuery.set(value);
+    // Pré-remplir la ref avec la query courante si formulaire inline
+    if (this.filteredPiecesModele().length === 0) {
+      this.newPieceRefInput.set(value.toUpperCase());
+    }
+  }
+
+  clearPieceSearch(): void {
+    this.pieceSearchQuery.set('');
+    this.newPieceRefInput.set('');
+    this.newPieceDesigInput.set('');
+  }
+
+  isPieceAdded(refPiece: string): boolean {
+    return this.pieces.controls.some(
+      c => c.get('ref_piece')?.value === refPiece
+    );
+  }
+
+  addPieceFromCatalog(piece: PieceRef): void {
+    this.pieces.push(
+      this.fb.group({
+        piece_ref_id: [piece.id ?? null],
+        ref_piece:    [piece.ref_piece, Validators.required],
+        designation:  [piece.designation, Validators.required],
+        quantite:     [1, [Validators.required, Validators.min(1)]],
+        is_new:       [false],
+      })
+    );
+    this.clearPieceSearch();
+  }
+
+  addCustomPiece(): void {
+    const ref   = this.newPieceRefInput().trim().toUpperCase();
+    const desig = this.newPieceDesigInput().trim();
+    if (!ref || !desig) return;
+
+    this.pieces.push(
+      this.fb.group({
+        piece_ref_id: [null],
+        ref_piece:    [ref,   Validators.required],
+        designation:  [desig, Validators.required],
+        quantite:     [1, [Validators.required, Validators.min(1)]],
+        is_new:       [true],
+      })
+    );
+    this.clearPieceSearch();
+  }
+
+  incrementQty(index: number): void {
+    const ctrl = this.pieces.at(index).get('quantite');
+    ctrl?.setValue((ctrl.value ?? 1) + 1);
+  }
+
+  decrementQty(index: number): void {
+    const ctrl = this.pieces.at(index).get('quantite');
+    if ((ctrl?.value ?? 1) > 1) ctrl?.setValue(ctrl.value - 1);
   }
 }

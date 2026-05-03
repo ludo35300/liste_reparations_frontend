@@ -254,25 +254,25 @@ export class Machines implements OnInit {
     const modele = this.selectedModele();
     if (!ref || !desig) { this.errorNewPiece.set('Référence et désignation obligatoires.'); return; }
     if (!modele) return;
-    const marqueId = modele.marque_id;
 
     this.savingNewPiece.set(true);
     this.errorNewPiece.set(null);
-    this.refService.createPiece(ref, desig, marqueId).subscribe({
+    this.refService.createPiece(ref, desig, modele.marque_id).subscribe({
       next: (newPiece) => {
         this.refService.addPieceToModele(modele.id, newPiece.id).subscribe({
           next: () => {
             this.piecesDuModele.update(list => [...list, newPiece]);
             this.allPieces.update(list => [...list, newPiece]);
             this.savingNewPiece.set(false);
-            this.showNewPieceForm.set(false);
             this.newPieceRef.set('');
             this.newPieceDesig.set('');
+            this.searchPieceQuery.set('');   // ← reset la recherche après succès
+            this.errorNewPiece.set(null);
           },
-          error: () => { this.errorNewPiece.set('Pièce créée mais association échouée.'); this.savingNewPiece.set(false); }
+          error: () => this.savingNewPiece.set(false)
         });
       },
-      error: () => { this.errorNewPiece.set('Erreur lors de la création de la pièce.'); this.savingNewPiece.set(false); }
+      error: () => { this.errorNewPiece.set('Erreur lors de la création.'); this.savingNewPiece.set(false); }
     });
   }
 

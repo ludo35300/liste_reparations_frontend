@@ -251,40 +251,142 @@
 
     <!-- Pièces changées -->
     <div class="pieces-block">
+
       <div class="pieces-block-header">
         <h4>Pièces changées</h4>
-        <button type="button" class="btn btn-ghost btn-sm" (click)="addPiece()">
-          + Ajouter une pièce
-        </button>
+        <span class="pieces-count-badge">{{ pieces.length }} pièce{{ pieces.length > 1 ? 's' : '' }}</span>
       </div>
 
-      <div formArrayName="pieces" class="pieces-list" [formGroup]="form">
-        @if (pieces.length === 0) {
-          <div class="empty-pieces">
-            <span>🔩</span>
-            <p>Aucune pièce ajoutée.<br>Cliquez sur « + Ajouter une pièce » si nécessaire.</p>
-          </div>
+      <!-- Liste des pièces déjà ajoutées -->
+      @if (pieces.length > 0) {
+        <ul class="added-pieces-list">
+          @for (piece of pieces.controls; track $index) {
+            <li class="added-piece-item" [formGroupName]="$index" [formArrayName]="'pieces'">
+              <div class="added-piece-info">
+                <span class="added-piece-ref">{{ piece.get('ref_piece')?.value }}</span>
+                <span class="added-piece-desig">{{ piece.get('designation')?.value }}</span>
+              </div>
+              <div class="added-piece-qty">
+                <button type="button" class="qty-btn"
+                  (click)="decrementQty($index)"
+                  [disabled]="piece.get('quantite')?.value <= 1"
+                  aria-label="Diminuer">−</button>
+                <span class="qty-value">{{ piece.get('quantite')?.value }}</span>
+                <button type="button" class="qty-btn"
+                  (click)="incrementQty($index)"
+                  aria-label="Augmenter">+</button>
+              </div>
+              <button type="button" class="piece-remove-btn"
+                (click)="removePiece($index)"
+                aria-label="Retirer cette pièce">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty-pieces">
+          <span class="empty-pieces-icon">🔩</span>
+          <p>Aucune pièce ajoutée. Recherchez une pièce ci-dessous.</p>
+        </div>
+      }
+
+      <!-- Séparateur -->
+      <div class="pieces-add-zone">
+
+        <!-- Champ de recherche -->
+        <div class="search-piece-wrapper">
+          <i class="fas fa-search search-piece-icon"></i>
+          <input
+            class="field-input search-piece-input"
+            [ngModel]="pieceSearchQuery()"
+            (ngModelChange)="onPieceSearch($event)"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Rechercher une pièce par référence ou désignation…"
+            autocomplete="off"
+            (keyup.escape)="clearPieceSearch()"
+          />
+          @if (pieceSearchQuery().length > 0) {
+            <button type="button" class="search-clear-btn"
+              (click)="clearPieceSearch()" aria-label="Effacer">
+              <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+          }
+        </div>
+
+        <!-- Résultats -->
+        @if (pieceSearchQuery().length >= 2) {
+
+          @if (filteredPiecesModele().length > 0) {
+            <ul class="pieces-catalog">
+              @for (piece of filteredPiecesModele(); track piece.id) {
+                <li class="catalog-item"
+                  [class.catalog-item--added]="isPieceAdded(piece.ref_piece)"
+                  (click)="!isPieceAdded(piece.ref_piece) && addPieceFromCatalog(piece)">
+                  <div class="piece-item-info">
+                    <span class="piece-ref">{{ piece.ref_piece }}</span>
+                    <span class="piece-desig">{{ piece.designation }}</span>
+                  </div>
+                  @if (isPieceAdded(piece.ref_piece)) {
+                    <span class="catalog-linked-tag">
+                      <fa-icon [icon]="faCheck"></fa-icon> Ajoutée
+                    </span>
+                  } @else {
+                    <span class="catalog-add-hint">
+                      <fa-icon [icon]="faPlus"></fa-icon> Ajouter
+                    </span>
+                  }
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Aucun résultat → création inline -->
+          @if (filteredPiecesModele().length === 0) {
+            <div class="create-inline-prompt">
+              <div class="create-inline-prompt__header">
+                <fa-icon [icon]="faPlus" class="create-inline-prompt__icon"></fa-icon>
+                <div>
+                  <p class="create-inline-prompt__title">Pièce introuvable dans le catalogue</p>
+                  <p class="create-inline-prompt__sub">Saisir les informations pour ajouter « <strong>{{ pieceSearchQuery() }}</strong> »</p>
+                </div>
+              </div>
+              <div class="create-inline-fields">
+                <div class="field-group">
+                  <label class="field-label-sm">Référence <span class="required">*</span></label>
+                  <input class="field-input"
+                    [ngModel]="newPieceRefInput()"
+                    (ngModelChange)="newPieceRefInput.set($event)"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Ex : 40A-001" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label-sm">Désignation <span class="required">*</span></label>
+                  <input class="field-input"
+                    [ngModel]="newPieceDesigInput()"
+                    (ngModelChange)="newPieceDesigInput.set($event)"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Ex : Joint torique"
+                    (keyup.enter)="addCustomPiece()" />
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary btn-create-link"
+                (click)="addCustomPiece()"
+                [disabled]="!newPieceRefInput() || !newPieceDesigInput()">
+                <fa-icon [icon]="faPlus"></fa-icon> Ajouter cette pièce
+              </button>
+            </div>
+          }
         }
-        @for (piece of pieces.controls; track $index) {
-          <div class="piece-row" [formGroupName]="$index">
-            <div class="field-group">
-              <label class="field-label" [for]="'ref_' + $index">Référence <span class="required">*</span></label>
-              <input [id]="'ref_' + $index" class="field-input" formControlName="ref_piece" placeholder="Ex : 40A-001" />
-            </div>
-            <div class="field-group piece-row-desig">
-              <label class="field-label" [for]="'desig_' + $index">Désignation <span class="required">*</span></label>
-              <input [id]="'desig_' + $index" class="field-input" formControlName="designation" placeholder="Ex : Joint torique" />
-            </div>
-            <div class="field-group piece-row-qty">
-              <label class="field-label" [for]="'qty_' + $index">Qté</label>
-              <input [id]="'qty_' + $index" class="field-input" type="number" min="1" formControlName="quantite" />
-            </div>
-            <div class="piece-row-del">
-              <button type="button" class="btn-delete-piece" (click)="removePiece($index)" aria-label="Supprimer la pièce">✕</button>
-            </div>
-          </div>
+
+        @if (pieceSearchQuery().length < 2 && pieces.length === 0) {
+          <p class="search-hint">
+            <fa-icon [icon]="faSearch"></fa-icon>
+            Tapez au moins 2 caractères pour rechercher dans le catalogue du modèle
+          </p>
         }
       </div>
+
     </div>
 
     <div class="form-actions">
