@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService }      from '../../auth-lib/services/auth.service';
 import { MeResponse }       from '../../auth-lib/models/auth.model';
@@ -36,6 +36,9 @@ export class Machines implements OnInit {
   readonly brandGroups  = signal<BrandGroup[]>([]);
   readonly faTrash      = faTrash;
   readonly faPlus       = faPlus;
+  readonly faSearch = faSearch;
+  readonly faCheck = faCheck;
+  readonly faTimes = faTimes;
 
   // ── Formulaire ajout marque ────────────────────────────────
   readonly showMarqueForm  = signal(false);

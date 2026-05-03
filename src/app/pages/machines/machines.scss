@@ -759,6 +759,21 @@
   list-style: none;
   padding: 0;
   margin: 0;
+
+  max-height: 250px;   // ← même valeur que .pieces-catalog pour la cohérence
+  overflow-y: auto;
+
+  // Scrollbar fine et discrète
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+
+  &::-webkit-scrollbar       { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+    &:hover { background: var(--border-strong); }
+  }
 }
 
 .piece-item {
@@ -830,7 +845,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 220px;
+  max-height: 250px;
   overflow-y: auto;
 }
 

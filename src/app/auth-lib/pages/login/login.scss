@@ -1,3 +1,44 @@
 :host {
-    display: block;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;   // ← le :host propage la hauteur à la section
+}
+
+// Surcharge du toggle password (bouton FontAwesome, intégré dans l'input)
+.form-group.position-relative {
+  .btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted, #94a3b8);
+    transition: color 0.18s ease;
+
+    &:hover { color: var(--text-dark, #0f172a); }
+  }
+}
+
+// Lien "Mot de passe oublié"
+.form-link {
+  justify-content: flex-end;
+
+  a {
+    font-size: 0.78rem;
+    color: var(--text-muted, #94a3b8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.18s ease;
+
+    &:hover { color: var(--c-primary, #2563eb); }
+  }
+}
+
+// Alertes Bootstrap — override léger pour coller au design system
+.alert-danger {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.20);
+  color: #991b1b;
+  border-radius: 8px;
+  font-size: 0.82rem;
 }

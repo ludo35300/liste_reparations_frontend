@@ -185,7 +185,9 @@
         <span class="drawer-header-type">{{ selectedModele()!.type_machine }}</span>
         <h3 class="drawer-header-title">{{ selectedModele()!.nom }}</h3>
       </div>
-      <button class="drawer-close" (click)="closePiecesDrawer()" aria-label="Fermer">✕</button>
+      <button class="drawer-close" (click)="closePiecesDrawer()" aria-label="Fermer">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
     </div>
 
     <div class="drawer-body">
@@ -200,7 +202,7 @@
 
       @if (!piecesLoading()) {
 
-        <!-- Pièces associées -->
+        <!-- ── Pièces associées ─────────────────────────────── -->
         <div class="drawer-section">
           <div class="drawer-section-header">
             <h4>Pièces associées</h4>
@@ -224,7 +226,11 @@
                     (click)="removePiece(piece)"
                     [disabled]="removingPieceId() === piece.id"
                     aria-label="Retirer cette pièce">
-                    @if (removingPieceId() === piece.id) { … } @else { ✕ }
+                    @if (removingPieceId() === piece.id) {
+                      <div class="btn-spinner-sm"></div>
+                    } @else {
+                      <fa-icon [icon]="faTimes"></fa-icon>
+                    }
                   </button>
                 </li>
               }
@@ -234,78 +240,115 @@
 
         <hr class="drawer-divider" />
 
-        <!-- Associer pièce existante -->
+        <!-- ── Recherche + ajout unifié ────────────────────── -->
         <div class="drawer-section">
           <div class="drawer-section-header">
-            <h4>Associer une pièce existante</h4>
+            <h4>Ajouter une pièce</h4>
           </div>
-          <div class="search-piece-row">
-            <input class="field-input"
+
+          <!-- Champ de recherche -->
+          <div class="search-piece-wrapper">
+            <i class="fas fa-search search-piece-icon"></i>
+            <input
+              class="field-input search-piece-input"
               [ngModel]="searchPieceQuery()"
               (ngModelChange)="searchPieceQuery.set($event)"
-              placeholder="Filtrer par référence ou désignation…" />
+              placeholder="Référence ou désignation…"
+              autocomplete="off"
+            />
+            @if (searchPieceQuery().length > 0) {
+              <button class="btn btn-outline-danger search-clear-btn" (click)="searchPieceQuery.set('')" aria-label="Effacer">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            }
           </div>
-          @if (filteredAllPieces().length > 0) {
-            <ul class="pieces-catalog">
-              @for (piece of filteredAllPieces(); track piece.id) {
-                <li class="catalog-item" [class.catalog-item--linked]="isPieceLinked(piece.id)">
-                  <div class="piece-item-info">
-                    <span class="piece-ref">{{ piece.ref_piece }}</span>
-                    <span class="piece-desig">{{ piece.designation }}</span>
+
+          <!-- Résultats de recherche -->
+          @if (searchPieceQuery().length >= 2) {
+
+            @if (filteredAllPieces().length > 0) {
+              <ul class="pieces-catalog">
+                @for (piece of filteredAllPieces(); track piece.id) {
+                  <li class="catalog-item" [class.catalog-item--linked]="isPieceLinked(piece.id)">
+                    <div class="piece-item-info">
+                      <span class="piece-ref">{{ piece.ref_piece }}</span>
+                      <span class="piece-desig">{{ piece.designation }}</span>
+                    </div>
+                    @if (isPieceLinked(piece.id)) {
+                      <span class="catalog-linked-tag">
+                        <fa-icon [icon]="faCheck"></fa-icon> Associée
+                      </span>
+                    } @else {
+                      <button class="btn btn-sm btn-outline"
+                        (click)="linkPiece(piece)"
+                        [disabled]="linkingPieceId() === piece.id">
+                        @if (linkingPieceId() === piece.id) {
+                          <div class="btn-spinner-sm"></div>
+                        } @else {
+                          <fa-icon [icon]="faPlus"></fa-icon> Associer
+                        }
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            <!-- Aucun résultat → proposition de création inline -->
+            @if (filteredAllPieces().length === 0) {
+              <div class="create-inline-prompt">
+                <div class="create-inline-prompt__header">
+                  <div>
+                    <p class="create-inline-prompt__title">Aucune pièce trouvée</p>
+                    <p class="create-inline-prompt__sub">Créer « <strong>{{ searchPieceQuery() }}</strong> » comme nouvelle pièce ?</p>
                   </div>
-                  @if (isPieceLinked(piece.id)) {
-                    <span class="catalog-linked-tag">✓ associée</span>
+                </div>
+
+                <div class="create-inline-fields">
+                  <div class="field-group">
+                    <label class="field-label-sm">Référence <span class="required">*</span></label>
+                    <input class="field-input"
+                      [ngModel]="newPieceRef()"
+                      (ngModelChange)="newPieceRef.set($event)"
+                      placeholder="Ex : 40A-001"
+                      (keyup.enter)="createAndLinkPiece()" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label-sm">Désignation <span class="required">*</span></label>
+                    <input class="field-input"
+                      [ngModel]="newPieceDesig()"
+                      (ngModelChange)="newPieceDesig.set($event)"
+                      placeholder="Ex : Joint torique"
+                      (keyup.enter)="createAndLinkPiece()" />
+                  </div>
+                </div>
+
+                @if (errorNewPiece()) {
+                  <p class="field-error">{{ errorNewPiece() }}</p>
+                }
+
+                <button class="btn btn-primary btn-create-link"
+                  (click)="createAndLinkPiece()"
+                  [disabled]="savingNewPiece() || !newPieceRef() || !newPieceDesig()">
+                  @if (savingNewPiece()) {
+                    <div class="btn-spinner-sm"></div> Création…
                   } @else {
-                    <button class="btn btn-sm btn-outline" (click)="linkPiece(piece)" [disabled]="linkingPieceId() === piece.id">
-                      @if (linkingPieceId() === piece.id) { … } @else { + Associer }
-                    </button>
+                    <fa-icon [icon]="faPlus"></fa-icon> Créer et associer
                   }
-                </li>
-              }
-            </ul>
-          } @else if (searchPieceQuery().length > 1) {
-            <p class="no-results">Aucune pièce trouvée pour « {{ searchPieceQuery() }} »</p>
-          }
-        </div>
-
-        <hr class="drawer-divider" />
-
-        <!-- Créer et associer -->
-        <div class="drawer-section">
-          <div class="drawer-section-header">
-            <h4>Créer et associer une nouvelle pièce</h4>
-            <button class="btn btn-sm btn-ghost" (click)="toggleNewPieceForm()">
-              {{ showNewPieceForm() ? 'Annuler' : '+ Créer' }}
-            </button>
-          </div>
-          @if (showNewPieceForm()) {
-            <div class="new-piece-form">
-              <div class="form-row-2">
-                <div class="field-group">
-                  <label class="field-label-sm">Référence <span class="required">*</span></label>
-                  <input class="field-input"
-                    [ngModel]="newPieceRef()"
-                    (ngModelChange)="newPieceRef.set($event)"
-                    placeholder="Ex : 40A-001" />
-                </div>
-                <div class="field-group">
-                  <label class="field-label-sm">Désignation <span class="required">*</span></label>
-                  <input class="field-input"
-                    [ngModel]="newPieceDesig()"
-                    (ngModelChange)="newPieceDesig.set($event)"
-                    placeholder="Ex : Joint torique" />
-                </div>
-              </div>
-              @if (errorNewPiece()) { <p class="field-error">{{ errorNewPiece() }}</p> }
-              <div class="new-piece-actions">
-                <button class="btn btn-primary btn-sm" (click)="createAndLinkPiece()" [disabled]="savingNewPiece()">
-                  @if (savingNewPiece()) { Création… } @else { Créer et associer }
                 </button>
               </div>
-            </div>
+            }
           }
-        </div>
 
+          <!-- État initial — hint -->
+          @if (searchPieceQuery().length < 2) {
+            <p class="search-hint">
+              <fa-icon [icon]="faSearch"></fa-icon>
+              Tapez au moins 2 caractères pour rechercher
+            </p>
+          }
+
+        </div>
       }
     </div>
   </aside>
