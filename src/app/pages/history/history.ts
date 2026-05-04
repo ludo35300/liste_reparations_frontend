@@ -15,7 +15,7 @@ import { ReparationAction }  from '../../models/actions.model';
 import { StatutMachine }     from '../../models/statut.model';
 import { Topbar }            from '../../components/topbar/topbar';
 import { NavService }        from '../../core/nav.service';
-import { faTrash, faWarning, faPen, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faWarning, faPen, faCheck, faXmark, faArrowLeft, faClock, faPlus, faListCheck, faWrench, faGears, faGrip, faQrcode, faMagnifyingGlass, faBell, faBars, faExpand, faSpinner, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 
 type ActiveTab = 'pieces' | 'actions';
 
@@ -59,6 +59,20 @@ export class History implements OnInit {
   readonly faPen     = faPen;
   readonly faCheck   = faCheck;
   readonly faXmark   = faXmark;
+  readonly faArrowLeft = faArrowLeft;
+  readonly faClock = faClock;
+  readonly faPlus = faPlus;
+  readonly faListCheck = faListCheck;
+  readonly faWrench = faWrench;
+  readonly faGears = faGears;
+  readonly faGrip = faGrip;
+  readonly faQrcode = faQrcode;
+  readonly faMagnifyingGlass = faMagnifyingGlass;
+  readonly faBell = faBell;
+  readonly faBars = faBars;
+  readonly faExpand = faExpand;
+  readonly faSpinner = faSpinner;
+  readonly faClipboardList = faClipboardList;
 
   // ── Constantes template ────────────────────────────────────
   readonly typesAction = TYPES_ACTION;
