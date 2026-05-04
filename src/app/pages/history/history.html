@@ -11,35 +11,45 @@
 
       @if (errorMessage()) {
         <div class="alert-error" role="alert">
-          <fa-icon [icon]="faWarning"></fa-icon> &nbsp; {{ errorMessage() }}
+          <fa-icon [icon]="faWarning"></fa-icon>
+          {{ errorMessage() }}
         </div>
       }
 
-      <div class="page-header m-2">
+      <!-- ── En-tête de page ─────────────────────────────── -->
+      <div class="page-header">
         <div class="page-header-left">
-          <button class="btn-back" (click)="retour()" aria-label="Retour">←</button>
+          <button class="btn-back" (click)="retour()" aria-label="Retour">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+          </button>
           <div>
             <h2 class="page-title">{{ numeroSerie() }}</h2>
-            <p class="page-sub">{{ reparations().length }} intervention{{ reparations().length > 1 ? 's' : '' }}</p>
+            <p class="page-sub">
+              {{ reparations().length }}
+              intervention{{ reparations().length > 1 ? 's' : '' }}
+            </p>
           </div>
         </div>
       </div>
 
+      <!-- ── Grille historique ───────────────────────────── -->
       <div class="history-layout">
 
-        <!-- ── Liste interventions ──────────────────────────── -->
-        <aside class="history-list">
+        <!-- ── Liste des interventions ──────────────────── -->
+        <aside class="history-list" aria-label="Liste des interventions">
           @if (reparations().length === 0) {
             <div class="empty-state">
-              <span class="empty-icon">📋</span>
+              <fa-icon [icon]="faClipboardList"></fa-icon>
               <p>Aucune intervention trouvée</p>
             </div>
           }
+
           @for (rep of reparations(); track rep.id) {
             <button
               class="history-item"
               [class.active]="selected()?.id === rep.id"
               (click)="selectionner(rep)"
+              [attr.aria-current]="selected()?.id === rep.id ? 'true' : null"
             >
               <div class="item-date">{{ rep.date_reparation | date:'d MMM y' }}</div>
               <div class="item-tech">{{ rep.technicien || 'Technicien N/A' }}</div>
@@ -53,7 +63,7 @@
                   </span>
                 }
                 @if (rep.machine?.statut) {
-                  <span class="item-badge {{ getStatutCls(rep.machine?.statut) }}">
+                  <span class="badge {{ getStatutCls(rep.machine?.statut) }}">
                     {{ labelStatut(rep.machine?.statut) }}
                   </span>
                 }
@@ -62,11 +72,11 @@
           }
         </aside>
 
-        <!-- ── Panneau détail ────────────────────────────────── -->
+        <!-- ── Panneau de détail ──────────────────────────── -->
         @if (selected(); as rep) {
           <section class="history-detail" aria-label="Détail de l'intervention">
 
-            <!-- En-tête + statut + supprimer -->
+            <!-- En-tête méta-données -->
             <div class="detail-header">
               <div class="detail-meta">
 
@@ -100,23 +110,44 @@
                       <span class="badge {{ getStatutCls(rep.machine?.statut) }}">
                         {{ labelStatut(rep.machine?.statut) }}
                       </span>
-                      <button class="btn-icon-sm" (click)="openEditStatut()" title="Modifier le statut" aria-label="Modifier le statut">
+                      <button
+                        class="btn-icon-sm"
+                        (click)="openEditStatut()"
+                        title="Modifier le statut"
+                        aria-label="Modifier le statut"
+                      >
                         <fa-icon [icon]="faPen"></fa-icon>
                       </button>
                     </div>
                   } @else {
                     <div class="statut-edit-row">
-                      <select class="field-input field-input--sm"
+                      <select
+                        class="field-input field-input--sm"
                         [ngModel]="statutEdit()"
-                        (ngModelChange)="statutEdit.set($event)">
+                        (ngModelChange)="statutEdit.set($event)"
+                        aria-label="Choisir un statut"
+                      >
                         @for (s of statuts; track s.value) {
                           <option [value]="s.value">{{ s.label }}</option>
                         }
                       </select>
-                      <button class="btn-icon-sm btn-icon-sm--success" (click)="saveStatut()" [disabled]="savingStatut()" aria-label="Valider">
-                        @if (savingStatut()) { … } @else { <fa-icon [icon]="faCheck"></fa-icon> }
+                      <button
+                        class="btn-icon-sm btn-icon-sm--success"
+                        (click)="saveStatut()"
+                        [disabled]="savingStatut()"
+                        aria-label="Valider le statut"
+                      >
+                        @if (savingStatut()) {
+                          <fa-icon [icon]="faSpinner" [animation]="'spin'"></fa-icon>
+                        } @else {
+                          <fa-icon [icon]="faCheck"></fa-icon>
+                        }
                       </button>
-                      <button class="btn-icon-sm btn-icon-sm--danger" (click)="cancelEditStatut()" aria-label="Annuler">
+                      <button
+                        class="btn-icon-sm btn-icon-sm--danger"
+                        (click)="cancelEditStatut()"
+                        aria-label="Annuler"
+                      >
                         <fa-icon [icon]="faXmark"></fa-icon>
                       </button>
                     </div>
@@ -124,34 +155,54 @@
                 </div>
 
               </div>
+            </div>
 
-              <button class="btn-delete" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
-                <fa-icon [icon]="faTrash"></fa-icon> Supprimer
+            <!-- ── Onglets ─────────────────────────────────── -->
+            <div class="tabs" role="tablist">
+              <button
+                class="tab-btn"
+                [class.tab-active]="activeTab() === 'pieces'"
+                (click)="setTab('pieces')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'pieces'"
+                id="tab-pieces"
+                aria-controls="panel-pieces"
+              >
+                <fa-icon [icon]="faWrench"></fa-icon>
+                Pièces ({{ rep.pieces.length }})
+              </button>
+              <button
+                class="tab-btn"
+                [class.tab-active]="activeTab() === 'actions'"
+                (click)="setTab('actions')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'actions'"
+                id="tab-actions"
+                aria-controls="panel-actions"
+              >
+                <fa-icon [icon]="faListCheck"></fa-icon>
+                Actions ({{ actions().length }})
               </button>
             </div>
 
-            <!-- Onglets -->
-            <div class="tabs">
-              <button class="tab-btn" [class.tab-active]="activeTab() === 'pieces'" (click)="setTab('pieces')">
-                🔩 Pièces ({{ rep.pieces.length }})
-              </button>
-              <button class="tab-btn" [class.tab-active]="activeTab() === 'actions'" (click)="setTab('actions')">
-                📋 Actions ({{ actions().length }})
-              </button>
-            </div>
-
-            <!-- ══════════════════════════════════════════════
+            <!-- ══════════════════════════════════════════
                  ONGLET PIÈCES
-            ══════════════════════════════════════════════ -->
+            ══════════════════════════════════════════ -->
             @if (activeTab() === 'pieces') {
-              <div class="pieces-section">
-
+              <div
+                class="pieces-section"
+                role="tabpanel"
+                id="panel-pieces"
+                aria-labelledby="tab-pieces"
+              >
                 @if (!editingPieces()) {
                   <!-- Mode lecture -->
                   <div class="pieces-toolbar">
-                    <span class="pieces-count">{{ rep.pieces.length }} pièce{{ rep.pieces.length > 1 ? 's' : '' }}</span>
-                    <button class="btn btn-primary-sm" (click)="openEditPieces()">
-                      <fa-icon [icon]="faPen"></fa-icon> Modifier les pièces
+                    <span class="pieces-count">
+                      {{ rep.pieces.length }} pièce{{ rep.pieces.length > 1 ? 's' : '' }}
+                    </span>
+                    <button class="btn-primary-sm" (click)="openEditPieces()">
+                      <fa-icon [icon]="faPen"></fa-icon> Modifier
                     </button>
                   </div>
 
@@ -160,9 +211,9 @@
                       <table class="pieces-table">
                         <thead>
                           <tr>
-                            <th>Référence</th>
-                            <th>Désignation</th>
-                            <th class="cell-qty">Qté</th>
+                            <th scope="col">Référence</th>
+                            <th scope="col">Désignation</th>
+                            <th scope="col" class="cell-qty">Qté</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -177,7 +228,7 @@
                       </table>
                     </div>
                   } @else {
-                    <div class="no-pieces">Aucune pièce enregistrée.</div>
+                    <p class="no-pieces">Aucune pièce enregistrée pour cette intervention.</p>
                   }
 
                 } @else {
@@ -186,54 +237,99 @@
                     <div class="pieces-edit-header">
                       <h4>Modifier les pièces</h4>
                       <div class="pieces-edit-actions">
-                        <button class="btn btn-ghost btn-sm" (click)="cancelEditPieces()">Annuler</button>
-                        <button class="btn btn-primary btn-sm" (click)="savePieces()" [disabled]="savingPieces()">
-                          @if (savingPieces()) { Enregistrement… } @else { <fa-icon [icon]="faCheck"></fa-icon> Enregistrer }
+                        <button class="btn-ghost btn-sm" (click)="cancelEditPieces()">
+                          Annuler
+                        </button>
+                        <button
+                          class="btn btn-primary btn-sm"
+                          (click)="savePieces()"
+                          [disabled]="savingPieces()"
+                        >
+                          @if (savingPieces()) {
+                            Enregistrement…
+                          } @else {
+                            <fa-icon [icon]="faCheck"></fa-icon> Enregistrer
+                          }
                         </button>
                       </div>
                     </div>
 
                     @if (piecesError()) {
-                      <div class="form-error">⚠️ {{ piecesError() }}</div>
+                      <div class="form-error" role="alert">
+                        <fa-icon [icon]="faWarning"></fa-icon>
+                        {{ piecesError() }}
+                      </div>
                     }
 
                     <!-- Liste éditable -->
                     @if (piecesEdit().length > 0) {
-                      <ul class="pieces-edit-list">
+                      <ul class="pieces-edit-list" aria-label="Pièces de la réparation">
                         @for (p of piecesEdit(); track p.ref_piece) {
                           <li class="piece-edit-row">
                             <div class="piece-edit-info">
                               <span class="piece-ref">{{ p.ref_piece }}</span>
                               <span class="piece-desig">{{ p.designation }}</span>
                             </div>
-                            <div class="qty-control">
-                              <button class="qty-btn" (click)="updateQty(p, -1)" [disabled]="p.quantite <= 1">−</button>
-                              <input type="number" class="qty-input"
+                            <div class="qty-control" aria-label="Quantité">
+                              <button
+                                class="qty-btn"
+                                (click)="updateQty(p, -1)"
+                                [disabled]="p.quantite <= 1"
+                                aria-label="Diminuer la quantité"
+                              >−</button>
+                              <input
+                                type="number"
+                                class="qty-input"
                                 [ngModel]="p.quantite"
                                 (ngModelChange)="setQty(p, +$event)"
-                                min="1" />
-                              <button class="qty-btn" (click)="updateQty(p, 1)">+</button>
+                                min="1"
+                                [attr.aria-label]="'Quantité de ' + p.ref_piece"
+                              />
+                              <button
+                                class="qty-btn"
+                                (click)="updateQty(p, 1)"
+                                aria-label="Augmenter la quantité"
+                              >+</button>
                             </div>
-                            <button class="piece-remove-btn" (click)="removePieceEdit(p.ref_piece)" aria-label="Retirer">✕</button>
+                            <button
+                              class="piece-remove-btn"
+                              (click)="removePieceEdit(p.ref_piece)"
+                              [attr.aria-label]="'Retirer ' + p.ref_piece"
+                            >
+                              <fa-icon [icon]="faXmark"></fa-icon>
+                            </button>
                           </li>
                         }
                       </ul>
                     } @else {
-                      <div class="no-pieces">Aucune pièce — ajoutez-en ci-dessous.</div>
+                      <p class="no-pieces">Aucune pièce — ajoutez-en depuis le catalogue ci-dessous.</p>
                     }
 
-                    <!-- Recherche dans le catalogue -->
+                    <!-- Recherche catalogue -->
                     <div class="pieces-search-section">
-                      <label class="field-label-sm">Ajouter depuis le catalogue</label>
-                      <input class="field-input"
+                      <label for="search-piece" class="field-label-sm">
+                        Ajouter depuis le catalogue
+                      </label>
+                      <input
+                        id="search-piece"
+                        class="field-input"
                         [ngModel]="searchPiece()"
                         (ngModelChange)="searchPiece.set($event)"
-                        placeholder="Rechercher par référence ou désignation…" />
+                        placeholder="Rechercher par référence ou désignation…"
+                        autocomplete="off"
+                      />
 
                       @if (filteredPieces().length > 0) {
-                        <ul class="pieces-catalog-list">
+                        <ul class="pieces-catalog-list" aria-label="Résultats du catalogue">
                           @for (p of filteredPieces(); track p.id) {
-                            <li class="catalog-row" (click)="addPieceFromCatalog(p)">
+                            <li
+                              class="catalog-row"
+                              (click)="addPieceFromCatalog(p)"
+                              role="button"
+                              tabindex="0"
+                              (keydown.enter)="addPieceFromCatalog(p)"
+                              (keydown.space)="addPieceFromCatalog(p)"
+                            >
                               <span class="piece-ref">{{ p.ref_piece }}</span>
                               <span class="piece-desig">{{ p.designation }}</span>
                               <span class="catalog-add">+ Ajouter</span>
@@ -241,32 +337,46 @@
                           }
                         </ul>
                       } @else if (searchPiece().length > 1) {
-                        <p class="no-results">Aucune pièce trouvée pour « {{ searchPiece() }} »</p>
+                        <p class="no-results">
+                          Aucune pièce trouvée pour « {{ searchPiece() }} »
+                        </p>
                       }
                     </div>
-
                   </div>
                 }
               </div>
             }
 
-            <!-- ══════════════════════════════════════════════
+            <!-- ══════════════════════════════════════════
                  ONGLET ACTIONS
-            ══════════════════════════════════════════════ -->
+            ══════════════════════════════════════════ -->
             @if (activeTab() === 'actions') {
-              <div class="actions-section">
-
+              <div
+                class="actions-section"
+                role="tabpanel"
+                id="panel-actions"
+                aria-labelledby="tab-actions"
+              >
                 <div class="actions-toolbar">
-                  <span class="actions-count">{{ actions().length }} action{{ actions().length > 1 ? 's' : '' }}</span>
-                  <button class="btn btn-primary-sm" (click)="openForm()">+ Ajouter une action</button>
+                  <span class="actions-count">
+                    {{ actions().length }} action{{ actions().length > 1 ? 's' : '' }}
+                  </span>
+                  <button class="btn-primary-sm" (click)="openForm()">
+                    <fa-icon [icon]="faPlus"></fa-icon> Ajouter une action
+                  </button>
                 </div>
 
                 @if (showForm()) {
                   <div class="action-form-card">
                     <h4 class="form-title">Nouvelle action</h4>
+
                     @if (formError()) {
-                      <div class="form-error">⚠️ {{ formError() }}</div>
+                      <div class="form-error" role="alert">
+                        <fa-icon [icon]="faWarning"></fa-icon>
+                        {{ formError() }}
+                      </div>
                     }
+
                     <div class="form-grid">
                       <div class="form-group">
                         <label for="act-type">Type *</label>
@@ -276,22 +386,43 @@
                           }
                         </select>
                       </div>
+
                       <div class="form-group">
                         <label for="act-date">Date *</label>
                         <input id="act-date" type="date" [(ngModel)]="form.date_action" />
                       </div>
+
                       <div class="form-group form-group--full">
                         <label for="act-titre">Titre *</label>
-                        <input id="act-titre" type="text" placeholder="Ex: Diagnostic frein moulin" [(ngModel)]="form.titre" />
+                        <input
+                          id="act-titre"
+                          type="text"
+                          placeholder="Ex : Diagnostic frein moulin"
+                          [(ngModel)]="form.titre"
+                        />
                       </div>
+
                       <div class="form-group form-group--full">
                         <label for="act-desc">Description</label>
-                        <textarea id="act-desc" rows="3" placeholder="Détails de l'intervention…" [(ngModel)]="form.description"></textarea>
+                        <textarea
+                          id="act-desc"
+                          rows="3"
+                          placeholder="Détails de l'intervention…"
+                          [(ngModel)]="form.description"
+                        ></textarea>
                       </div>
+
                       <div class="form-group">
                         <label for="act-duree">Durée (min)</label>
-                        <input id="act-duree" type="number" min="1" placeholder="30" [(ngModel)]="form.duree_minutes" />
+                        <input
+                          id="act-duree"
+                          type="number"
+                          min="1"
+                          placeholder="30"
+                          [(ngModel)]="form.duree_minutes"
+                        />
                       </div>
+
                       @if (needsStatutApres()) {
                         <div class="form-group">
                           <label for="act-avant">Statut avant</label>
@@ -302,6 +433,7 @@
                             }
                           </select>
                         </div>
+
                         <div class="form-group">
                           <label for="act-apres">Statut après *</label>
                           <select id="act-apres" [(ngModel)]="form.statut_apres">
@@ -313,9 +445,16 @@
                         </div>
                       }
                     </div>
+
                     <div class="form-actions">
-                      <button class="btn btn-ghost" (click)="cancelForm()" [disabled]="saving()">Annuler</button>
-                      <button class="btn btn-primary-sm" (click)="submitAction()" [disabled]="saving()">
+                      <button class="btn-ghost btn-sm" (click)="cancelForm()" [disabled]="saving()">
+                        Annuler
+                      </button>
+                      <button
+                        class="btn btn-primary btn-sm"
+                        (click)="submitAction()"
+                        [disabled]="saving()"
+                      >
                         @if (saving()) { Enregistrement… } @else { Enregistrer }
                       </button>
                     </div>
@@ -323,37 +462,58 @@
                 }
 
                 @if (loadingAct()) {
-                  <div class="timeline-loading">Chargement…</div>
+                  <p class="timeline-loading">Chargement des actions…</p>
                 } @else if (actions().length === 0) {
-                  <div class="no-pieces">Aucune action. Ajoutez la première ci-dessus.</div>
+                  <p class="no-pieces">Aucune action. Ajoutez la première ci-dessus.</p>
                 } @else {
-                  <ol class="timeline">
+                  <ol class="timeline" aria-label="Historique des actions">
                     @for (action of actions(); track action.id) {
                       <li class="timeline-item">
-                        <div class="timeline-dot" [attr.data-type]="action.type"></div>
+                        <div
+                          class="timeline-dot"
+                          [attr.data-type]="action.type"
+                          aria-hidden="true"
+                        ></div>
                         <div class="timeline-content">
                           <div class="timeline-header">
                             <span class="timeline-type">{{ labelType(action.type) }}</span>
-                            <span class="timeline-date">{{ action.date_action | date:'d/MM/y' }}</span>
-                            <button class="btn-icon-sm btn-icon-sm--danger" (click)="supprimerAction(action.id!)" aria-label="Supprimer">
+                            <span class="timeline-date">
+                              {{ action.date_action | date:'d/MM/y' }}
+                            </span>
+                            <button
+                              class="btn-icon-sm btn-icon-sm--danger"
+                              (click)="supprimerAction(action.id!)"
+                              aria-label="Supprimer cette action"
+                            >
                               <fa-icon [icon]="faTrash"></fa-icon>
                             </button>
                           </div>
+
                           <p class="timeline-titre">{{ action.titre }}</p>
+
                           @if (action.description) {
                             <p class="timeline-desc">{{ action.description }}</p>
                           }
+
                           @if (action.statut_apres) {
                             <div class="timeline-statut">
                               @if (action.statut_avant) {
-                                <span class="badge {{ getStatutCls(action.statut_avant) }}">{{ labelStatut(action.statut_avant) }}</span>
-                                <span class="statut-arrow">→</span>
+                                <span class="badge {{ getStatutCls(action.statut_avant) }}">
+                                  {{ labelStatut(action.statut_avant) }}
+                                </span>
+                                <span class="statut-arrow" aria-hidden="true">→</span>
                               }
-                              <span class="badge {{ getStatutCls(action.statut_apres) }}">{{ labelStatut(action.statut_apres) }}</span>
+                              <span class="badge {{ getStatutCls(action.statut_apres) }}">
+                                {{ labelStatut(action.statut_apres) }}
+                              </span>
                             </div>
                           }
+
                           @if (action.duree_minutes) {
-                            <span class="timeline-duree">⏱ {{ action.duree_minutes }} min</span>
+                            <span class="timeline-duree">
+                              <fa-icon [icon]="faClock"></fa-icon>
+                              {{ action.duree_minutes }} min
+                            </span>
                           }
                         </div>
                       </li>
@@ -364,11 +524,22 @@
               </div>
             }
 
+            <!-- ── Zone suppression (bas du panneau) ──────── -->
+            <div class="detail-footer-danger">
+              <button
+                class="btn-delete"
+                (click)="supprimer(rep.id!)"
+                aria-label="Supprimer cette intervention"
+              >
+                <fa-icon [icon]="faTrash"></fa-icon> Supprimer l'intervention
+              </button>
+            </div>
+
           </section>
         } @else {
-          <div class="detail-empty">
-            <span>👈</span>
-            <p>Sélectionnez une intervention</p>
+          <div class="detail-empty" aria-label="Aucune intervention sélectionnée">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+            <p>Sélectionnez une intervention dans la liste</p>
           </div>
         }
 
