@@ -47,6 +47,9 @@ export class ReferenceService {
   createPiece(ref_piece: string, designation: string, marque_id: number): Observable<PieceRef> {
     return this.http.post<PieceRef>(`${this.api}/pieces`, { ref_piece, designation, marque_id });
   }
+  updatePiece(id: number, ref_piece: string, designation: string): Observable<PieceRef> {
+    return this.http.put<PieceRef>(`${this.api}/pieces/${id}`, { ref_piece, designation });
+  }
   deletePiece(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/pieces/${id}`);
   }
@@ -79,4 +82,6 @@ export class ReferenceService {
     fd.append('logo', file);
     return this.http.patch<Machine>(`${this.api}/machines/${machineId}/logo`, fd);
   }
+
+
 }

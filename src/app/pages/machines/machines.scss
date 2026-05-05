@@ -1069,3 +1069,35 @@
   align-items: center;
   gap: 0.3rem;
 }
+.piece-edit-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+
+  &:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: rgba(68, 96, 241, 0.3);
+  }
+}
+
+.edit-piece-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(68, 96, 241, 0.04);
+  border: 1px dashed rgba(68, 96, 241, 0.25);
+  border-radius: var(--radius-sm);
+  animation: fadeSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}

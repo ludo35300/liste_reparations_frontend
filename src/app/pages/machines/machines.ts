@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { faPlus, faSearch, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faTrash, faCheck, faTimes, faPen } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService }      from '../../auth-lib/services/auth.service';
 import { MeResponse }       from '../../auth-lib/models/auth.model';
@@ -34,11 +34,13 @@ export class Machines implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly loading      = signal(false);
   readonly brandGroups  = signal<BrandGroup[]>([]);
-  readonly faTrash      = faTrash;
-  readonly faPlus       = faPlus;
+  // ── Icônes FontAwesome ─────────────────────────────────────
+  readonly faTrash  = faTrash;
+  readonly faPlus   = faPlus;
   readonly faSearch = faSearch;
-  readonly faCheck = faCheck;
-  readonly faTimes = faTimes;
+  readonly faCheck  = faCheck;
+  readonly faTimes  = faTimes;
+  readonly faPen    = faPen;
 
   // ── Formulaire ajout marque ────────────────────────────────
   readonly showMarqueForm  = signal(false);
@@ -75,6 +77,12 @@ export class Machines implements OnInit {
   readonly totalModeles = computed(() =>
     this.brandGroups().reduce((acc, g) => acc + g.modeles.length, 0)
   );
+
+  readonly editingPiece    = signal<PieceRef | null>(null);
+  readonly editPieceRef    = signal('');
+  readonly editPieceDesig  = signal('');
+  readonly savingEditPiece = signal(false);
+  readonly errorEditPiece  = signal<string | null>(null);
 
   readonly filteredAllPieces = computed(() => {
     const q = this.searchPieceQuery().trim().toLowerCase();
@@ -285,4 +293,37 @@ export class Machines implements OnInit {
   // Alias rétrocompatibilité
   openPiecesModal = this.openPiecesDrawer.bind(this);
   closePiecesModal = this.closePiecesDrawer.bind(this);
+
+
+
+
+  openEditPiece(piece: PieceRef): void {
+  this.editingPiece.set(piece);
+  this.editPieceRef.set(piece.ref_piece);
+  this.editPieceDesig.set(piece.designation);
+  this.errorEditPiece.set(null);
 }
+
+cancelEditPiece(): void {
+  this.editingPiece.set(null);
+  this.errorEditPiece.set(null);
+}
+
+saveEditPiece(): void {
+  const ref   = this.editPieceRef().trim().toUpperCase();
+  const desig = this.editPieceDesig().trim();
+  const piece = this.editingPiece();
+  if (!ref || !desig || !piece) { this.errorEditPiece.set('Champs requis.'); return; }
+  this.savingEditPiece.set(true);
+  this.refService.updatePiece(piece.id, ref, desig).subscribe({
+    next: (updated) => {
+      this.piecesDuModele.update(list => list.map(p => p.id === updated.id ? updated : p));
+      this.allPieces.update(list => list.map(p => p.id === updated.id ? updated : p));
+      this.savingEditPiece.set(false);
+      this.editingPiece.set(null);
+    },
+    error: () => { this.errorEditPiece.set('Erreur lors de la mise à jour.'); this.savingEditPiece.set(false); }
+  });
+}
+}
+

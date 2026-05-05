@@ -222,6 +222,13 @@
                     <span class="piece-ref">{{ piece.ref_piece }}</span>
                     <span class="piece-desig">{{ piece.designation }}</span>
                   </div>
+                  <!-- Bouton modifier pièce -->
+                  <button class="piece-edit-btn"
+                    (click)="openEditPiece(piece)"
+                    aria-label="Modifier cette pièce">
+                    <fa-icon [icon]="faPen"></fa-icon>
+                  </button>
+                  <!-- Bouton supprimer pièce -->
                   <button class="piece-remove-btn"
                     (click)="removePiece(piece)"
                     [disabled]="removingPieceId() === piece.id"
@@ -235,6 +242,36 @@
                 </li>
               }
             </ul>
+          }
+          <!-- Editer une pièce associée à un modèle. -->
+          @if (editingPiece()) {
+            <div class="edit-piece-form">
+              <div class="create-inline-fields">
+                <div class="field-group">
+                  <label class="field-label-sm">Référence <span class="required">*</span></label>
+                  <input class="field-input"
+                    [ngModel]="editPieceRef()"
+                    (ngModelChange)="editPieceRef.set($event)"
+                    (keyup.enter)="saveEditPiece()" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label-sm">Désignation <span class="required">*</span></label>
+                  <input class="field-input"
+                    [ngModel]="editPieceDesig()"
+                    (ngModelChange)="editPieceDesig.set($event)"
+                    (keyup.enter)="saveEditPiece()" />
+                </div>
+              </div>
+              @if (errorEditPiece()) {
+                <p class="field-error">{{ errorEditPiece() }}</p>
+              }
+              <div class="form-actions">
+                <button class="btn btn-outline btn-sm" (click)="cancelEditPiece()">Annuler</button>
+                <button class="btn btn-primary btn-sm" (click)="saveEditPiece()" [disabled]="savingEditPiece()">
+                  @if (savingEditPiece()) { <div class="btn-spinner-sm"></div> } @else { Enregistrer }
+                </button>
+              </div>
+            </div>
           }
         </div>
 
