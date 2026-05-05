@@ -98,17 +98,17 @@
                 <div class="pulse-dot"></div>
                 Analyse en cours
               </div>
-              <h3 class="analyse-title">Mistral AI analyse votre fiche…</h3>
+              <h3 class="analyse-title">Analyse de la fiche…</h3>
               <p class="analyse-sub">Extraction du numéro de série, du type de machine et des pièces détectées.</p>
               <div class="analyse-steps-list">
                 <div class="astep" [class.done]="analyseStep() >= 1" [class.active]="analyseStep() === 1">
                   <span class="astep-dot"></span> Compression de l'image
                 </div>
                 <div class="astep" [class.done]="analyseStep() >= 2" [class.active]="analyseStep() === 2">
-                  <span class="astep-dot"></span> OCR — lecture du texte
+                  <span class="astep-dot"></span> Lecture du texte
                 </div>
                 <div class="astep" [class.done]="analyseStep() >= 3" [class.active]="analyseStep() === 3">
-                  <span class="astep-dot"></span> Extraction des données structurées
+                  <span class="astep-dot"></span> Extraction des données
                 </div>
               </div>
             </div>
@@ -149,39 +149,63 @@
             </div>
 
             <div class="form-grid">
+
               <label class="field-label">
                 <span>Numéro de série <span class="required">*</span></span>
-                <input class="field-input" [(ngModel)]="form.numero_serie" placeholder="ex: SANTOS-40AN-001" />
+
+                <input class="field-input" [(ngModel)]="form.numero_serie"
+                      placeholder="ex: SANTOS-40AN-001" />
+
+                @if (machineStatus() === 'known') {
+                  <span class="machine-status-badge machine-status-badge--known">
+                    <fa-icon [icon]="faCheckCircle"></fa-icon> Machine déjà enregistrée
+                  </span>
+                }
+                @if (machineStatus() === 'new') {
+                  <span class="machine-status-badge machine-status-badge--new">
+                    <fa-icon [icon]="faCirclePlus"></fa-icon> Nouvelle machine
+                  </span>
+                }
               </label>
+
+              <!-- Affichage du modèle de la machine -->
               <label class="field-label">
-                <span>Type de machine
-                  @if (isNewMachine()) {
-                    <span class="badge-new">Nouvelle</span>
+                <span>Type de machine <span class="required">*</span></span>
+                <select class="field-input field-select"
+                        [ngModel]="form.modele_id"
+                        (ngModelChange)="onModeleChange($event)">
+                  <option [ngValue]="null" disabled>Choisir un modèle…</option>
+                  @for (modele of modeles; track modele.id) {
+                    <option [ngValue]="modele.id">
+                      {{ modele.type_machine }} {{ modele.nom }}
+                    </option>
                   }
-                </span>
-                <input class="field-input" [(ngModel)]="form.machine_type"
-                       [class.field-new]="isNewMachine()"
-                       placeholder="ex: MOULIN SANTOS 40AN" />
+                </select>
+                @if (form.modele_id === null && !isOcrFailed()) {
+                  <span class="machine-status-badge machine-status-badge--new">
+                    <fa-icon [icon]="faCirclePlus"></fa-icon> Modèle non reconnu — sélectionnez manuellement
+                  </span>
+                }
               </label>
               <label class="field-label">
                 <span>Technicien</span>
                 <input class="field-input" [(ngModel)]="form.technicien" placeholder="Nom du technicien" />
               </label>
+              <!-- Date de réparation -->
               <label class="field-label">
                 <span>Date <span class="required">*</span></span>
-                <input class="field-input" [(ngModel)]="form.date_reparation" placeholder="JJ/MM/AAAA" />
+                <input class="field-input"
+                      [ngModel]="form.date_affichage"
+                      (ngModelChange)="onDateInput($event)"
+                      placeholder="JJ/MM/AAAA" />
               </label>
             </div>
 
-            <label class="field-label full-width">
-              <span>Notes</span>
-              <textarea class="field-input field-textarea"
-                        [(ngModel)]="form.notes" rows="3"
-                        placeholder="Remarques, observations…"></textarea>
-            </label>
+             <h4 class="form-section-title">🔩 Pièces détectées</h4>
 
-            @if (getPieces().length > 0) {
+            @if (getPieces().length > 0 || form.modele_id) {
               <div class="pieces-section">
+
                 @if (avertissementActif()) {
                   <div class="alert-banner alert-banner--warning">
                     <span>⚠️</span>
@@ -191,61 +215,187 @@
                     </div>
                   </div>
                 }
-                <h4 class="form-section-title">🔩 Pièces détectées</h4>
-                <div class="table-wrapper">
-                  <table class="pieces-table">
-                    <thead>
-                      <tr>
-                        <th>Référence</th>
-                        <th>Désignation</th>
-                        <th>Quantité</th>
-                        <th>Statut</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
-                        <tr [class.row-highlight]="piece.quantite > 0"
-                            [class.row-new]="isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)"
-                            [class.row-validated]="isNouvelle(piece.ref_piece) && isValidee(piece.ref_piece)">
-                          <td>
-                            <span class="cell-ref">{{ piece.ref_piece }}</span>
-                            @if (isNouvelle(piece.ref_piece)) {
-                              <span class="badge-new">Nouvelle</span>
-                            }
-                          </td>
-                          <td>{{ piece.designation }}</td>
-                          <td>
-                            <input type="number" min="0"
-                                   [value]="piece.quantite"
-                                   (input)="updateQuantite(i, $any($event.target).value)"
-                                   class="qty-input" />
-                          </td>
-                          <td class="cell-status">
-                            @if (isNouvelle(piece.ref_piece)) {
-                              @if (!isValidee(piece.ref_piece)) {
-                                <button class="btn-validate" (click)="validerPiece(piece.ref_piece)">✔ Valider</button>
-                              } @else {
-                                <span class="status-ok">✔ Vérifiée</span>
-                              }
-                            } @else {
-                              <span class="status-known">En base</span>
-                            }
-                          </td>
+
+                <!-- Tableau pièces -->
+                @if (getPieces().length > 0) {
+                  <div class="table-wrapper">
+                    <table class="pieces-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Référence</th>
+                          <th scope="col">Désignation</th>
+                          <th scope="col">Qté</th>
+                          <th scope="col">Statut</th>
+                          <th scope="col"></th>
                         </tr>
+                      </thead>
+                      <tbody>
+                        @for (piece of getPieces(); track piece.ref_piece; let i = $index) {
+                          <tr [class.row-highlight]="piece.quantite > 0"
+                              [class.row-new]="isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)"
+                              [class.row-validated]="isNouvelle(piece.ref_piece) && isValidee(piece.ref_piece)">
+
+                            <!-- Référence -->
+                            <td>
+                              @if (isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)) {
+                                <input class="field-input field-input--inline"
+                                      [ngModel]="piece.ref_piece"
+                                      (ngModelChange)="updateRef(i, $event)"
+                                      placeholder="Référence"
+                                      aria-label="Référence de la pièce" />
+                              } @else {
+                                <div class="cell-ref-wrap">
+                                  <span class="cell-ref">{{ piece.ref_piece }}</span>
+                                  @if (isNouvelle(piece.ref_piece)) {
+                                    <span class="badge-new">Nouvelle</span>
+                                  }
+                                  @if (!isNouvelle(piece.ref_piece) && form.modele_id && !isPieceAssociee(piece.ref_piece)) {
+                                    <button class="btn-associer" (click)="associerPiece(piece)" title="Associer au modèle sélectionné">
+                                      <fa-icon [icon]="faLink"></fa-icon> Associer
+                                    </button>
+                                  }
+                                </div>
+                              }
+                            </td>
+
+                            <!-- Désignation -->
+                            <td>
+                              @if (isNouvelle(piece.ref_piece) && !isValidee(piece.ref_piece)) {
+                                <input class="field-input field-input--inline"
+                                      [ngModel]="piece.designation"
+                                      (ngModelChange)="updateDesignation(i, $event)"
+                                      placeholder="Désignation"
+                                      aria-label="Désignation de la pièce" />
+                              } @else {
+                                {{ piece.designation }}
+                              }
+                            </td>
+
+                            <!-- Quantité -->
+                            <td>
+                              <input type="number" min="0"
+                                    [value]="piece.quantite"
+                                    (input)="updateQuantite(i, $any($event.target).value)"
+                                    class="qty-input"
+                                    [attr.aria-label]="'Quantité de ' + piece.ref_piece" />
+                            </td>
+
+                            <!-- Statut -->
+                            <td class="cell-status">
+                              @if (isNouvelle(piece.ref_piece)) {
+                                @if (!isValidee(piece.ref_piece)) {
+                                  <button class="btn-validate" (click)="validerPiece(i)">✔ Valider</button>
+                                } @else {
+                                  <span class="status-ok">✔ Vérifiée</span>
+                                }
+                              } @else {
+                                <span class="status-known">En base</span>
+                              }
+                            </td>
+
+                            <!-- Supprimer -->
+                            <td class="cell-delete">
+                              <button class="piece-remove-btn"
+                                      (click)="removePiece(i)"
+                                      aria-label="Supprimer cette pièce">
+                                <fa-icon [icon]="faTimes"></fa-icon>
+                              </button>
+                            </td>
+
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+
+
+                <!-- Panel ajout pièce -->
+                @if (showAddPiecePanel() && form.modele_id) {
+                  <div class="add-piece-panel">
+                    <div class="search-piece-wrapper">
+                      <i class="fas fa-search search-piece-icon"></i>
+                      <input class="field-input search-piece-input"
+                            [ngModel]="searchAddQuery()"
+                            (ngModelChange)="searchAddQuery.set($event)"
+                            placeholder="Rechercher une pièce du modèle…"
+                            autocomplete="off" />
+                      @if (searchAddQuery()) {
+                        <button class="search-clear-btn" (click)="searchAddQuery.set('')" aria-label="Effacer">
+                          <fa-icon [icon]="faTimes"></fa-icon>
+                        </button>
                       }
-                    </tbody>
-                  </table>
+                    </div>
+
+                    @if (filteredPiecesModele().length > 0) {
+                      <ul class="add-piece-list">
+                        @for (piece of filteredPiecesModele(); track piece.id) {
+                          <li class="add-piece-item" (click)="addPieceFromModele(piece)">
+                            <div class="piece-item-info">
+                              <span class="piece-ref">{{ piece.ref_piece }}</span>&nbsp;
+                              <span class="piece-desig">{{ piece.designation }}</span>
+                            </div>
+                            <fa-icon [icon]="faPlus" class="add-piece-icon"></fa-icon>
+                          </li>
+                        }
+                      </ul>
+                    } @else {
+                      <p class="search-hint">
+                        <fa-icon [icon]="faSearch"></fa-icon>
+                        {{ searchAddQuery() ? 'Aucune pièce trouvée' : 'Toutes les pièces sont déjà ajoutées' }}
+                      </p>
+                    }
+                  </div>
+                }
+                <div class="pieces-section-header">
+                  @if (form.modele_id) {
+                    <button class="btn btn-sm btn-outline" (click)="toggleAddPiecePanel()">
+                      {{ showAddPiecePanel() ? 'Fermer' : ' Ajouter une pièce' }}
+                    </button>
+                  }
                 </div>
+
+
               </div>
             }
+            <label class="field-label full-width">
+              <span>Notes</span>
+              <textarea class="field-input field-textarea"
+                        [(ngModel)]="form.notes" rows="3"
+                        placeholder="Remarques, observations…"></textarea>
+            </label>
 
             @if (error()) {
               <div class="alert alert-danger">⚠️ {{ error() }}</div>
             }
 
             <div class="form-footer">
-              <button class="btn btn-save" (click)="enregistrer()">
-                💾 Enregistrer la réparation
+              <div class="form-footer-hints">
+                @if (!form.numero_serie.trim()) {
+                  <span class="footer-hint">Numéro de série requis</span>
+                }
+                @if (!form.date_reparation.trim()) {
+                  <span class="footer-hint">Date requise</span>
+                }
+                @if (!form.modele_id) {
+                  <span class="footer-hint">Modèle requis</span>
+                }
+                @if (avertissementActif()) {
+                  <span class="footer-hint">Validez toutes les nouvelles pièces</span>
+                }
+                @if (form.modele_id && form.pieces.some(p => !isNouvelle(p.ref_piece) && !isPieceAssociee(p.ref_piece))) {
+                  <span class="footer-hint">Associez les pièces hors modèle</span>
+                }
+              </div>
+
+              <button class="btn btn-save"
+                      (click)="enregistrer()"
+                      [disabled]="saving() || !canSave()">
+                @if (saving()) {
+                  <div class="btn-spinner-sm"></div> Enregistrement…
+                } @else {
+                  💾 Enregistrer la réparation
+                }
               </button>
             </div>
           </div>
