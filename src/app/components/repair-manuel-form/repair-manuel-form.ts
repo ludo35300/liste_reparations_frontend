@@ -257,6 +257,7 @@ export class RepairManuelForm implements OnInit {
         (p): p is PieceChangee => !!p && p.quantite > 0,
       ),
     };
+    console.log('Submitting repair manual form with payload:', payload);
 
     this.submitted.emit(payload);
   }

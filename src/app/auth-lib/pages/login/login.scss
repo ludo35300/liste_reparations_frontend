@@ -42,3 +42,25 @@
   border-radius: 8px;
   font-size: 0.82rem;
 }
+.shape-bg {
+  pointer-events: none;
+}
+
+.rocket-container {
+  pointer-events: none;
+}
+
+// Empêche la colonne gauche (fusée) de superposer le formulaire sur mobile
+@media (max-width: 991px) {
+  .col-lg-8 {
+    pointer-events: none;
+    position: relative;
+    z-index: 0;
+    .hero-text        { display: none; }
+  }
+
+  .col-lg-4 {
+    width: 100%;    // Le formulaire prend toute la largeur
+  }
+}
+
