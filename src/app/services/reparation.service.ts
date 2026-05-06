@@ -23,6 +23,7 @@ export class ReparationService {
   }
 
   enregistrer(data: Reparation): Observable<Reparation> {
+    console.log('Enregistrement de la réparation avec les données suivantes :', data);
     return this.http.post<Reparation>(`${this.api}/reparations`, data);
   }
 
