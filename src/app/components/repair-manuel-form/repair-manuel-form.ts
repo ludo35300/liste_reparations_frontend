@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, computed, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { Reparation } from '../../models/reparation.model';
@@ -126,6 +126,13 @@ export class RepairManuelForm implements OnInit {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentTechnicienId'] && this.currentTechnicienId) {
+      this.form.patchValue({ technicien_id: this.currentTechnicienId });
+      this.syncTechnicienName(this.currentTechnicienId);
+    }
+  }
+
   public async checkNumeroSerie(): Promise<void> {
     this.serialForm.get('numero_serie')?.markAsTouched();
     if (this.serialForm.invalid) return;
@@ -240,7 +247,7 @@ export class RepairManuelForm implements OnInit {
     const payload: RepairManualSubmit = {
       numero_serie: this.serialForm.get('numero_serie')?.value?.trim() ?? '',
       date_reparation: raw.date_reparation ?? '',
-      technicien_id: raw.technicien_id ?? undefined,
+      technicien_id: raw.technicien_id ?? this.currentTechnicienId ?? undefined,
       technicien: raw.technicien ?? '',
       modele_id: Number(raw.modele_id),
       machine_type: selectedModele.label || selectedModele.type_machine || '',

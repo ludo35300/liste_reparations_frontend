@@ -494,7 +494,7 @@ export class Scan implements OnInit {
         numero_serie:    this.form.numero_serie,
         machine_type:    this.form.machine_type,
         technicien:      this.form.technicien,
-        technicien_id:   this.form.technicien_id ?? undefined,
+        technicien_id:   this.form.technicien_id ?? this.currentTechnicienId ?? undefined,
         date_reparation: this.form.date_reparation,
         notes:           this.form.notes,
         pieces:          this.form.pieces.filter(p => p.quantite > 0),
