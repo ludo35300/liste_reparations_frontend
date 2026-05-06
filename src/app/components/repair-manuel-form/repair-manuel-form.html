@@ -241,16 +241,6 @@
 
     <div [formGroup]="form">
 
-      <!-- Notes -->
-      <div class="field-group">
-        <label class="field-label" for="notes">Notes / Observations</label>
-        <textarea
-          id="notes"
-          class="field-input field-textarea"
-          formControlName="notes"
-          placeholder="Diagnostic, remarques, symptômes…"
-        ></textarea>
-      </div>
 
       <!-- Pièces changées -->
       <div class="pieces-block">
@@ -329,7 +319,7 @@
                     [class.catalog-item--added]="isPieceAdded(piece.ref_piece)"
                     (click)="!isPieceAdded(piece.ref_piece) && addPieceFromCatalog(piece)">
                     <div class="piece-item-info">
-                      <span class="piece-ref">{{ piece.ref_piece }}</span>
+                      <span class="piece-ref">{{ piece.ref_piece }}</span>&nbsp;
                       <span class="piece-desig">{{ piece.designation }}</span>
                     </div>
                     @if (isPieceAdded(piece.ref_piece)) {
@@ -393,6 +383,17 @@
           }
         </div>
 
+      </div>
+
+      <!-- Notes -->
+      <div class="field-group mt-2">
+        <label class="field-label" for="notes">Notes / Observations</label>
+        <textarea
+          id="notes"
+          class="field-input field-textarea"
+          formControlName="notes"
+          placeholder="Diagnostic, remarques, symptômes…"
+        ></textarea>
       </div>
 
       <!-- Actions -->

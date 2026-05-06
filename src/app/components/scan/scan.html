@@ -177,7 +177,7 @@
                   <option [ngValue]="null" disabled>Choisir un modèle…</option>
                   @for (modele of modeles; track modele.id) {
                     <option [ngValue]="modele.id">
-                      {{ modele.type_machine }} {{ modele.nom }}
+                      {{ modele.marque }} {{ modele.nom }}
                     </option>
                   }
                 </select>
