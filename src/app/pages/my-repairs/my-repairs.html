@@ -2,74 +2,144 @@
   <div class="layout-right">
     <app-topbar
       [me]="me()"
-      [navItems]="navItems"
       pageTitle="Mes réparations"
+      [navItems]="navItems"
       (logoutEvt)="logout()"
     />
 
     <main class="main-content">
 
-      <!-- ── Barre supérieure ─────────────────────────────── -->
-      <div class="toolbar">
+      <!-- En-tête -->
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Mes réparations</h2>
+          <p class="page-sub">Suivi de vos interventions en cours et terminées</p>
+        </div>
+      </div>
 
-        <!-- Tabs -->
-        <div class="tabs-bar">
-          <button type="button" class="tab-btn" [class.active]="activeTab() === 'en_cours'" (click)="setTab('en_cours')">
-            <fa-icon [icon]="faTools"></fa-icon>
+      <!-- Onglets + recherche -->
+      <div class="toolbar">
+        <div class="tabs" role="tablist">
+          <button
+            role="tab"
+            class="tab"
+            [class.active]="activeTab() === 'en_cours'"
+            [attr.aria-selected]="activeTab() === 'en_cours'"
+            (click)="setTab('en_cours')">
+            <fa-icon [icon]="faWrench"></fa-icon>
             En cours
             @if (enCours().length > 0) {
-              <span class="tab-badge tab-badge--progress">{{ enCours().length }}</span>
+              <span class="tab-count">{{ enCours().length }}</span>
             }
           </button>
-          <button type="button" class="tab-btn" [class.active]="activeTab() === 'terminees'" (click)="setTab('terminees')">
+          <button
+            role="tab"
+            class="tab"
+            [class.active]="activeTab() === 'terminees'"
+            [attr.aria-selected]="activeTab() === 'terminees'"
+            (click)="setTab('terminees')">
             <fa-icon [icon]="faCheck"></fa-icon>
             Terminées
             @if (terminees().length > 0) {
-              <span class="tab-badge tab-badge--done">{{ terminees().length }}</span>
+              <span class="tab-count tab-count--muted">{{ terminees().length }}</span>
             }
           </button>
         </div>
 
-        <!-- Recherche -->
-        <div class="search-wrap">
-          <span class="search-icon"><fa-icon [icon]="faWrench"></fa-icon></span>
+        <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
           <input
             class="search-input"
-            type="search"
-            placeholder="N° série, modèle, technicien…"
-            (input)="searchQuery.set($any($event.target).value)"
-            
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            placeholder="Rechercher…"
+            autocomplete="off"
           />
         </div>
-
       </div>
 
-      <!-- ── Erreur ────────────────────────────────────────── -->
+      <!-- Erreur -->
       @if (error()) {
-        <div class="alert-error">
-          <fa-icon [icon]="faClock"></fa-icon> {{ error() }}
+        <div class="alert alert-danger">⚠️ {{ error() }}</div>
+      }
+
+      <!-- Skeleton -->
+      @if (loading()) {
+        <div class="skeleton-table">
+          @for (i of [1,2,3,4,5]; track i) {
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell-lg"></div>
+              <div class="skeleton skeleton-cell-md"></div>
+              <div class="skeleton skeleton-cell-md"></div>
+              <div class="skeleton skeleton-cell-sm"></div>
+              <div class="skeleton skeleton-cell-sm"></div>
+            </div>
+          }
         </div>
       }
 
-      <!-- ── Skeleton ──────────────────────────────────────── -->
-      @if (loading()) {
-        <div class="table-wrap">
-          <table class="rep-table">
+      <!-- Tableau -->
+      @if (!loading() && displayed().length > 0) {
+        <div class="table-wrapper">
+          <table class="repairs-table">
             <thead>
               <tr>
-                <th>Date</th><th>N° Série</th><th>Modèle</th><th>Technicien</th><th>Pièces</th><th>Statut</th><th></th>
+                <th scope="col" (click)="sortBy('date')" [class]="sortClass('date')">
+                  Date <fa-icon [icon]="sortIcon('date')"></fa-icon>
+                </th>
+                <th scope="col" (click)="sortBy('serie')" [class]="sortClass('serie')">
+                  N° de série <fa-icon [icon]="sortIcon('serie')"></fa-icon>
+                </th>
+                <th scope="col" (click)="sortBy('modele')" [class]="sortClass('modele')">
+                  Modèle <fa-icon [icon]="sortIcon('modele')"></fa-icon>
+                </th>
+                <th scope="col" (click)="sortBy('technicien')" [class]="sortClass('technicien')">
+                  Technicien <fa-icon [icon]="sortIcon('technicien')"></fa-icon>
+                </th>
+                <th scope="col" (click)="sortBy('pieces')" [class]="sortClass('pieces')">
+                  Pièces <fa-icon [icon]="sortIcon('pieces')"></fa-icon>
+                </th>
+                <th scope="col" (click)="sortBy('statut')" [class]="sortClass('statut')">
+                  Statut <fa-icon [icon]="sortIcon('statut')"></fa-icon>
+                </th>
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
-              @for (i of [1,2,3,4,5]; track i) {
-                <tr class="skeleton-row">
-                  <td><span class="skeleton sk-sm"></span></td>
-                  <td><span class="skeleton sk-md"></span></td>
-                  <td><span class="skeleton sk-lg"></span></td>
-                  <td><span class="skeleton sk-md"></span></td>
-                  <td><span class="skeleton sk-xs"></span></td>
-                  <td><span class="skeleton sk-sm"></span></td>
-                  <td></td>
+              @for (rep of displayed(); track rep.id) {
+                <tr class="repair-row" (click)="goToHistory(rep)">
+                  <td class="cell-date">
+                    {{ rep.date_reparation | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td class="cell-serie">
+                    {{ rep.machine?.numero_serie ?? rep.numero_serie ?? '—' }}
+                  </td>
+                  <td class="cell-modele">
+                    {{ rep.machine?.modele?.label ?? rep.machine_type ?? '—' }}
+                  </td>
+                  <td class="cell-tech">
+                    {{ rep.technicien ?? '—' }}
+                  </td>
+                  <td class="cell-pieces">
+                    @if ((rep.pieces.length) > 0) {
+                      <span class="pieces-pill">{{ rep.pieces!.length }}</span>
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                  <td class="cell-statut">
+                    <span class="badge" [class]="getStatutClass(rep.machine?.statut)">
+                      <fa-icon [icon]="getStatutIcon(rep.machine?.statut)"></fa-icon>
+                      {{ getStatutLabel(rep.machine?.statut) }}
+                    </span>
+                  </td>
+                  <td class="cell-action">
+                    <button class="btn-open"
+                            (click)="goToHistory(rep); $event.stopPropagation()"
+                            aria-label="Voir les détails">
+                      <fa-icon [icon]="faOpen"></fa-icon>
+                    </button>
+                  </td>
                 </tr>
               }
             </tbody>
@@ -77,111 +147,21 @@
         </div>
       }
 
-      <!-- ── Contenu ────────────────────────────────────────── -->
-      @if (!loading() && !error()) {
-
-        @if (displayed().length === 0) {
-          <div class="empty-state">
-            <fa-icon [icon]="faWrench" class="empty-icon"></fa-icon>
-            <h3>{{ activeTab() === 'en_cours' ? 'Aucune réparation en cours' : 'Aucune réparation terminée' }}</h3>
-            <p>{{ searchQuery() ? 'Aucun résultat pour « ' + searchQuery() + ' »' : (activeTab() === 'en_cours' ? 'Les nouvelles réparations apparaîtront ici.' : 'Les réparations clôturées apparaîtront ici.') }}</p>
-          </div>
-        } @else {
-
-          <div class="table-meta">
-            <span class="table-count">{{ displayed().length }} résultat{{ displayed().length > 1 ? 's' : '' }}</span>
-          </div>
-
-          <div class="table-wrap">
-            <table class="rep-table">
-              <thead>
-                <tr>
-
-                  <th class="th-sortable {{ sortClass('date') }}" (click)="sortBy('date')">
-                    <span>Date</span>
-                    <fa-icon [icon]="sortIcon('date')"></fa-icon>
-                  </th>
-
-                  <th class="th-sortable {{ sortClass('serie') }}" (click)="sortBy('serie')">
-                    <span>N° Série</span>
-                    <fa-icon [icon]="sortIcon('serie')"></fa-icon>
-                  </th>
-
-                  <th class="th-sortable {{ sortClass('modele') }}" (click)="sortBy('modele')">
-                    <span>Modèle</span>
-                    <fa-icon [icon]="sortIcon('modele')"></fa-icon>
-                  </th>
-
-                  <th class="th-sortable {{ sortClass('technicien') }}" (click)="sortBy('technicien')">
-                    <span>Technicien</span>
-                    <fa-icon [icon]="sortIcon('technicien')"></fa-icon>
-                  </th>
-
-                  <th class="th-sortable th-center {{ sortClass('pieces') }}" (click)="sortBy('pieces')">
-                    <span>Pièces</span>
-                    <fa-icon [icon]="sortIcon('pieces')"></fa-icon>
-                  </th>
-
-                  <th class="th-sortable {{ sortClass('statut') }}" (click)="sortBy('statut')">
-                    <span>Statut</span>
-                    <fa-icon [icon]="sortIcon('statut')"></fa-icon>
-                  </th>
-
-                  <th class="th-action"></th>
-
-                </tr>
-              </thead>
-
-              <tbody>
-                @for (rep of displayed(); track rep.id) {
-                  <tr class="rep-row" (click)="goToHistory(rep)" role="button" tabindex="0"
-                    (keyup.enter)="goToHistory(rep)"
-                    [attr.aria-label]="'Voir historique ' + (rep.machine?.numero_serie ?? rep.numero_serie)">
-
-                    <td class="td-date">
-                      {{ rep.date_reparation | date:'dd/MM/yyyy' }}
-                    </td>
-
-                    <td class="td-serie">
-                      <code class="serie-code">{{ rep.machine?.numero_serie ?? rep.numero_serie ?? '—' }}</code>
-                    </td>
-
-                    <td class="td-modele">
-                      {{ rep.machine?.modele?.label ?? rep.machine_type ?? '—' }}
-                    </td>
-
-                    <td class="td-tech">
-                      {{ rep.technicien || '—' }}
-                    </td>
-
-                    <td class="td-pieces th-center">
-                      @if (rep.pieces.length) {
-                        <span class="pieces-pill">{{ rep.pieces.length }}</span>
-                      } @else {
-                        <span class="text-muted">—</span>
-                      }
-                    </td>
-
-                    <td class="td-statut">
-                      <span class="statut-badge {{ getStatutClass(rep.machine?.statut) }}">
-                        <fa-icon [icon]="getStatutIcon(rep.machine?.statut)"></fa-icon>
-                        {{ getStatutLabel(rep.machine?.statut) }}
-                      </span>
-                    </td>
-
-                    <td class="td-action" (click)="$event.stopPropagation()">
-                      <button class="btn-open" (click)="goToHistory(rep)" aria-label="Ouvrir">
-                        <fa-icon [icon]="faOpen"></fa-icon>
-                      </button>
-                    </td>
-
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-        }
+      <!-- Empty state -->
+      @if (!loading() && displayed().length === 0) {
+        <div class="empty-state">
+          <fa-icon [icon]="activeTab() === 'en_cours' ? faWrench : faCheck" class="empty-icon"></fa-icon>
+          <h3>Aucune réparation {{ activeTab() === 'en_cours' ? 'en cours' : 'terminée' }}</h3>
+          <p>
+            @if (searchQuery()) {
+              Aucun résultat pour « {{ searchQuery() }} »
+            } @else if (activeTab() === 'en_cours') {
+              Vous n'avez pas d'intervention active pour le moment.
+            } @else {
+              Votre historique apparaîtra ici.
+            }
+          </p>
+        </div>
       }
 
     </main>
