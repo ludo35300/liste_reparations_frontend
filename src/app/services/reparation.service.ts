@@ -16,14 +16,13 @@ export class ReparationService {
   private http = inject(HttpClient);
   private api = '/api';  // proxy vers Flask
 
-  scanFiche(image: File): Observable<OcrResult> {
+  scanFiche(image: File): Observable<OcrResult> {................
     const form = new FormData();
     form.append('image', image);
     return this.http.post<OcrResult>(`${this.api}/scan`, form);
   }
 
   enregistrer(data: Reparation): Observable<Reparation> {
-    console.log('Enregistrement de la réparation avec les données suivantes :', data);
     return this.http.post<Reparation>(`${this.api}/reparations`, data);
   }
 

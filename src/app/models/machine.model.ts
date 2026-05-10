@@ -7,7 +7,5 @@ export interface Machine {
   modele_id?: number | null;
   modele?: Modele | null;
   statut: StatutMachine;
-  date_entree?: string | null;
-  notes?: string;
   created_at?: string;
 }
