@@ -1,0 +1,43 @@
+<div class="quick-search-shell">
+  <div class="quick-search-bar">
+    <input
+      class="quick-search-input"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      placeholder="Rechercher un numéro de série..."
+      (keyup.enter)="rechercher()"
+    />
+
+    <button
+      class="quick-search-btn"
+      (click)="rechercher()"
+      [disabled]="loading()"
+    >
+      @if (loading()) {
+        <span class="btn-spinner" aria-hidden="true"></span>
+      } @else {
+        Rechercher
+      }
+    </button>
+
+    <button class="quick-search-clear" (click)="clear()" *ngIf="query()">
+      ×
+    </button>
+
+    <button class="quick-search-new" (click)="nouvelleReparation()">
+      + Nouvelle réparation
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="quick-search-error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (searched() && searchResult() && !searchResult()!.found) {
+    <div class="quick-search-empty">
+      Aucun résultat pour <strong>{{ query() }}</strong>
+    </div>
+  }
+</div>

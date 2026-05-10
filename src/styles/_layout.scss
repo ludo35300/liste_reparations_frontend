@@ -34,7 +34,7 @@
 // Structure : <div class="page-header">
 //               <div class="page-header-left">
 //                 <h1 class="page-title">…</h1>
-//                 <p class="page-sub">…</p>
+//                 <p class="page-subtitle">…</p>
 //               </div>
 //               <div> ← boutons d'action droite
 //             </div>
@@ -54,18 +54,16 @@
 }
 
 .page-title {
-  margin: 0 0 0.2rem;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--text-dark);
-  letter-spacing: -0.02em;
+  margin: 0;
 }
 
-.page-sub {
-  margin: 0;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-muted);
+.page-subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0;
 }
 
 // ── Responsive ────────────────────────────────────────────────────

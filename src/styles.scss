@@ -37,6 +37,26 @@ body.topbar-hidden {
   padding-top: var(--navbar-h);
 }
 
+.surface-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-panel {
+  @extend .surface-card;
+  padding: 1.1rem;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.1rem;
+}
+
 
 
 
