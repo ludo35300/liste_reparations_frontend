@@ -47,36 +47,6 @@
   margin-bottom: 1.25rem;
 }
 
-// ─── En-tête de page ──────────────────────────────────────────
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-
-.page-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-}
-
-.page-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0 0 0.1rem;
-  letter-spacing: -0.01em;
-}
-
-.page-sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin: 0;
-  font-weight: 500;
-}
-
 // ─── Bouton Retour ────────────────────────────────────────────
 .btn-back {
   display: inline-flex;
@@ -348,70 +318,6 @@
     outline: 2px solid var(--primary);
     outline-offset: -2px;
   }
-}
-
-// ─── Boutons principaux ───────────────────────────────────────
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: background var(--transition), box-shadow var(--transition), border-color var(--transition);
-  white-space: nowrap;
-
-  &:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-
-  &:hover:not(:disabled) {
-    background: var(--primary-hover);
-    box-shadow: var(--shadow-sm);
-  }
-  &:active:not(:disabled) { background: var(--primary-active); }
-}
-
-.btn-primary-sm {
-  @extend .btn;
-  padding: 0.4rem 0.875rem;
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-
-  &:hover:not(:disabled) {
-    background: var(--primary-hover);
-    box-shadow: var(--shadow-sm);
-  }
-}
-
-.btn-ghost {
-  @extend .btn;
-  background: transparent;
-  color: var(--text);
-  border-color: var(--border);
-
-  &:hover:not(:disabled) { background: var(--surface-offset); }
-}
-
-.btn-sm {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.78rem;
 }
 
 // ─── Boutons icône (stylo, valider, annuler) ──────────────────
