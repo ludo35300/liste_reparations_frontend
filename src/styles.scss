@@ -1,108 +1,143 @@
-// ─────────────────────────────────────────────────────────────────
-// DESIGN SYSTEM — Liste Réparations
-// Art direction: outil métier de réparation → sobre, dense, précis
-// Palette: ardoise sombre navbar + surfaces neutres claires
-// Accent: bleu professionnel #2563eb
-// ─────────────────────────────────────────────────────────────────
-@use './styles/shared';
+// ════════════════════════════════════════════════════════════════════
+// styles.scss — Design System Global
+// Application : Liste Réparations (machines & café industriel)
+// Art direction : outil métier sobre, dense, précis
+// Palette : navbar ardoise sombre + surfaces claires neutres
+// Accent : bleu professionnel #2563eb (Inter Blue 600)
+// ════════════════════════════════════════════════════════════════════
+// Ordre de chargement :
+//   1. @use  → imports SCSS (doit être en tête absolue)
+//   2. @import → fonts externes
+//   3. :root → tokens CSS custom properties
+//   4. Reset & base
+//   5. Composants globaux (auth, modals…)
+//   6. Animations
+//   7. Print
+// ════════════════════════════════════════════════════════════════════
 
+// ── 1. Imports SCSS ──────────────────────────────────────────────
+@use './styles/tables';   // styles spécifiques aux tables
+@use './styles/feedback'; // skeletons, spinners, loaders, placeholders
+@use './styles/layout';   // structure de page, header, main-content
+@use './styles/buttons';  // styles de boutons globaux (primary, outline, sizes)
+@use './styles/badges';   // styles de badges globaux (status, generic, sizes)
+
+// ── 2. Police ────────────────────────────────────────────────────
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..800&display=swap');
 
-// ── Tokens ────────────────────────────────────────────────────────
+
+// ════════════════════════════════════════════════════════════════════
+// 3. TOKENS — CSS Custom Properties
+// ════════════════════════════════════════════════════════════════════
 :root {
-  // Accent
-  --c-primary:          #2563eb;
-  --c-primary-hover:    #1d4ed8;
-  --c-primary-active:   #1e40af;
-  --c-primary-light:    rgba(37, 99, 235, 0.10);
-  --c-primary-ring:     rgba(37, 99, 235, 0.22);
 
-  // Sémantique
-  --c-success:          #16a34a;
-  --c-success-light:    rgba(22, 163, 74, 0.10);
-  --c-danger:           #dc2626;
-  --c-danger-light:     rgba(220, 38, 38, 0.09);
-  --c-warning:          #d97706;
-  --c-warning-light:    rgba(217, 119, 6, 0.10);
+  // ── Couleur primaire (bleu professionnel) ──────────────────────
+  --c-primary:        #2563eb;
+  --c-primary-hover:  #1d4ed8;
+  --c-primary-active: #1e40af;
+  --c-primary-light:  rgba(37, 99, 235, 0.10);
+  --c-primary-ring:   rgba(37, 99, 235, 0.22);
 
-  // Topbar / Navbar (ardoise foncée)
-  --topbar-bg:          #0f172a;
-  --topbar-surface:     #1e293b;
-  --topbar-border:      rgba(255, 255, 255, 0.07);
-  --topbar-text:        #e2e8f0;
-  --topbar-muted:       rgba(148, 163, 184, 0.75);
-  --topbar-hover:       rgba(255, 255, 255, 0.07);
-  --topbar-active:      rgba(37, 99, 235, 0.30);
-  --topbar-active-bar:  #2563eb;
+  // ── Couleurs sémantiques ───────────────────────────────────────
+  --c-success:        #16a34a;
+  --c-success-light:  rgba(22, 163, 74, 0.10);
 
-  // Surfaces contenu (clair)
-  --bg:                 #f1f5f9;
-  --surface:            #ffffff;
-  --surface-2:          #f8fafc;
-  --surface-offset:     #f1f5f9;
-  --border:             rgba(15, 23, 42, 0.09);
-  --border-strong:      rgba(15, 23, 42, 0.15);
+  --c-danger:         #dc2626;
+  --c-danger-light:   rgba(220, 38, 38, 0.09);
 
-  // Texte
-  --text:               #475569;
-  --text-dark:          #0f172a;
-  --text-muted:         #94a3b8;
-  --text-faint:         #cbd5e1;
+  --c-warning:        #d97706;
+  --c-warning-light:  rgba(217, 119, 6, 0.10);
 
-  // Dimensions topbar
-  --topbar-top-h:       56px;
-  --navbar-h:           44px;
+  // ── Topbar & Navbar (thème ardoise sombre) ─────────────────────
+  --topbar-bg:        #0f172a;     // fond de la barre supérieure
+  --topbar-surface:   #1e293b;     // surface dropdown & navbar
+  --topbar-border:    rgba(255, 255, 255, 0.07);
+  --topbar-text:      #e2e8f0;
+  --topbar-muted:     rgba(148, 163, 184, 0.75);
+  --topbar-hover:     rgba(255, 255, 255, 0.07);
+  --topbar-active:    rgba(37, 99, 235, 0.30);
 
-  // Espacements
-  --space-1:  0.25rem;
-  --space-2:  0.5rem;
-  --space-3:  0.75rem;
-  --space-4:  1rem;
-  --space-5:  1.25rem;
-  --space-6:  1.5rem;
-  --space-8:  2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
+  // ── Surfaces contenu (thème clair) ────────────────────────────
+  --bg:               #f1f5f9;     // fond de page
+  --surface:          #ffffff;     // cartes, panneaux
+  --surface-2:        #f8fafc;     // thead, hover rows
+  --surface-offset:   #f1f5f9;     // zone décalée, skeleton
 
-  // Formes
+  // ── Bordures ──────────────────────────────────────────────────
+  --border:           rgba(15, 23, 42, 0.09);
+  --border-strong:    rgba(15, 23, 42, 0.15);
+
+  // ── Texte ─────────────────────────────────────────────────────
+  --text:             #475569;     // corps de texte
+  --text-dark:        #0f172a;     // titres, labels
+  --text-muted:       #94a3b8;     // texte secondaire
+  --text-faint:       #cbd5e1;     // décoratif, icônes vides
+
+  // ── Dimensions Topbar ─────────────────────────────────────────
+  --topbar-top-h:     56px;
+  --navbar-h:         44px;
+
+  // ── Espacements (base 4px) ────────────────────────────────────
+  --space-1:   0.25rem;   //  4px
+  --space-2:   0.5rem;    //  8px
+  --space-3:   0.75rem;   // 12px
+  --space-4:   1rem;      // 16px
+  --space-5:   1.25rem;   // 20px
+  --space-6:   1.5rem;    // 24px
+  --space-8:   2rem;      // 32px
+  --space-10:  2.5rem;    // 40px
+  --space-12:  3rem;      // 48px
+
+  // ── Rayons de bordure ─────────────────────────────────────────
   --radius-sm:   6px;
   --radius:      10px;
   --radius-lg:   14px;
   --radius-full: 9999px;
 
-  // Ombres (ton froid accordé aux surfaces)
+  // ── Ombres (ton froid accordé aux surfaces ardoise) ───────────
   --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.09), 0 2px 4px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.13), 0 4px 8px rgba(15, 23, 42, 0.07);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07),
+               0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.09),
+               0 2px  4px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.13),
+               0  4px  8px rgba(15, 23, 42, 0.07);
 
-  // Transitions
-  --t-fast:   0.14s cubic-bezier(0.16, 1, 0.3, 1);
-  --t-base:   0.20s cubic-bezier(0.16, 1, 0.3, 1);
-  --t-slow:   0.35s cubic-bezier(0.16, 1, 0.3, 1);
-
-  @media (max-width: 768px) {
-    :root {
-      --topbar-top-h: 56px;
-      --navbar-h:     40px;
-    }
-  }
+  // ── Transitions (easing "spring" rapide) ──────────────────────
+  --t-fast: 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+  --t-base: 0.20s cubic-bezier(0.16, 1, 0.3, 1);
+  --t-slow: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-// ── Reset & Base ──────────────────────────────────────────────────
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+// Ajustements mobile des dimensions topbar
+@media (max-width: 768px) {
+  :root { --navbar-h: 40px; }
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 4. RESET & BASE
+// ════════════════════════════════════════════════════════════════════
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html {
+  font-size: 16px;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  scroll-behavior: smooth;
-  font-size: 16px;
+  text-size-adjust: none;
+  hanging-punctuation: first last;
 }
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.9375rem;
+  font-size: 0.9375rem;  // 15px — légèrement plus dense qu'un 16px standard
   font-weight: 400;
   line-height: 1.6;
   color: var(--text);
@@ -110,53 +145,77 @@ body {
   min-height: 100vh;
 }
 
+// Éléments de contenu
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
-input, button, textarea, select { font: inherit; color: inherit; }
-h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
+input, button, textarea, select  { font: inherit; color: inherit; }
+h1, h2, h3, h4, h5, h6          { line-height: 1.2; color: var(--text-dark); }
+button                           { cursor: pointer; background: none; border: none; }
 
-// Focus global
+// Focus accessible (keyboard navigation)
 :focus-visible {
   outline: 2px solid var(--c-primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-// Sélection
+// Sélection de texte
 ::selection {
   background: var(--c-primary-light);
   color: var(--text-dark);
 }
 
+// Respect des préférences de mouvement réduit
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 5. COMPOSANTS GLOBAUX
+// ════════════════════════════════════════════════════════════════════
+
 // ── Page Auth ─────────────────────────────────────────────────────
+// Utilisé par login, register, forgot-password, reset-password.
+// Tous ces composants n'ont pas de style propre — ils héritent d'ici.
 .auth-page {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;   // ← la section elle-même occupe le viewport
+  min-height: 100dvh;
   width: 100%;
   position: relative;
   overflow: hidden;
   background: var(--bg);
 
+  // Wrapper Bootstrap étiré en hauteur
   .container-fluid {
-    flex: 1;                    // ← prend tout l'espace vertical disponible
+    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--space-8) var(--space-8);
-  }
-  .row {
-    flex: 1;
-    align-items: center;     // ← centrage vertical effectif
+    padding: var(--space-8);
   }
 
+  .row {
+    flex: 1;
+    align-items: center; // centrage vertical du formulaire
+  }
+
+  // Forme décorative en arrière-plan
   .shape-bg {
-    position: absolute; top: 0; left: 0; z-index: 0;
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 0;
     img { max-width: 100%; height: auto; }
   }
 
-  form { margin-top: var(--space-3); }
-
+  // Illustration fusée animée (côté droit)
   .rocket-img {
-    position: absolute; z-index: -1; top: -250px; right: 50px;
+    position: absolute;
+    z-index: -1;
+    top: -250px; right: 50px;
     transform: translateY(-50%);
     animation: float 6s ease-in-out infinite;
     width: 70%;
@@ -164,6 +223,9 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     pointer-events: none;
   }
 
+  form { margin-top: var(--space-3); }
+
+  // ── Champs formulaire auth ──────────────────────────────────
   .form-group { position: relative; margin-bottom: var(--space-5); }
 
   .form-label {
@@ -180,7 +242,6 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     height: 46px;
     padding: 0 var(--space-4);
     font-size: 0.875rem;
-    font-weight: 400;
     color: var(--text-dark);
     background: var(--surface);
     border: 1.5px solid var(--border-strong);
@@ -188,27 +249,26 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     outline: none;
     transition:
       border-color var(--t-base),
-      box-shadow var(--t-base),
-      background var(--t-base);
+      box-shadow   var(--t-base),
+      background   var(--t-base);
 
     &::placeholder { color: var(--text-muted); }
 
     &:focus {
       border-color: var(--c-primary);
       box-shadow: 0 0 0 3px var(--c-primary-ring);
-      background: var(--surface);
     }
-  }
 
-  .form-control.ng-invalid.ng-touched,
-  .form-control.ng-invalid.ng-dirty {
-    border-color: var(--c-danger) !important;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
-  }
+    // Validation Angular (rouge si invalide touché)
+    &.ng-invalid.ng-touched,
+    &.ng-invalid.ng-dirty {
+      border-color: var(--c-danger) !important;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+    }
 
-  .form-control.ng-valid.ng-touched,
-  .form-control.ng-valid.ng-dirty {
-    border-color: var(--c-success);
+    // Validation Angular (vert si valide touché)
+    &.ng-valid.ng-touched,
+    &.ng-valid.ng-dirty { border-color: var(--c-success); }
   }
 
   .field-error {
@@ -220,6 +280,7 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     gap: 0.3rem;
   }
 
+  // ── Bouton de soumission ────────────────────────────────────
   .btn-submit {
     width: 100%;
     height: 46px;
@@ -231,9 +292,12 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     border: none;
     border-radius: var(--radius);
     cursor: pointer;
-    transition: background var(--t-base), box-shadow var(--t-base), transform var(--t-fast);
     margin-bottom: var(--space-5);
     letter-spacing: 0.01em;
+    transition:
+      background  var(--t-base),
+      box-shadow  var(--t-base),
+      transform   var(--t-fast);
 
     &:hover:not(:disabled) {
       background: var(--c-primary-hover);
@@ -244,15 +308,35 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     &:disabled { opacity: 0.65; cursor: not-allowed; }
   }
 
+  // ── Éléments typographiques ─────────────────────────────────
+  .brand-logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--c-primary);
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .hero-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+  }
+
   .form-link a {
     font-size: 0.8rem;
     color: var(--text-muted);
-    font-weight: 400;
     text-decoration: none;
     transition: color var(--t-base);
     &:hover { color: var(--c-primary); }
   }
 
+  // Séparateur "ou" centré entre deux éléments
   .style-line {
     display: flex;
     align-items: center;
@@ -269,75 +353,99 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; color: var(--text-dark); }
     }
   }
 
-  .brand-logo {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--c-primary);
-    letter-spacing: -0.03em;
-    margin-bottom: var(--space-6);
-    //display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .hero-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: var(--space-2);
-    letter-spacing: -0.02em;
-
-  }
-
+  // ── Animations d'entrée ─────────────────────────────────────
   .animate-left {
     opacity: 0;
     transform: translateX(-20px);
     animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .spinner {
-    width: 18px; height: 18px;
-    border: 2.5px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.75s linear infinite;
-    margin: 0 auto;
-  }
-
+  // ── Responsive Auth ─────────────────────────────────────────
   @media (max-width: 991px) {
-    flex-direction: column;
     height: auto;
-    padding: var(--space-8) 0;
     overflow-y: auto;
+    padding: var(--space-8) 0;
+
     .col-lg-8   { text-align: center; margin-bottom: var(--space-10); }
-    .rocket-img { top: 0px; right: 30%; transform: translate(50%, -50%); width: 80%; }
+    .rocket-img { top: 0; right: 30%; transform: translate(50%, -50%); width: 80%; }
+
+    // Texte lisible sur fond sombre mobile
     .hero-text {
       font-size: 1.75rem;
-      color: transparent;
-      color:#ffffff;
+      color: #fff;
       text-shadow:
-        -1px -1px 0 black, /* Ombre vers le haut-gauche */
-        1px -1px 0 black,  /* Ombre vers le haut-droite */
-        -1px 1px 0 black,  /* Ombre vers le bas-gauche */
-        1px 1px 0 black;
+        -1px -1px 0 #000,
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000;
     }
   }
 }
 
-// ── Animations globales ───────────────────────────────────────────
-@keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(18px)} }
-@keyframes slideIn { to{opacity:1;transform:translateX(0)} }
-@keyframes spin    { to{transform:rotate(360deg)} }
-@keyframes fadeIn  { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideUp { from { transform: translateY(16px); opacity: 0;} to { transform: translateY(0);  opacity: 1; }}
-@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0);}}
-@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50%  { transform: scale(1.5); opacity: 0.5; }}
-@keyframes fadeUp {from { opacity: 0; transform: translateY(10px); } to  { opacity: 1; transform: translateY(0); }}
-@keyframes shimmer {0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-@keyframes dropdown-in {from { opacity: 0; transform: translateY(-8px) scale(0.97); }to { opacity: 1; transform: translateY(0) scale(1); }}
-// ── Print ─────────────────────────────────────────────────────────
-@media print {
-  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .topbar-top, .topbar-nav { display: none; }
+
+// ════════════════════════════════════════════════════════════════════
+// 6. ANIMATIONS GLOBALES
+// Centralisées ici — les composants les référencent directement.
+// Aucun @keyframes ne doit être redéfini dans les fichiers composants.
+// ════════════════════════════════════════════════════════════════════
+
+// Flottement vertical — illustration auth
+@keyframes float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(18px); }
 }
 
+// Entrée depuis la gauche — .animate-left
+@keyframes slideIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+// Rotation continue — spinners
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Apparition douce vers le haut — éléments de liste, cards
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+// Montée plus ample — modals, drawers
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+// Pulsation — indicateurs actifs, badges live
+@keyframes pulse {
+  0%, 100% { transform: scale(1);   opacity: 1;   }
+  50%       { transform: scale(1.5); opacity: 0.5; }
+}
+
+// Shimmer — skeleton loaders
+@keyframes shimmer {
+  from { background-position:  200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+// Ouverture dropdown — menus déroulants
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 7. PRINT
+// ════════════════════════════════════════════════════════════════════
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  // Masquer la navigation à l'impression
+  .topbar-top,
+  .topbar-nav { display: none !important; }
+}
