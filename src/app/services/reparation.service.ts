@@ -16,7 +16,7 @@ export class ReparationService {
   private http = inject(HttpClient);
   private api = '/api';  // proxy vers Flask
 
-  scanFiche(image: File): Observable<OcrResult> {................
+  scanFiche(image: File): Observable<OcrResult> {
     const form = new FormData();
     form.append('image', image);
     return this.http.post<OcrResult>(`${this.api}/scan`, form);

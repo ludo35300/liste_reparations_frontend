@@ -1,18 +1,11 @@
+// ══════════════════════════════════════════════════════════
+// topbar.scss
+// Tokens globaux hérités de :root → supprimés du :host
+// ══════════════════════════════════════════════════════════
 :host {
-  --topbar-bg:         #0f172a;
-  --topbar-surface:    #1e293b;
-  --topbar-border:     rgba(255,255,255,0.07);
-  --topbar-text:       #e2e8f0;
-  --topbar-muted:      rgba(148,163,184,0.75);
-  --topbar-hover:      rgba(255,255,255,0.07);
-  --nav-active-bar:    #2563eb;
-  --nav-active-bg:     rgba(37,99,235,0.22);
-  --primary:           #2563eb;
-  --danger:            #dc2626;
-  --danger-light:      rgba(220,38,38,0.09);
-  --t-base:            0.18s cubic-bezier(0.16,1,0.3,1);
-  --topbar-top-h:      56px;
-  --navbar-h:          44px;
+  // Seuls les tokens propres à la topbar (absents de :root)
+  --nav-active-bar: var(--c-primary);     // référence le token global
+  --nav-active-bg:  var(--topbar-active); // référence le token global
 }
 
 // ══════════════════════════════════════════════════════════
@@ -40,201 +33,137 @@
   }
 }
 
-// ── Outils (gauche)
 .topbar-tools {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  display: flex; align-items: center; gap: 0.25rem;
 }
 
 .tool-btn {
   width: 32px; height: 32px;
-  border-radius: var(--radius-sm, 6px);
-  border: none;
-  background: transparent;
+  border-radius: var(--radius-sm);
+  border: none; background: transparent;
   color: var(--topbar-muted);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  font-size: 0.85rem;
+  cursor: pointer; font-size: 0.85rem;
   transition: background var(--t-base), color var(--t-base);
 
-  &:hover {
-    background: var(--topbar-hover);
-    color: var(--topbar-text);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--nav-active-bar);
-    outline-offset: 2px;
-  }
+  &:hover { background: var(--topbar-hover); color: var(--topbar-text); }
+  &:focus-visible { outline: 2px solid var(--nav-active-bar); outline-offset: 2px; }
 }
 
-// ── Brand centré
 .topbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
+  display: flex; align-items: center; gap: 0.5rem; justify-content: center;
 
   .brand-icon {
-    width: 28px; height: 28px;
-    border-radius: 6px;
+    width: 28px; height: 28px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    color: var(--nav-active-bar);
-    font-size: 1rem;
-    flex-shrink: 0;
+    color: var(--nav-active-bar); font-size: 1rem; flex-shrink: 0;
   }
 
   .brand-name {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--topbar-text);
-    letter-spacing: -0.02em;
-    white-space: nowrap;
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--topbar-text); letter-spacing: -0.02em; white-space: nowrap;
   }
 }
 
-// ── Profil (droite)
 .topbar-right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
+  display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;
 }
 
-// ── User menu
 .user-menu { position: relative; }
 
 .user-chip {
   display: flex; align-items: center; gap: 0.4rem;
   padding: 0.25rem 0.5rem 0.25rem 0.25rem;
-  border-radius: var(--radius-full, 9999px);
+  border-radius: var(--radius-full);
   border: 1px solid var(--topbar-border);
   background: rgba(255,255,255,0.05);
   cursor: pointer;
-  transition:
-    background var(--t-base),
-    border-color var(--t-base),
-    box-shadow var(--t-base);
+  transition: background var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
 
-  &:hover {
-    background: var(--topbar-hover);
-    border-color: rgba(255,255,255,0.14);
-  }
+  &:hover { background: var(--topbar-hover); border-color: rgba(255,255,255,0.14); }
 
   .user-menu.open & {
     border-color: rgba(37,99,235,0.5);
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    box-shadow: 0 0 0 3px var(--c-primary-ring);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--nav-active-bar);
-    outline-offset: 2px;
-  }
+  &:focus-visible { outline: 2px solid var(--nav-active-bar); outline-offset: 2px; }
 }
 
-.user-info {
-  display: flex; flex-direction: column;
-  align-items: flex-start; gap: 0;
-}
+.user-info { display: flex; flex-direction: column; align-items: flex-start; }
 
 .user-name {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--topbar-text);
-  white-space: nowrap;
-  line-height: 1.25;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--topbar-text); white-space: nowrap; line-height: 1.25;
 }
 
 .user-email {
-  font-size: 0.62rem;
-  color: var(--topbar-muted);
-  white-space: nowrap;
-  line-height: 1.25;
+  font-size: 0.62rem; color: var(--topbar-muted);
+  white-space: nowrap; line-height: 1.25;
 }
 
-// ── Avatar
 .avatar {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(140deg, #2563eb 0%, #4f46e5 100%);
-  color: #fff;
-  font-size: 0.62rem;
-  font-weight: 700;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(140deg, var(--c-primary) 0%, #4f46e5 100%);
+  color: #fff; font-size: 0.62rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(37,99,235,0.35);
 
-  &.avatar-lg {
-    width: 38px; height: 38px;
-    font-size: 0.75rem;
-  }
+  &.avatar-lg { width: 38px; height: 38px; font-size: 0.75rem; }
 }
 
-// ── Chevron
 .chevron {
-  font-size: 0.55rem;
-  color: var(--topbar-muted);
+  font-size: 0.55rem; color: var(--topbar-muted);
   transition: transform var(--t-base);
   .user-menu.open & { transform: rotate(180deg); }
   @media (max-width: 600px) { display: none; }
 }
 
-// ── Dropdown profil
 .dropdown-menu-custom {
   position: absolute; top: calc(100% + 0.5rem); right: 0;
   min-width: 236px;
-  background: #1e293b;
+  background: var(--topbar-surface);  // ← plus de #1e293b hardcodé
   border: 1px solid rgba(255,255,255,0.10);
-  border-radius: var(--radius, 10px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.20);
-  z-index: 1050;
-  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);       // ← token global au lieu de rgba magique
+  z-index: 1050; overflow: hidden;
   animation: dropdown-in 0.15s cubic-bezier(0.16,1,0.3,1);
-}
-
-@keyframes dropdown-in {
-  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .dropdown-header {
   display: flex; align-items: center; gap: 0.75rem;
   padding: 1rem 1rem 0.875rem;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid var(--topbar-border);
 }
 
 .dropdown-name {
   font-size: 0.82rem; font-weight: 700;
-  color: #e2e8f0; margin: 0 0 0.1rem;
+  color: var(--topbar-text); margin: 0 0 0.1rem;
 }
 
 .dropdown-email {
-  font-size: 0.72rem; color: #94a3b8; margin: 0;
+  font-size: 0.72rem; color: var(--topbar-muted); margin: 0;
   max-width: 160px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
-.dropdown-divider {
-  height: 1px;
-  background: rgba(255,255,255,0.07);
-  margin: 0.25rem 0;
-}
+.dropdown-divider { height: 1px; background: var(--topbar-border); margin: 0.25rem 0; }
 
 .dropdown-item-custom {
   display: flex; align-items: center; gap: 0.6rem;
   width: 100%; padding: 0.6rem 1rem;
   border: none; background: none; text-align: left;
   font-size: 0.82rem; font-weight: 500;
-  color: #cbd5e1;
-  cursor: pointer;
+  color: #cbd5e1; cursor: pointer;
   transition: background var(--t-base), color var(--t-base);
 
   i { width: 16px; color: #64748b; flex-shrink: 0; }
 
   &:hover:not(.disabled) {
     background: rgba(255,255,255,0.06);
-    color: #e2e8f0;
-    i { color: #94a3b8; }
+    color: var(--topbar-text);
+    i { color: var(--topbar-muted); }
   }
   &:focus-visible { outline: 2px solid var(--nav-active-bar); outline-offset: -2px; }
   &.disabled { opacity: 0.45; cursor: default; }
@@ -242,7 +171,7 @@
   &.danger {
     color: #fca5a5;
     i { color: #f87171; }
-    &:hover { background: rgba(220,38,38,0.12); color: #fca5a5; }
+    &:hover { background: var(--c-danger-light); color: #fca5a5; }
   }
 }
 
@@ -250,15 +179,14 @@
   margin-left: auto;
   font-size: 0.58rem; font-weight: 700;
   padding: 0.1rem 0.4rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: rgba(255,255,255,0.08);
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--topbar-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
 }
 
 // ══════════════════════════════════════════════════════════
-// Niveau 2 — Navbar (toujours visible, reste fixe)
+// Niveau 2 — Navbar
 // ══════════════════════════════════════════════════════════
 .topbar-nav {
   position: fixed;
@@ -270,17 +198,11 @@
   padding: 0 1rem;
   border-bottom: 1px solid var(--topbar-border);
   box-shadow: 0 2px 8px rgba(0,0,0,0.22);
-  transition:
-    top   0.28s cubic-bezier(0.4,0,0.2,1),
-    box-shadow 0.28s ease;
+  transition: top 0.28s cubic-bezier(0.4,0,0.2,1), box-shadow 0.28s ease;
 
-  &.scrolled {
-    top: 0;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.32);
-  }
+  &.scrolled { top: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.32); }
 }
 
-// ── Liens desktop
 .nav-links {
   display: flex; align-items: stretch; flex: 1;
 
@@ -304,15 +226,9 @@
   font-size: 0.78rem; font-weight: 500;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
-  transition:
-    color         var(--t-base),
-    background    var(--t-base),
-    border-color  var(--t-base);
+  transition: color var(--t-base), background var(--t-base), border-color var(--t-base);
 
-  &:hover {
-    color: var(--topbar-text);
-    background: var(--topbar-hover);
-  }
+  &:hover { color: var(--topbar-text); background: var(--topbar-hover); }
 
   &.nav-active {
     color: #fff;
@@ -333,43 +249,33 @@
   }
 }
 
-// ── Hamburger
 .nav-hamburger {
   display: none;
-  width: 36px; height: 36px;
-  border-radius: 6px;
-  border: none;
-  background: var(--topbar-hover);
-  color: var(--topbar-muted);
-  font-size: 0.9rem;
+  width: 36px; height: 36px; border-radius: 6px;
+  border: none; background: var(--topbar-hover);
+  color: var(--topbar-muted); font-size: 0.9rem;
   align-items: center; justify-content: center;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  align-self: center;
+  cursor: pointer; margin-right: 0.5rem; align-self: center;
   transition: background var(--t-base), color var(--t-base);
 
   &:hover { background: rgba(255,255,255,0.12); color: var(--topbar-text); }
   @media (max-width: 767px) { display: flex; }
 }
 
-// ── Breadcrumb
 .nav-breadcrumb {
   display: flex; align-items: center; gap: 0.35rem;
-  margin-left: auto;
-  padding-right: 0.5rem;
-  font-size: 0.7rem;
-  color: var(--topbar-muted);
+  margin-left: auto; padding-right: 0.5rem;
+  font-size: 0.7rem; color: var(--topbar-muted);
 
-  .breadcrumb-sep { font-size: 0.5rem; opacity: 0.4; }
-  .breadcrumb-current { color: #e2e8f0; font-weight: 500; }
+  .breadcrumb-sep     { font-size: 0.5rem; opacity: 0.4; }
+  .breadcrumb-current { color: var(--topbar-text); font-weight: 500; }
 }
 
-// ── Responsive
 @media (max-width: 768px) {
-  .topbar-top { height: 56px; padding: 0 1rem; }
-  .topbar-nav { height: 40px; padding: 0 0.75rem; }
-  .brand-name  { font-size: 0.82rem; }
-  .brand-icon  { width: 24px; height: 24px; font-size: 0.85rem; }
+  .topbar-top   { height: 56px; padding: 0 1rem; }
+  .topbar-nav   { height: 40px; padding: 0 0.75rem; }
+  .brand-name   { font-size: 0.82rem; }
+  .brand-icon   { width: 24px; height: 24px; font-size: 0.85rem; }
   .topbar-tools { gap: 0.15rem; }
-  .tool-btn { width: 28px; height: 28px; font-size: 0.78rem; }
+  .tool-btn     { width: 28px; height: 28px; font-size: 0.78rem; }
 }

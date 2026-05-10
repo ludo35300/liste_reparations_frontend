@@ -1,0 +1,55 @@
+// src/styles/_shared.scss
+
+// ── Boutons ────────────────────────────────────────
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0 1rem; height: 36px;
+  font-size: 0.825rem; font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none; cursor: pointer;
+  transition: background var(--t-base), box-shadow var(--t-base), transform var(--t-fast);
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+.btn-primary {
+  background: var(--c-primary); color: #fff;
+  &:hover:not(:disabled) { background: var(--c-primary-hover); box-shadow: 0 4px 12px rgba(37,99,235,0.28); }
+}
+.btn-outline {
+  background: transparent; color: var(--c-primary);
+  border: 1.5px solid var(--border-strong);
+  &:hover:not(:disabled) { border-color: var(--c-primary); background: var(--c-primary-light); }
+}
+.btn-danger {
+  background: var(--c-danger); color: #fff;
+  &:hover:not(:disabled) { background: #b91c1c; }
+}
+.btn-sm { height: 30px; padding: 0 0.75rem; font-size: 0.775rem; }
+
+// ── En-tête de page ────────────────────────────────
+.page-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.page-title {
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--text-dark); margin: 0;
+}
+.page-subtitle {
+  font-size: 0.82rem; color: var(--text-muted); margin: 0.1rem 0 0;
+}
+
+// ── Badges statuts ─────────────────────────────────
+.badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem; font-weight: 600;
+  border-radius: var(--radius-full); border: 1px solid transparent;
+}
+.badge-waiting  { background: rgba(217,119,6,0.10);  color: var(--c-warning); border-color: rgba(217,119,6,0.20); }
+.badge-progress { background: var(--c-primary-light); color: var(--c-primary); border-color: rgba(37,99,235,0.20); }
+.badge-ready    { background: var(--c-success-light); color: var(--c-success); border-color: rgba(22,163,74,0.20); }
+.badge-done     { background: rgba(100,116,139,0.10); color: #64748b;          border-color: rgba(100,116,139,0.20); }
+
+// ── Table wrapper ──────────────────────────────────
+.table-wrapper { overflow-x: auto; }
