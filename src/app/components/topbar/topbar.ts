@@ -19,6 +19,7 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { faSignOut } from '@fortawesome/free-solid-svg-icons';
+import { QuickSearch } from '../quick-search/quick-search';
 
 export interface NavItem {
   label: string;
@@ -29,7 +30,7 @@ export interface NavItem {
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [FontAwesomeModule, RouterLink, RouterLinkActive],
+  imports: [FontAwesomeModule, RouterLink, RouterLinkActive, QuickSearch],
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss',
 })
