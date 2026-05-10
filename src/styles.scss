@@ -16,6 +16,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 // ── 1. Imports SCSS ──────────────────────────────────────────────
+@use './styles/tokens';   // design tokens globaux (couleurs, espacements, typographie)
 @use './styles/tables';   // styles spécifiques aux tables
 @use './styles/feedback'; // skeletons, spinners, loaders, placeholders
 @use './styles/layout';   // structure de page, header, main-content
@@ -26,88 +27,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..800&display=swap');
 
 
-// ════════════════════════════════════════════════════════════════════
-// 3. TOKENS — CSS Custom Properties
-// ════════════════════════════════════════════════════════════════════
-:root {
-
-  // ── Couleur primaire (bleu professionnel) ──────────────────────
-  --c-primary:        #2563eb;
-  --c-primary-hover:  #1d4ed8;
-  --c-primary-active: #1e40af;
-  --c-primary-light:  rgba(37, 99, 235, 0.10);
-  --c-primary-ring:   rgba(37, 99, 235, 0.22);
-
-  // ── Couleurs sémantiques ───────────────────────────────────────
-  --c-success:        #16a34a;
-  --c-success-light:  rgba(22, 163, 74, 0.10);
-
-  --c-danger:         #dc2626;
-  --c-danger-light:   rgba(220, 38, 38, 0.09);
-
-  --c-warning:        #d97706;
-  --c-warning-light:  rgba(217, 119, 6, 0.10);
-
-  // ── Topbar & Navbar (thème ardoise sombre) ─────────────────────
-  --topbar-bg:        #0f172a;     // fond de la barre supérieure
-  --topbar-surface:   #1e293b;     // surface dropdown & navbar
-  --topbar-border:    rgba(255, 255, 255, 0.07);
-  --topbar-text:      #e2e8f0;
-  --topbar-muted:     rgba(148, 163, 184, 0.75);
-  --topbar-hover:     rgba(255, 255, 255, 0.07);
-  --topbar-active:    rgba(37, 99, 235, 0.30);
-
-  // ── Surfaces contenu (thème clair) ────────────────────────────
-  --bg:               #f1f5f9;     // fond de page
-  --surface:          #ffffff;     // cartes, panneaux
-  --surface-2:        #f8fafc;     // thead, hover rows
-  --surface-offset:   #f1f5f9;     // zone décalée, skeleton
-
-  // ── Bordures ──────────────────────────────────────────────────
-  --border:           rgba(15, 23, 42, 0.09);
-  --border-strong:    rgba(15, 23, 42, 0.15);
-
-  // ── Texte ─────────────────────────────────────────────────────
-  --text:             #475569;     // corps de texte
-  --text-dark:        #0f172a;     // titres, labels
-  --text-muted:       #94a3b8;     // texte secondaire
-  --text-faint:       #cbd5e1;     // décoratif, icônes vides
-
-  // ── Dimensions Topbar ─────────────────────────────────────────
-  --topbar-top-h:     56px;
-  --navbar-h:         44px;
-
-  // ── Espacements (base 4px) ────────────────────────────────────
-  --space-1:   0.25rem;   //  4px
-  --space-2:   0.5rem;    //  8px
-  --space-3:   0.75rem;   // 12px
-  --space-4:   1rem;      // 16px
-  --space-5:   1.25rem;   // 20px
-  --space-6:   1.5rem;    // 24px
-  --space-8:   2rem;      // 32px
-  --space-10:  2.5rem;    // 40px
-  --space-12:  3rem;      // 48px
-
-  // ── Rayons de bordure ─────────────────────────────────────────
-  --radius-sm:   6px;
-  --radius:      10px;
-  --radius-lg:   14px;
-  --radius-full: 9999px;
-
-  // ── Ombres (ton froid accordé aux surfaces ardoise) ───────────
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07),
-               0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.09),
-               0 2px  4px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.13),
-               0  4px  8px rgba(15, 23, 42, 0.07);
-
-  // ── Transitions (easing "spring" rapide) ──────────────────────
-  --t-fast: 0.14s cubic-bezier(0.16, 1, 0.3, 1);
-  --t-base: 0.20s cubic-bezier(0.16, 1, 0.3, 1);
-  --t-slow: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+// ── Offset body sous le double header ────────────────────────────
+body.has-topbar {
+  padding-top: var(--header-total-h);
 }
+// ── Classe ajoutée par le HostListener de topbar.ts ──────────────
+// Quand la topbar se cache, la navbar remonte — on ajuste le padding
+body.topbar-hidden {
+  padding-top: var(--navbar-h);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Ajustements mobile des dimensions topbar
 @media (max-width: 768px) {

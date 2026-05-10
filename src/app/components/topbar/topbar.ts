@@ -1,12 +1,24 @@
 import {
   Component, computed, input, output, signal,
-  HostListener, OnInit, inject
+  HostListener, OnInit
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faBars, faBell, faExpand, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faBell,
+  faChevronRight,
+  faEnvelope,
+  faExpand,
+  faHome,
+  faMagnifyingGlass,
+  faTimes,
+  faUser,
+  faWrench,
+} from '@fortawesome/free-solid-svg-icons';
+import { faSignOut } from '@fortawesome/free-solid-svg-icons';
 
 export interface NavItem {
   label: string;
@@ -22,22 +34,34 @@ export interface NavItem {
   styleUrl: './topbar.scss',
 })
 export class Topbar implements OnInit {
+
+  // ── Inputs / Outputs ────────────────────────────────────────────
   public readonly me        = input<MeResponse | null>(null);
   public readonly pageTitle = input<string>('');
   public readonly logoutEvt = output<void>();
   public readonly navItems  = input<NavItem[]>([]);
 
+  // ── État local ──────────────────────────────────────────────────
   public readonly menuOpen      = signal(false);
   public readonly mobileNavOpen = signal(false);
   public readonly topbarHidden  = signal(false);
 
-  /** Icônes */
-  public readonly faExpand = faExpand;
+  // ── Icônes ──────────────────────────────────────────────────────
+  public readonly faBars            = faBars;
+  public readonly faBell            = faBell;
+  public readonly faChevronRight    = faChevronRight;
+  public readonly faEnvelope        = faEnvelope;
+  public readonly faExpand          = faExpand;
+  public readonly faHome            = faHome;
   public readonly faMagnifyingGlass = faMagnifyingGlass;
-  public readonly faBell = faBell;
-  public readonly faBars = faBars;
+  public readonly faSignOut         = faSignOut;
+  public readonly faTimes           = faTimes;
+  public readonly faUser            = faUser;
+  public readonly faWrench          = faWrench;
+
   private lastScrollY = 0;
 
+  // ── Computed ─────────────────────────────────────────────────────
   public readonly initials = computed(() => {
     const m = this.me();
     if (!m) return '?';
@@ -46,6 +70,7 @@ export class Topbar implements OnInit {
 
   ngOnInit(): void { this.lastScrollY = window.scrollY; }
 
+  // ── Actions ──────────────────────────────────────────────────────
   public toggleMenu(): void { this.menuOpen.update(v => !v); }
 
   public onLogout(): void {
@@ -61,6 +86,7 @@ export class Topbar implements OnInit {
     }
   }
 
+  // ── Listeners ────────────────────────────────────────────────────
   @HostListener('window:scroll')
   onWindowScroll(): void {
     const y = window.scrollY;
