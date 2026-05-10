@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGrip, faQrcode, faMagnifyingGlass, faChartBar, faDoorOpen } from '@fortawesome/free-solid-svg-icons';
+import { faGrip, faQrcode, faMagnifyingGlass, faChartBar, faDoorOpen, faGear, faWrench, faCheckCircle, faExclamationTriangle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
@@ -25,25 +25,39 @@ export class Home implements OnInit {
   public readonly me           = signal<MeResponse | null>(null);
   public readonly loading      = signal(false);
   public readonly errorMessage = signal<string | null>(null);
-  
+
   public readonly faDoorOpen        = faDoorOpen;
   public readonly faGrip            = faGrip;
-  public readonly faQrcode          = faQrcode;
   public readonly faMagnifyingGlass = faMagnifyingGlass;
   public readonly faChartBar        = faChartBar;
+  public readonly faGear = faGear;
+  public readonly faWrench = faWrench;
+  public readonly faCheckCircle = faCheckCircle;
+  public readonly faExclamationTriangle = faExclamationTriangle;
+  public readonly faPlus = faPlus;
 
-  public readonly dashCards = [
-    { route: '/scan',   icon: '📷', color: '#696cff',
-      title: 'Scanner une fiche',
-      desc: 'Analyser une fiche de réparation par OCR' },
-    { route: '/search', icon: '🔍', color: '#03c3ec',
-      title: 'Rechercher une machine',
-      desc: 'Consulter l\'historique par numéro de série' },
-    { route: '/stats',  icon: '📊', color: '#71dd37',
-      title: 'Statistiques',
-      desc: 'Vue globale des interventions et pièces changées' },
+
+  public readonly statsCards = [
+    { title: 'Machines suivies', value: 128, icon: faGear , color: '#3b82f6', delta: '+12%', period: 'Derniers 30 jours' },
+    { title: 'Réparations en cours', value: 14, icon: faWrench, color: '#06b6d4', delta: '+3', period: 'Derniers 30 jours' },
+    { title: 'Réparations terminées', value: 86, icon: faCheckCircle, color: '#22c55e', delta: '+8%', period: 'Derniers 30 jours' },
+    { title: 'Alertes', value: 5, icon: faExclamationTriangle, color: '#f59e0b', delta: '-2', period: 'Derniers 30 jours' },
   ];
 
+  public readonly quickLinks = [
+    {
+      route: '/search',
+      title: 'Rechercher une machine',
+      desc: 'Consulter l’historique par numéro de série.',
+      icon: faMagnifyingGlass,
+    },
+    {
+      route: '/ajout-repair',
+      title: 'Ajouter une réparation',
+      desc: 'Créer une nouvelle intervention rapidement.',
+      icon: faPlus,
+    },
+  ];
   ngOnInit(): void {
     this.loading.set(true);
     this.errorMessage.set(null);

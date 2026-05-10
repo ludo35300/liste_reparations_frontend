@@ -9,54 +9,80 @@
     />
 
     <main class="main-content">
-
+      <!-- État de chargement -->
       @if (loading()) {
         <div class="state-loading" role="status" aria-live="polite">
           <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           <span>Chargement...</span>
         </div>
       }
-
+      <!-- État d'erreur -->
       @if (errorMessage()) {
         <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
       }
-
+      <!-- Contenu principal -->
       @if (me()) {
-
-        <!-- Greeting -->
-        <div class="greeting">
+        <!-- === SECTION HÉRO === -->
+        <section class="hero">
           <div>
-            <h2 class="greeting-title">Bonjour, {{ me()!.firstName }} 👋</h2>
+            <p class="hero-kicker">Bienvenue</p>
+            <h2 class="hero-title">Bonjour, {{ me()!.firstName }} 👋</h2>
+            <p class="hero-sub">
+              Voici un aperçu rapide de votre activité de maintenance.
+            </p>
           </div>
-        </div>
-
-        
-
-        <!-- Action Cards -->
-        <h3 class="section-title">Actions rapides</h3>
-        <div class="cards-grid">
-          @for (card of dashCards; track card.route) {
-            <div class="dash-card" [routerLink]="card.route"
-                role="button" tabindex="0"
-                [attr.aria-label]="card.title"
-                [style.--card-color]="card.color">
-
-              <!-- Image / Illustration en haut -->
-              <div class="card-img-top" [style.background]="card.color + '18'">
-                <span class="card-big-icon">{{ card.icon }}</span>
+        </section>
+        <!-- === SECTION STATS & DASHBOARD === -->
+        <section class="stats-grid">
+          @for (card of statsCards; track card.title) {
+            <article class="stat-card" [style.--card-color]="card.color">
+              <div class="stat-top">
+                <div class="stat-text">
+                  <p class="stat-value">{{ card.value }}</p>
+                  <p class="stat-title">{{ card.title }}</p>
+                </div>
+                <div class="stat-icon"><fa-icon [icon]="card.icon"></fa-icon></div>
               </div>
 
-              <!-- Corps -->
-              <div class="card-content">
-                <h3 class="card-title">{{ card.title }}</h3>
-                <p class="card-desc">{{ card.desc }}</p>
+              <div class="stat-footer">
+                <span class="stat-delta">{{ card.delta }}</span>
+                <span class="stat-period">{{ card.period }}</span>
               </div>
-            </div>
+            </article>
           }
-        </div>
+        </section>
 
+        <section class="dashboard-grid">
+          <article class="panel panel-main">
+            <div class="panel-header">
+              <h3>Activité récente</h3>
+              <a routerLink="/stats" class="panel-link">Voir les statistiques</a>
+            </div>
+
+            <div class="panel-placeholder">
+              <p>TODO: Afficher les réparations en cours, sinon les 10 dernières réparations.</p>
+            </div>
+          </article>
+
+          <article class="panel panel-side">
+            <div class="panel-header">
+              <h3>Accès rapides</h3>
+            </div>
+
+            <div class="quick-links">
+              @for (link of quickLinks; track link.route) {
+                <a class="quick-link" [routerLink]="link.route">
+                  <div class="quick-icon"><fa-icon [icon]="link.icon"></fa-icon></div>
+                  <div class="quick-content">
+                    <strong>{{ link.title }}</strong>
+                    <p>{{ link.desc }}</p>
+                  </div>
+                </a>
+              }
+            </div>
+          </article>
+        </section>
       }
-
     </main>
   </div>
 </div>

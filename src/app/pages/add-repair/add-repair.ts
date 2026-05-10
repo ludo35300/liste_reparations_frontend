@@ -114,7 +114,6 @@ export class AddRepair implements OnInit {
       await firstValueFrom(this.reparationService.enregistrer(repairPayload));
       await this.router.navigate(['/history/'+payload.numero_serie]);
     } catch (error) {
-      console.error('onManualRepairSubmitted error:', error);
       this.errorMessage.set("Erreur lors de l'enregistrement de la réparation.");
     } finally {
       this.saving.set(false);
