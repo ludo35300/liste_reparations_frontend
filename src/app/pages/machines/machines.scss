@@ -315,22 +315,6 @@
 }
 
 /* ── Page header / form / boutons génériques ───────── */
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.75rem;
-}
-
-.page-title {
-  margin: 0 0 0.35rem;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
 .page-sub {
   display: flex;
   align-items: center;
@@ -434,53 +418,14 @@
   margin-top: 1rem;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.58rem 1.05rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background var(--transition),
-    color var(--transition),
-    border-color var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
-}
-
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  color: #fff;
-  background: var(--primary);
-}
-
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-dark);
   box-shadow: 0 8px 18px rgba(68, 96, 241, 0.25);
 }
 
-.btn-outline {
-  color: var(--text-dark);
-  background: transparent;
-  border-color: var(--border);
-}
 
 .btn-outline:hover {
   background: #f7f9fd;
-}
-
-.btn-danger {
-  color: var(--danger);
-  background: var(--danger-soft);
 }
 
 .btn-danger:hover {
