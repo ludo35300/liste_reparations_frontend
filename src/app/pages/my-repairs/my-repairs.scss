@@ -1,18 +1,9 @@
 // my-repairs.scss
+// Tokens hérités de :root → aucun token local nécessaire.
+// --primary, --primary-soft, --transition remplacés par les tokens globaux.
 :host { display: block; }
 
-.layout       { display: flex; min-height: 100vh; background: var(--bg); }
-.layout-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-.main-content {
-  flex: 1; overflow-y: auto;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2.5rem 3rem;
-}
-
-.page-header { margin-bottom: 1.75rem; }
-.page-title  { margin: 0 0 0.3rem; font-size: 1.35rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.02em; }
-.page-sub    { margin: 0; color: var(--text-muted); font-size: 0.88rem; }
-
+// ── Toolbar ───────────────────────────────────────────────────
 .toolbar {
   display: flex; align-items: center; justify-content: space-between;
   gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;
@@ -40,29 +31,36 @@
   min-width: 20px; padding: 0.05rem 0.4rem;
   border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 700;
   background: rgba(255,255,255,0.25); color: inherit;
+
   &--muted { background: var(--c-primary-light); color: var(--c-primary); }
 }
+
 .tab.active .tab-count--muted { background: rgba(255,255,255,0.25); color: #fff; }
 
+// ── Recherche ─────────────────────────────────────────────────
 .search-wrapper { position: relative; display: flex; align-items: center; }
-.search-icon    { position: absolute; left: 0.875rem; color: var(--text-muted); font-size: 0.75rem; pointer-events: none; }
+
+.search-icon {
+  position: absolute; left: 0.875rem;
+  color: var(--text-muted); font-size: 0.75rem; pointer-events: none;
+}
 
 .search-input {
   height: 40px; padding: 0 1rem 0 2.25rem;
   border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: var(--surface); color: var(--text-dark); font-size: 0.84rem;
-  outline: none; width: 240px;
+  background: var(--surface); color: var(--text-dark);
+  font-size: 0.84rem; outline: none; width: 240px;
   transition: border-color var(--t-base), box-shadow var(--t-base);
+
   &:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px var(--c-primary-light); }
 }
 
-.table-wrapper {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);
-}
+// ── Tableau ───────────────────────────────────────────────────
+
 
 .repairs-table {
   width: 100%; border-collapse: collapse;
+
   thead tr { background: var(--surface-2); border-bottom: 1px solid var(--border); }
 
   th {
@@ -73,7 +71,7 @@
     transition: color var(--t-base);
 
     fa-icon { margin-left: 0.3rem; opacity: 0.5; font-size: 0.65rem; }
-    &:hover     { color: var(--text-dark); }
+    &:hover    { color: var(--text-dark); }
     &.th-active { color: var(--c-primary); fa-icon { opacity: 1; } }
   }
 
@@ -85,25 +83,23 @@
 
 .repair-row {
   cursor: pointer; transition: background var(--t-base);
-  &:hover td      { background: var(--surface-2); }
-  &:last-child td { border-bottom: none; }
+  &:hover td       { background: var(--surface-2); }
+  &:last-child td  { border-bottom: none; }
 }
 
-.cell-date   { white-space: nowrap; color: var(--text-muted); font-size: 0.8rem; }
-.cell-serie  { font-weight: 700; color: var(--c-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
-.cell-modele { font-weight: 600; color: var(--text-dark); }
 .cell-tech   { color: var(--text); }
 .text-muted  { color: var(--text-muted); }
 
 .pieces-pill {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 24px; padding: 0.15rem 0.5rem; border-radius: var(--radius-full);
+  min-width: 24px; padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
   background: var(--c-primary-light); color: var(--c-primary);
   font-size: 0.72rem; font-weight: 700;
 }
 
-// .badge, .badge-waiting/progress/ready/done → supprimés → voir _shared.scss
 
+// ── Bouton ouvrir ─────────────────────────────────────────────
 .btn-open {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
@@ -111,38 +107,17 @@
   border-radius: var(--radius-sm); color: var(--text-muted);
   font-size: 0.75rem; cursor: pointer;
   transition: background var(--t-base), color var(--t-base), border-color var(--t-base);
-  &:hover { background: var(--c-primary-light); color: var(--c-primary); border-color: rgba(37,99,235,0.25); }
+
+  &:hover {
+    background: var(--c-primary-light);
+    color: var(--c-primary);
+    border-color: rgba(37,99,235,0.25);
+  }
 }
 
-.skeleton {
-  border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, var(--surface-offset) 25%, var(--surface-2) 50%, var(--surface-offset) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
-
-.skeleton-table   { display: flex; flex-direction: column; gap: 0.5rem; }
-.skeleton-row     { display: flex; gap: 1rem; padding: 0.85rem 1rem; background: var(--surface); border-radius: var(--radius-sm); }
-.skeleton-cell-lg { flex: 2; height: 18px; }
-.skeleton-cell-md { flex: 1.5; height: 18px; }
-.skeleton-cell-sm { flex: 1; height: 18px; }
-
-.empty-state {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 4rem 2rem; text-align: center;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-
-  .empty-icon { font-size: 2rem; color: var(--text-faint); margin-bottom: 1rem; }
-  h3          { margin: 0 0 0.5rem; font-size: 0.96rem; font-weight: 700; color: var(--text-dark); }
-  p           { margin: 0; font-size: 0.84rem; color: var(--text-muted); max-width: 36ch; }
-}
-
-.alert        { padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.84rem; }
-.alert-danger { background: var(--c-danger-light); color: var(--c-danger); border: 1px solid rgba(220,38,38,0.2); }
-
+// ── Responsive ────────────────────────────────────────────────
 @media (max-width: 768px) {
-  .main-content { padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1rem) 1rem 2rem; }
-  .toolbar      { flex-direction: column; align-items: stretch; }
+  .toolbar { flex-direction: column; align-items: stretch; }
   .search-input { width: 100%; }
 
   .repairs-table {

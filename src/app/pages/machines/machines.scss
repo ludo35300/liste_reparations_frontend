@@ -2,26 +2,6 @@
   display: block; // si besoin
 }
 
-/* ── Layout ─────────────────────────────────────────── */
-.layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg);
-}
-
-.layout-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2rem 2rem;
-}
 
 /* ── Grille ─────────────────────────────────────────── */
 .brands-cards-grid {
@@ -31,9 +11,6 @@
 }
 
 @media (max-width: 640px) {
-  .main-content {
-    padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1rem) 1rem 1rem;
-  }
 
   .brands-cards-grid {
     grid-template-columns: 1fr;
@@ -177,22 +154,7 @@
 }
 
 /* ── Boutons ────────────────────────────────────────── */
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  transition:
-    transform var(--transition),
-    background var(--transition),
-    color var(--transition),
-    border-color var(--transition),
-    box-shadow var(--transition);
-}
+
 
 .icon-btn:hover {
   transform: translateY(-1px);
@@ -314,14 +276,6 @@
   text-decoration: underline;
 }
 
-/* ── Page header / form / boutons génériques ───────── */
-.page-sub {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin: 0;
-}
 
 .stat-pill {
   display: inline-flex;
@@ -418,32 +372,10 @@
   margin-top: 1rem;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
-  box-shadow: 0 8px 18px rgba(68, 96, 241, 0.25);
-}
 
-
-.btn-outline:hover {
-  background: #f7f9fd;
-}
-
-.btn-danger:hover {
-  background: rgba(220, 38, 38, 0.16);
-}
 
 /* ── Empty state global ─────────────────────────────── */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3rem 2rem;
-  text-align: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-}
+
 
 .empty-icon-fa {
   margin-bottom: 1rem;
@@ -451,26 +383,9 @@
   color: #d9dfec;
 }
 
-.empty-state h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.96rem;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.empty-state p {
-  margin: 0 0 1.25rem;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
 
 
-.skeleton {
-  border-radius: 8px;
-  background: linear-gradient(90deg, #eef2f7 25%, #e4e9f2 50%, #eef2f7 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
+
 
 .skeleton-brand-card {
   padding: 1rem;
@@ -479,21 +394,7 @@
   border-radius: var(--radius);
 }
 
-.skeleton-heading {
-  width: 50%;
-  height: 20px;
-  margin-bottom: 0.75rem;
-}
 
-.skeleton-text {
-  width: 80%;
-  height: 14px;
-  margin-bottom: 0.5rem;
-}
-
-.skeleton-text:last-child {
-  width: 60%;
-}
 
 
 .drawer-backdrop {
@@ -822,18 +723,7 @@
   justify-content: flex-end;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--text-dark);
-  border: 1px solid var(--border);
-  &:hover { background: var(--bg); }
-}
 
-.btn-sm {
-  min-height: 34px;
-  padding: 0.38rem 0.85rem;
-  font-size: 0.78rem;
-}
 
 /* Modèle actif dans la liste */
 .brand-model-item--active .brand-model-item__main {
@@ -952,24 +842,11 @@
   gap: 0.4rem;
 }
 
-// ── Spinner bouton sm ─────────────────────────────────────────
-.btn-spinner-sm {
-  width: 12px; height: 12px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  flex-shrink: 0;
-}
+
 
 
 // ── Overrides pour les btn-sm dans le catalog ─────────────────
-.btn.btn-sm {
-  fa-icon { font-size: 0.68rem; }
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
+
 .piece-edit-btn {
   width: 28px;
   height: 28px;

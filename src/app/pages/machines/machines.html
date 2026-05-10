@@ -234,7 +234,7 @@
                     [disabled]="removingPieceId() === piece.id"
                     aria-label="Retirer cette pièce">
                     @if (removingPieceId() === piece.id) {
-                      <div class="btn-spinner-sm"></div>
+                      <div class="btn-spinner"></div>
                     } @else {
                       <fa-icon [icon]="faTimes"></fa-icon>
                     }
@@ -268,7 +268,7 @@
               <div class="form-actions">
                 <button class="btn btn-outline btn-sm" (click)="cancelEditPiece()">Annuler</button>
                 <button class="btn btn-primary btn-sm" (click)="saveEditPiece()" [disabled]="savingEditPiece()">
-                  @if (savingEditPiece()) { <div class="btn-spinner-sm"></div> } @else { Enregistrer }
+                  @if (savingEditPiece()) { <div class="btn-spinner"></div> } @else { Enregistrer }
                 </button>
               </div>
             </div>
@@ -320,7 +320,7 @@
                         (click)="linkPiece(piece)"
                         [disabled]="linkingPieceId() === piece.id">
                         @if (linkingPieceId() === piece.id) {
-                          <div class="btn-spinner-sm"></div>
+                          <div class="btn-spinner"></div>
                         } @else {
                           <fa-icon [icon]="faPlus"></fa-icon> Associer
                         }
@@ -368,7 +368,7 @@
                   (click)="createAndLinkPiece()"
                   [disabled]="savingNewPiece() || !newPieceRef() || !newPieceDesig()">
                   @if (savingNewPiece()) {
-                    <div class="btn-spinner-sm"></div> Création…
+                    <div class="btn-spinner"></div> Création…
                   } @else {
                     <fa-icon [icon]="faPlus"></fa-icon> Créer et associer
                   }

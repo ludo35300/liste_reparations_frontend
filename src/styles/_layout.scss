@@ -1,0 +1,82 @@
+// ════════════════════════════════════════════════════════════════════
+// _layout.scss — Structure de page principale
+// Utilisé par toutes les pages : home, history, machines, search,
+// my-repairs, stats, add-repair, scan
+// ════════════════════════════════════════════════════════════════════
+
+// ── Squelette de page ─────────────────────────────────────────────
+// Structure : <div class="layout"> > <div class="layout-right"> >
+//             <main class="main-content">
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.layout-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%; // prépare l'ajout futur d'une sidebar
+}
+
+// ── Zone de contenu scrollable ────────────────────────────────────
+// padding-top = topbar (56px) + navbar (44px) + marge interne
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2.5rem 3rem;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+// ── En-tête de section ────────────────────────────────────────────
+// Structure : <div class="page-header">
+//               <div class="page-header-left">
+//                 <h1 class="page-title">…</h1>
+//                 <p class="page-sub">…</p>
+//               </div>
+//               <div> ← boutons d'action droite
+//             </div>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.page-title {
+  margin: 0 0 0.2rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+}
+
+.page-sub {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+// ── Responsive ────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .main-content {
+    padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1rem) 1.25rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content   { padding-inline: 1rem; }
+  .page-title     { font-size: 1.1rem; }
+  .page-header    { margin-bottom: 1.25rem; }
+}

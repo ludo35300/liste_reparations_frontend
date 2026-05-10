@@ -4,24 +4,10 @@
   --surface-soft:   #f8faff;
   --primary-glow:   rgba(37, 99, 235, 0.18);
 }
-
-.layout       { display: flex; min-height: 100vh; background: var(--bg); }
-.layout-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-.main-content {
-  flex: 1; overflow-y: auto;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2.5rem 3rem;
-}
-
-.page-header { margin-bottom: 2rem; }
-.page-title  { margin: 0 0 0.35rem; font-size: 1.35rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.02em; }
-.page-sub    { margin: 0; color: var(--text-muted); font-size: 0.88rem; }
-
+// ── Sélecteur de mode ─────────────────────────────────────────
 .mode-selector {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 1rem; margin-bottom: 2rem;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;
 }
-
 .mode-card {
   display: flex; align-items: center; gap: 1.1rem;
   text-align: left; padding: 1.25rem 1.4rem;
@@ -29,7 +15,6 @@
   background: var(--surface); box-shadow: var(--shadow-sm); cursor: pointer;
   transition: transform var(--t-base), box-shadow var(--t-base),
               border-color var(--t-base), background var(--t-base);
-
   &:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
@@ -45,21 +30,21 @@
     .mode-card-body h3 { color: var(--c-primary); }
   }
 }
-
 .mode-card-icon {
   display: grid; place-items: center;
   width: 52px; height: 52px; border-radius: var(--radius-lg);
   background: var(--surface-soft); font-size: 1.4rem; flex-shrink: 0;
   transition: background var(--t-base), box-shadow var(--t-base), color var(--t-base);
 }
-
 .mode-card-body {
   h3 { margin: 0 0 0.2rem; font-size: 0.95rem; font-weight: 700; color: var(--text-dark); transition: color var(--t-base); }
   p  { margin: 0; color: var(--text-muted); font-size: 0.82rem; line-height: 1.45; }
 }
 
+// ── Zone de contenu ───────────────────────────────────────────
 .mode-content { min-height: 320px; animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
 
+// ── Badge statut machine ──────────────────────────────────────
 .machine-status {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.35rem 0.85rem; border-radius: var(--radius-full);
@@ -70,12 +55,11 @@
   &--new   { background: var(--c-warning-light); color: var(--c-warning); border: 1px solid rgba(217,119,6,0.2); }
 }
 
+// ── Responsive ────────────────────────────────────────────────
 @media (max-width: 768px) {
-  .main-content  { padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.25rem) 1.25rem 2rem; }
   .mode-selector { grid-template-columns: 1fr; }
   .mode-card     { padding: 1rem 1.1rem; }
 }
-
 @media (max-width: 480px) {
   .mode-card-icon { width: 44px; height: 44px; font-size: 1.2rem; }
 }

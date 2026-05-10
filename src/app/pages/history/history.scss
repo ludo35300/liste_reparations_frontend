@@ -11,26 +11,6 @@
 // ─── Reset minimal ────────────────────────────────────────────
 *, *::before, *::after { box-sizing: border-box; }
 
-// ─── Layout principal ─────────────────────────────────────────
-.layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg);
-}
-
-.layout-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
-.main-content {
-  flex: 1;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 1.75rem 2rem;
-  overflow-y: auto;
-}
 
 // ─── Alerte erreur ────────────────────────────────────────────
 .alert-error {
@@ -166,23 +146,7 @@
 .badge--ready    { background: var(--success-light);  color: var(--success); }
 .badge--done     { background: var(--surface-offset); color: var(--text-muted); }
 
-// ─── État vide (liste) ────────────────────────────────────────
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 3rem 1.5rem;
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  text-align: center;
 
-  fa-icon {
-    font-size: 1.75rem;
-    color: var(--text-faint);
-    margin-bottom: 0.25rem;
-  }
-}
 
 // ─── Panneau détail ───────────────────────────────────────────
 .history-detail {
@@ -417,11 +381,6 @@ select.field-input {
   font-weight: 600;
 }
 
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-}
 
 .pieces-table {
   width: 100%;
@@ -941,9 +900,6 @@ select.field-input {
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding-inline: 1rem;
-  }
 
   .history-layout {
     grid-template-columns: 1fr;
@@ -965,9 +921,6 @@ select.field-input {
 }
 
 @media (max-width: 480px) {
-  .main-content {
-    padding-inline: 0.75rem;
-  }
 
   .detail-header,
   .pieces-section,

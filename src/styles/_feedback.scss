@@ -1,0 +1,92 @@
+// ════════════════════════════════════════════════════════════
+// _feedback.scss — Alertes, états vides, skeletons
+// ════════════════════════════════════════════════════════════
+
+// ── Alertes ───────────────────────────────────────────────────
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  margin-bottom: 1rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+.alert-danger {
+  background: var(--c-danger-light);
+  color: var(--c-danger);
+  border-color: rgba(220, 38, 38, 0.20);
+}
+.alert-success {
+  background: var(--c-success-light);
+  color: var(--c-success);
+  border-color: rgba(22, 163, 74, 0.20);
+}
+.alert-warning {
+  background: var(--c-warning-light);
+  color: var(--c-warning);
+  border-color: rgba(217, 119, 6, 0.20);
+}
+
+// ── État vide ─────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  .empty-icon { font-size: 2rem; color: var(--text-faint); margin-bottom: 1rem; }
+  h3 { margin: 0 0 0.5rem; font-size: 0.96rem; font-weight: 700; color: var(--text-dark); }
+  p  { margin: 0 0 1.25rem; font-size: 0.84rem; color: var(--text-muted); max-width: 36ch; }
+}
+
+// ── Skeleton loader ───────────────────────────────────────────
+// Appliqué sur des divs vides en attendant les données.
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--surface-offset) 25%,
+    var(--surface-2)      50%,
+    var(--surface-offset) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+// Variantes de cellules skeleton (tableaux)
+.skeleton-text    { height: 14px; border-radius: var(--radius-sm); }
+.skeleton-text:last-child { width: 60%;}
+
+.skeleton-heading { height: 20px; width: 40%; border-radius: var(--radius-sm); }
+.skeleton-avatar  { width: 36px; height: 36px; border-radius: 50%; }
+
+.skeleton-table { display: flex; flex-direction: column; gap: 0.5rem; }
+.skeleton-row   {
+  display: flex; gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+}
+.skeleton-cell-lg { flex: 2;   height: 18px; }
+.skeleton-cell-md { flex: 1.5; height: 18px; }
+.skeleton-cell-sm { flex: 1;   height: 18px; }
+
+// ── Spinner standalone ─────────────────────────────────────────
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--c-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.spinner-sm {
+  width: 14px; height: 14px;
+  border-width: 2px;
+}

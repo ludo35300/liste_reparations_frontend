@@ -2,27 +2,6 @@
   display: block; // si besoin
 }
 
-// ── Layout ────────────────────────────────────────────────
-.layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg);
-}
-
-.layout-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
-.main-content {
-  flex: 1;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.5rem) 1.75rem 2rem;
-  overflow-y: auto;
-  animation: fadeIn 0.3s cubic-bezier(0.16,1,0.3,1);
-}
 // ── Greeting ──────────────────────────────────────────────
 .greeting {
   display: flex;
@@ -171,28 +150,8 @@
   margin-bottom: 1.25rem;
 }
 
-.alert {
-  padding: 0.75rem 1.125rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  margin-bottom: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.alert-danger {
-  background: var(--danger-light);
-  color: var(--danger);
-  border: 1px solid rgba(220,38,38,0.20);
-}
-
 // ── Mobile ────────────────────────────────────────────────
 @media (max-width: 768px) {
-
-  .main-content {
-    padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1rem) 1rem 1.5rem;
-  }
 
   .greeting { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
   .cards-grid  { grid-template-columns: 1fr; gap: 0.875rem; }

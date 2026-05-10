@@ -2,52 +2,6 @@
   display: block; // si besoin
 }
 
-// ── Layout ─────────────────────────────────────────────────────
-.layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg);
-}
-
-.layout-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  width: 100%;
-}
-
-.main-content {
-  flex: 1;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.5rem) 1.75rem 2rem;
-  overflow-y: auto;
-  animation: fadeIn 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-
-// ── Page Header ────────────────────────────────────────────────
-
-.page-sub {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-// ── Alertes ────────────────────────────────────────────────────
-.alert {
-  padding: 0.75rem 1.125rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  margin-bottom: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &.alert-danger {
-    background: var(--danger-light);
-    color: var(--danger);
-    border: 1px solid rgba(220,38,38,0.20);
-  }
-}
 
 // ── Boutons ────────────────────────────────────────────────────
 
@@ -59,33 +13,6 @@
   &:not(:disabled):hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,0.30); }
 }
 
-.btn-outline {
-  background: var(--surface);
-  color: var(--primary);
-  border: 1.5px solid rgba(37,99,235,0.35);
-  &:not(:disabled):hover {
-    background: var(--primary-light);
-    border-color: var(--primary);
-    box-shadow: none;
-    transform: none;
-  }
-}
-
-.btn-exploded {
-  @extend .btn-outline;
-  width: 100%;
-  justify-content: center;
-  margin-top: 0.25rem;
-}
-
-// ── Spinner bouton ─────────────────────────────────────────────
-.btn-spinner {
-  width: 13px; height: 13px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
 
 // ── Barre de recherche ────────────────────────────────────────
 .search-card {
@@ -141,43 +68,7 @@
   }
 }
 
-// ── Empty state ────────────────────────────────────────────────
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 3rem 2rem;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  gap: 0.6rem;
 
-  .empty-icon {
-    font-size: 2.25rem;
-    line-height: 1;
-    margin-bottom: 0.2rem;
-    color: var(--text-faint, #cbd5e1);
-  }
-
-  h3 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0;
-  }
-
-  p {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin: 0;
-    max-width: 34ch;
-    strong { color: var(--text-dark); }
-  }
-
-  .btn { margin-top: 0.5rem; }
-}
 
 // ── Layout résultats (2/3 + 1/3) ─────────────────────────────
 .results-layout {
@@ -226,7 +117,6 @@
 }
 
 // ── Tableau ────────────────────────────────────────────────────
-.table-wrapper { overflow-x: auto; }
 
 .results-table {
   width: 100%;
@@ -267,32 +157,10 @@
   tbody tr:last-child td { border-bottom: none; }
 }
 
-.cell-date {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  color: var(--text-dark);
-  font-weight: 500;
-  font-size: 0.8rem;
-}
 
-.cell-notes {
-  color: var(--text-muted);
-  font-style: italic;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
-.cell-action {
-  text-align: right;
-  padding-right: 1.125rem;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  transition: color var(--t-base);
 
-  .row-clickable:hover & { color: var(--primary); }
-}
+
 
 .badge-pieces {
   display: inline-flex;
@@ -440,15 +308,11 @@
 
 @media (max-width: 768px) {
 
-  .main-content {
-    padding: calc(var(--topbar-top-h) + var(--navbar-h) + 0.875rem) 1rem 1.5rem;
-  }
 
-  .page-header {
+  /*.page-header {
     flex-direction: column;
     align-items: flex-start;
-    .btn { width: 100%; justify-content: center; }
-  }
+  }*/
 
   .search-bar {
     flex-direction: column;
@@ -462,5 +326,5 @@
     th:nth-child(5), td:nth-child(5) { display: none; }
   }
 
-  .cell-notes { max-width: 110px; }
+
 }

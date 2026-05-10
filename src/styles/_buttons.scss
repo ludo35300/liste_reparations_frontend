@@ -1,0 +1,198 @@
+// ════════════════════════════════════════════════════════════════════
+// _buttons.scss — Système de boutons global
+// Toutes les variantes de bouton sont définies ici.
+// Les composants NE redéfinissent PAS ces classes localement.
+//
+// Classes disponibles :
+//   Base    : .btn
+//   Couleur : .btn-primary .btn-outline .btn-ghost
+//             .btn-danger  .btn-danger-ghost .btn-success
+//   Taille  : .btn-sm  .btn-lg  .btn-full
+//   Icône   : .icon-btn  .icon-btn--primary  .icon-btn--danger
+//             .icon-btn--ghost-danger
+//   Loader  : .btn-spinner
+// ════════════════════════════════════════════════════════════════════
+
+// ── Base ──────────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 1rem;
+  height: 36px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background   var(--t-base),
+    color        var(--t-base),
+    border-color var(--t-base),
+    box-shadow   var(--t-base),
+    transform    var(--t-fast);
+
+  &:not(:disabled):hover  { transform: translateY(-1px); }
+  &:not(:disabled):active { transform: translateY(0); }
+  &:disabled              { opacity: 0.55; cursor: not-allowed; }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Variantes de couleur ──────────────────────────────────────────
+
+// Primaire — action principale
+.btn-primary {
+  background: var(--c-primary);
+  color: #fff;
+  border-color: var(--c-primary);
+
+  &:hover:not(:disabled) {
+    background: var(--c-primary-hover);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+  }
+  &:active:not(:disabled) { background: var(--c-primary-active); }
+}
+
+// Contour — action secondaire
+.btn-outline {
+  background: transparent;
+  color: var(--c-primary);
+  border-color: var(--border-strong);
+
+  &:hover:not(:disabled) {
+    border-color: var(--c-primary);
+    background: var(--c-primary-light);
+    box-shadow: none;
+  }
+}
+
+// Fantôme — action tertiaire neutre
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+
+  &:hover:not(:disabled) { background: var(--surface-offset); }
+}
+
+// Danger — suppression, action destructrice (fond plein)
+.btn-danger {
+  background: var(--c-danger);
+  color: #fff;
+  border-color: var(--c-danger);
+
+  &:hover:not(:disabled) { background: #b91c1c; }
+}
+
+// Danger fantôme — suppression moins agressive (fond léger)
+.btn-danger-ghost {
+  background: var(--c-danger-light);
+  color: var(--c-danger);
+  border-color: transparent;
+
+  &:hover:not(:disabled) { background: rgba(220, 38, 38, 0.16); }
+}
+
+// Succès — confirmation, validation
+.btn-success {
+  background: var(--c-success);
+  color: #fff;
+  border-color: var(--c-success);
+
+  &:hover:not(:disabled) { background: #15803d; }
+}
+
+// ── Modificateurs de taille ───────────────────────────────────────
+.btn-sm {
+  height: 30px;
+  padding: 0 0.75rem;
+  font-size: 0.775rem;
+}
+
+.btn-lg {
+  height: 46px;
+  padding: 0 1.5rem;
+  font-size: 0.9375rem;
+  border-radius: var(--radius);
+}
+
+// Pleine largeur — bouton de soumission de formulaire
+.btn-full { width: 100%; }
+
+// ── Bouton icône carré ────────────────────────────────────────────
+// Usage : actions de tableau (éditer, supprimer, voir…)
+// Taille fixe 34×34px, toujours carré, jamais de texte.
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background   var(--t-base),
+    color        var(--t-base),
+    border-color var(--t-base),
+    transform    var(--t-fast),
+    box-shadow   var(--t-base);
+
+  &:hover  { transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+  }
+}
+
+.icon-btn--primary {
+  background: var(--c-primary);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.22);
+  &:hover { background: var(--c-primary-hover); }
+}
+
+.icon-btn--danger {
+  color: var(--c-danger);
+  background: var(--c-danger-light);
+  &:hover { background: rgba(220, 38, 38, 0.16); }
+}
+
+// Neutre au repos, rouge au survol — moins alarmant par défaut
+.icon-btn--ghost-danger {
+  color: var(--text-muted);
+  background: transparent;
+  &:hover { color: var(--c-danger); background: var(--c-danger-light); }
+}
+
+// ── Spinner intégré dans un bouton ────────────────────────────────
+// Usage : <span class="btn-spinner"></span> à l'intérieur d'un .btn
+// pendant un état de chargement (désactiver le bouton en parallèle).
+.btn-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+// Variante sombre (pour boutons outline/ghost sur fond clair)
+.btn-spinner--dark {
+  border-color: rgba(37, 99, 235, 0.25);
+  border-top-color: var(--c-primary);
+}
