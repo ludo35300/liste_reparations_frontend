@@ -1,0 +1,85 @@
+// ════════════════════════════════════════════════════════════════════
+// _tokens.scss — Design tokens globaux
+// À importer dans styles.scss : @use 'tokens' as *;
+// ════════════════════════════════════════════════════════════════════
+
+:root {
+
+  // ── Topbar (gris clair) ───────────────────────────────────────
+  --topbar-bg:          #f0f1f5;
+  --topbar-border:      #dde0e9;
+  --topbar-text:        #1e2433;      // texte sombre sur fond clair
+  --topbar-muted:       #6b7280;
+  --topbar-icon:        #4b5563;
+  --topbar-hover:       rgba(0, 0, 0, 0.05);
+
+  // ── Navbar (anthracite sombre) ────────────────────────────────
+  --navbar-bg:          #2b3144;
+  --navbar-border:      rgba(255, 255, 255, 0.06);
+  --navbar-text:        #ffffff;
+  --navbar-muted:       rgba(180, 188, 210, 0.80);
+  --navbar-hover:       rgba(255, 255, 255, 0.06);
+  --navbar-active-bg:   rgba(255, 255, 255, 0.07);
+
+  // ── Hauteurs fixes ────────────────────────────────────────────
+  --topbar-top-h:       52px;
+  --navbar-h:           46px;
+  --header-total-h:     calc(var(--topbar-top-h) + var(--navbar-h));
+
+  // ── Brand rouge ───────────────────────────────────────────────
+  --c-brand:            #e74c3c;
+  --c-brand-hover:      #c0392b;
+  --c-brand-light:      rgba(231, 76, 60, 0.10);
+
+  // ── Primaire (bleu actions) ───────────────────────────────────
+  --c-primary:          #2563eb;
+  --c-primary-hover:    #1d4ed8;
+  --c-primary-active:   #1e40af;
+  --c-primary-light:    rgba(37, 99, 235, 0.10);
+  --c-primary-ring:     rgba(37, 99, 235, 0.22);
+
+  // ── Succès ────────────────────────────────────────────────────
+  --c-success:          #16a34a;
+  --c-success-hover:    #15803d;
+  --c-success-light:    rgba(22, 163, 74, 0.10);
+
+  // ── Danger ────────────────────────────────────────────────────
+  --c-danger:           #ef4444;
+  --c-danger-hover:     #dc2626;
+  --c-danger-light:     rgba(239, 68, 68, 0.10);
+
+  // ── Warning ───────────────────────────────────────────────────
+  --c-warning:          #d97706;
+  --c-warning-light:    rgba(217, 119, 6, 0.10);
+
+  // ── Surfaces page (fond clair) ────────────────────────────────
+  --bg:                 #f4f5f7;
+  --surface:            #ffffff;
+  --surface-2:          #f8f9fb;
+  --surface-offset:     #eef0f5;
+  --border:             #e2e6ef;
+  --border-strong:      #c8cedb;
+
+  // ── Texte ─────────────────────────────────────────────────────
+  --text-dark:          #1e2433;
+  --text:               #374151;
+  --text-muted:         #6b7280;
+  --text-faint:         #9ca3af;
+
+  // ── Radius ───────────────────────────────────────────────────
+  --radius-sm:          0.3rem;
+  --radius:             0.5rem;
+  --radius-lg:          0.75rem;
+  --radius-xl:          1rem;
+  --radius-full:        9999px;
+
+  // ── Ombres ───────────────────────────────────────────────────
+  --shadow-sm:  0 1px 3px rgba(30, 36, 51, 0.07);
+  --shadow-md:  0 4px 12px rgba(30, 36, 51, 0.10);
+  --shadow-lg:  0 12px 32px rgba(30, 36, 51, 0.14);
+
+  // ── Transitions ───────────────────────────────────────────────
+  --t-fast:    120ms ease;
+  --t-base:    180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --t-slow:    300ms cubic-bezier(0.16, 1, 0.3, 1);
+}

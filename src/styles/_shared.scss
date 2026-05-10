@@ -1,0 +1,43 @@
+
+_shared
+// ════════════════════════════════════════════════════════════════════
+// _shared.scss — Composants partagés (boutons, badges, page-header…)
+// Importé une seule fois dans styles.scss
+// ════════════════════════════════════════════════════════════════════
+
+
+// ── Reset & base ─────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-total-h);
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

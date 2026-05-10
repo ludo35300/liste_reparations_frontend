@@ -1,105 +1,167 @@
-<!-- Niveau 1 : se cache au scroll -->
-<div class="topbar-top" [class.hidden]="topbarHidden()">
+<!-- ═══════════════════════════════════════════════════════════════
+  TOPBAR — Niveau 1 (gris clair, se cache au scroll)
+  Layout grid : [ outils gauche ] [ brand centré ] [ user droite ]
+════════════════════════════════════════════════════════════════ -->
+<div class="topbar-top" [class.hidden]="topbarHidden()" role="banner">
 
-  <!-- Gauche : Outils rapides -->
+  <!-- ── Outils gauche ──────────────────────────────────────── -->
   <div class="topbar-tools">
-    <button class="tool-btn" title="Recherche" aria-label="Recherche">
-      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+
+    <!-- Hamburger (ouvre le menu global / sidebar) -->
+    <button class="tool-btn" aria-label="Menu principal">
+      <fa-icon [icon]="faBars"></fa-icon>
     </button>
-    <button class="tool-btn" title="Plein écran" aria-label="Plein écran" (click)="toggleFullscreen()">
+
+    <!-- Plein écran -->
+    <button class="tool-btn" aria-label="Plein écran" (click)="toggleFullscreen()">
       <fa-icon [icon]="faExpand"></fa-icon>
     </button>
-    <button class="tool-btn" title="Notifications" aria-label="Notifications">
-      <fa-icon [icon]="faBell"></fa-icon>
+
+    <!-- Recherche -->
+    <button class="tool-btn" aria-label="Recherche">
+      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
     </button>
+
   </div>
 
-  <!-- Centre : Brand -->
-  <div class="topbar-brand">
-    <div class="brand-icon">
-      <img src="/favicon.svg" alt="Logo réparations" width="28" height="28">
-    </div>
+  <!-- ── Brand centré ────────────────────────────────────────── -->
+  <div class="topbar-brand" aria-label="Accueil">
+    <div class="brand-icon" aria-hidden="true">MR</div>
     <span class="brand-name">Mes Réparations</span>
   </div>
 
-  <!-- Droite : Profil -->
+  <!-- ── Zone droite ─────────────────────────────────────────── -->
   <div class="topbar-right">
+
+    <!-- Notifications avec badge -->
+    <button class="top-icon-btn" aria-label="Notifications">
+      <fa-icon [icon]="faBell"></fa-icon>
+      <span class="top-icon-badge" aria-label="5 notifications">5</span>
+    </button>
+
+    <!-- Messagerie -->
+    <button class="top-icon-btn" aria-label="Messages">
+      <fa-icon [icon]="faEnvelope"></fa-icon>
+    </button>
+
+    <!-- Séparateur -->
+    <div class="topbar-sep" aria-hidden="true"></div>
+
+    <!-- Menu utilisateur -->
     @if (me()) {
       <div class="user-menu" [class.open]="menuOpen()">
+
+        <!-- Chip nom + avatar -->
         <button
           class="user-chip"
           (click)="toggleMenu()"
           [attr.aria-expanded]="menuOpen()"
           aria-haspopup="true"
           [attr.aria-label]="'Menu de ' + me()!.firstName">
-          <div class="avatar">{{ initials() }}</div>
-          <div class="user-info d-none d-sm-flex">
-            <span class="user-name">{{ me()!.firstName }} {{ me()!.lastName }}</span>
-            <span class="user-email">{{ me()!.email }}</span>
+          <span class="user-name d-none d-sm-inline">
+            {{ me()!.firstName }} {{ me()!.lastName }}
+          </span>
+          <div class="avatar-wrap" style="position:relative">
+            <div class="avatar" aria-hidden="true">{{ initials() }}</div>
+            <span class="avatar-status" aria-hidden="true"></span>
           </div>
-          <i class="fas fa-chevron-down chevron" aria-hidden="true"></i>
         </button>
 
+        <!-- Dropdown -->
         @if (menuOpen()) {
-          <div class="dropdown-menu-custom" role="menu">
+          <div class="dropdown-menu-custom" role="menu" aria-label="Menu utilisateur">
+
             <div class="dropdown-header">
-              <div class="avatar avatar-lg">{{ initials() }}</div>
-              <div>
+              <div class="avatar avatar-lg" aria-hidden="true">{{ initials() }}</div>
+              <div class="dropdown-user-info">
                 <p class="dropdown-name">{{ me()!.firstName }} {{ me()!.lastName }}</p>
                 <p class="dropdown-email">{{ me()!.email }}</p>
               </div>
             </div>
-            <div class="dropdown-divider"></div>
-            <button class="dropdown-item-custom disabled" disabled role="menuitem">
-              <i class="fas fa-user" aria-hidden="true"></i>
+
+            <div class="dropdown-divider" role="separator"></div>
+
+            <button class="dropdown-item-custom disabled" disabled role="menuitem" aria-disabled="true">
+              <fa-icon [icon]="faUser" aria-hidden="true"></fa-icon>
               <span>Mon profil</span>
               <span class="badge-soon">Bientôt</span>
             </button>
-            <div class="dropdown-divider"></div>
+
+            <button class="dropdown-item-custom" (click)="toggleFullscreen()" role="menuitem">
+              <fa-icon [icon]="faExpand" aria-hidden="true"></fa-icon>
+              <span>Plein écran</span>
+            </button>
+
+            <div class="dropdown-divider" role="separator"></div>
+
             <button class="dropdown-item-custom danger" (click)="onLogout()" role="menuitem">
-              <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+              <fa-icon [icon]="faSignOut" aria-hidden="true"></fa-icon>
               <span>Déconnexion</span>
             </button>
+
           </div>
         }
+
       </div>
     }
+
   </div>
 </div>
 
-<!-- Niveau 2 : navbar toujours visible -->
-<nav class="topbar-nav" [class.scrolled]="topbarHidden()" aria-label="Navigation principale">
+
+<!-- ═══════════════════════════════════════════════════════════════
+  NAVBAR — Niveau 2 (fond anthracite, toujours visible)
+  Lien actif : texte blanc + border-left rouge
+════════════════════════════════════════════════════════════════ -->
+<nav
+  class="topbar-nav"
+  [class.scrolled]="topbarHidden()"
+  aria-label="Navigation principale">
 
   <!-- Hamburger mobile -->
   <button
-    class="nav-hamburger d-md-none"
+    class="nav-hamburger"
     (click)="mobileNavOpen.set(!mobileNavOpen())"
-    aria-label="Menu">
-    <fa-icon [icon]="faBars" [class.fa-bars]="!mobileNavOpen()" [class.fa-times]="mobileNavOpen()" aria-hidden="true"></fa-icon>
+    [attr.aria-expanded]="mobileNavOpen()"
+    aria-controls="main-nav-links"
+    aria-label="Ouvrir la navigation">
+    @if (mobileNavOpen()) {
+      <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
+    } @else {
+      <fa-icon [icon]="faBars" aria-hidden="true"></fa-icon>
+    }
   </button>
 
-  <!-- Liens desktop -->
-  <div class="nav-links" [class.mobile-open]="mobileNavOpen()">
+  <!-- Liens -->
+  <div
+    class="nav-links"
+    id="main-nav-links"
+    [class.mobile-open]="mobileNavOpen()"
+    role="list">
+
     @for (item of navItems(); track item.route) {
       <a
         [routerLink]="item.route"
         routerLinkActive="nav-active"
         [routerLinkActiveOptions]="{ exact: item.route === '/home' }"
         class="nav-link-item"
+        role="listitem"
         [attr.aria-label]="item.label"
         (click)="mobileNavOpen.set(false)">
         <fa-icon [icon]="item.icon" class="nav-icon" aria-hidden="true"></fa-icon>
         <span class="nav-label">{{ item.label }}</span>
       </a>
     }
+
   </div>
 
-  <!-- Breadcrumb droite -->
+  <!-- Breadcrumb droite (desktop) -->
   @if (pageTitle()) {
-    <div class="nav-breadcrumb d-none d-lg-flex">
-      <i class="fas fa-home" aria-hidden="true"></i>
-      <i class="fas fa-chevron-right breadcrumb-sep" aria-hidden="true"></i>
+    <div class="nav-breadcrumb" aria-label="Fil d'Ariane">
+      <fa-icon [icon]="faHome" aria-hidden="true"></fa-icon>
+      <fa-icon [icon]="faChevronRight" class="breadcrumb-sep" aria-hidden="true"></fa-icon>
       <span class="breadcrumb-current">{{ pageTitle() }}</span>
     </div>
   }
+
 </nav>
