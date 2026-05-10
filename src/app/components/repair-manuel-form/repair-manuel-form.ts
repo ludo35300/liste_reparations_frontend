@@ -4,8 +4,6 @@ import { FormArray, FormBuilder, FormsModule, ReactiveFormsModule, Validators } 
 import { firstValueFrom } from 'rxjs';
 import { Reparation } from '../../models/reparation.model';
 import { MachineService } from '../../services/machine.service';
-import { ReferenceService } from '../../services/references.services';
-import { ReparationService } from '../../services/reparation.service';
 import { Marque } from '../../models/marque.model';
 import { Modele } from '../../models/modele.model';
 import { Machine } from '../../models/machine.model';
@@ -13,6 +11,8 @@ import { TechnicienOption } from '../../models/user.model';
 import { PieceChangee, PieceRef } from '../../models/piece.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheck, faFloppyDisk, faPlus, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ReferenceService } from '../../services/references.service';
+import { ReparationService } from '../../services/reparation.service';
 
 
 export interface RepairManualSubmit {
@@ -257,7 +257,6 @@ export class RepairManuelForm implements OnInit {
         (p): p is PieceChangee => !!p && p.quantite > 0,
       ),
     };
-    console.log('Submitting repair manual form with payload:', payload);
 
     this.submitted.emit(payload);
   }
