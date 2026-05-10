@@ -1,20 +1,5 @@
 :host {
-  --primary:       #4460f1;
-  --primary-soft:  rgba(68, 96, 241, 0.10);
-  --surface:       #ffffff;
-  --bg:            #f3f6fb;
-  --text-dark:     #1f2937;
-  --text:          #566a7f;
-  --text-muted:    #8a94a6;
-  --border:        #e6ebf2;
-  --danger:        #dc2626;
-  --radius:        18px;
-  --radius-md:     12px;
-  --radius-sm:     8px;
-  --radius-pill:   999px;
-  --shadow-sm:     0 2px 8px rgba(15,23,42,0.06);
-  --shadow-md:     0 8px 24px rgba(15,23,42,0.10);
-  --transition:    180ms cubic-bezier(0.16,1,0.3,1);
+  display: block; // si besoin
 }
 
 .layout { display: flex; min-height: 100vh; background: var(--bg); }
@@ -229,12 +214,6 @@
     color: var(--primary);
     border-color: rgba(68,96,241,0.25);
   }
-}
-
-// ── Skeleton ──────────────────────────────────────────────────
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
 }
 
 .skeleton {

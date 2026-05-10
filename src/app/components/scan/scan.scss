@@ -1,25 +1,5 @@
 :host {
-  /* ✅ Couleurs alignées avec le thème global */
-  --primary:       #4460f1;
-  --primary-light: rgba(68, 96, 241, 0.12);
-  --surface:       #ffffff;
-  --bg:            #f0f2f8;
-  --text:          #566a7f;
-  --text-dark:     #2b2d42;
-  --text-muted:    #8898aa;
-  --border:        #e2e8f0;
-  --success:       #16a34a;
-  --danger:        #dc2626;
-  --danger-light:  #fee2e2;
-  --radius:        12px;
-  --radius-sm:     8px;
-  --shadow-sm:     0 2px 8px rgba(43, 45, 66, 0.07);
-  --shadow-md:     0 6px 24px rgba(43, 45, 66, 0.13);
-  --transition:    0.2s ease;
-
-  /* ✅ Sync avec les hauteurs de la topbar */
-  --topbar-top-h:  56px;
-  --navbar-h:      48px;
+  display: block; // si besoin
 }
 
 /* ─── Layout ─────────────────────────────────────────── */
@@ -195,10 +175,6 @@
   animation: fadeSlideIn 0.35s ease;
 }
 
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
 
 /* ─── STEP 1 — Upload ─────────────────────────────────────── */
 .upload-zone {
@@ -314,10 +290,7 @@
   animation: pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%       { transform: scale(1.5); opacity: 0.5; }
-}
+
 
 .analyse-title {
   font-size: 1.15rem;
@@ -801,9 +774,6 @@
   cursor: not-allowed;
   box-shadow: none;
 }
-
-/* ─── Animations ──────────────────────────────────────────── */
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ─── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 768px) {

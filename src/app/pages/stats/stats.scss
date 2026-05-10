@@ -1,23 +1,6 @@
 :host {
-  /* ✅ Couleurs alignées avec le thème global */
-  --primary:       #4460f1;
-  --primary-light: rgba(68, 96, 241, 0.12);
-  --surface:       #ffffff;
-  --bg:            #f0f2f8;
-  --text:          #566a7f;
-  --text-dark:     #2b2d42;
-  --text-muted:    #8898aa;
-  --border:        #e2e8f0;
-  --success:       #16a34a;
-  --danger:        #dc2626;
-  --danger-light:  #fee2e2;
-  --radius:        12px;
-  --radius-sm:     8px;
-  --shadow-sm:     0 2px 8px rgba(43, 45, 66, 0.07);
-  --shadow-md:     0 6px 24px rgba(43, 45, 66, 0.13);
-  --transition:    0.2s ease;
+  display: block; // si besoin
 }
-
 /* ─── Layout ─────────────────────────────────────────── */
 .layout {
   display: flex;
@@ -271,11 +254,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-// ── Skeleton ──────────────────────────────────────────────────
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
 
 .skeleton {
   display: block;
