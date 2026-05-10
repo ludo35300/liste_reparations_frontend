@@ -13,7 +13,6 @@ import {
 } from '../../components/repair-manuel-form/repair-manuel-form';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { NavService } from '../../core/nav.service';
-import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Reparation, } from '../../models/reparation.model';
 import { ReparationService } from '../../services/reparation.service';
 import { MachineService } from '../../services/machine.service';
@@ -22,6 +21,8 @@ import { Marque } from '../../models/marque.model';
 import { Modele } from '../../models/modele.model';
 import { Machine } from '../../models/machine.model';
 import { TechnicienOption } from '../../models/user.model';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ReferenceService } from '../../services/references.service';
 
 @Component({
   selector: 'app-add-repair',
@@ -42,11 +43,12 @@ export class AddRepair implements OnInit {
   private readonly router = inject(Router);
   private readonly reparationService = inject(ReparationService);
   private readonly technicienService = inject(TechnicienService);
+  private readonly referenceService = inject(ReferenceService);
   private readonly machineService = inject(MachineService);
 
   protected readonly navItems = inject(NavService).navItems;
 
-  public readonly me = signal<MeResponse | null>(null);
+  protected readonly me = this.auth.meSignal;
   public readonly errorMessage = signal<string | null>(null);
   public readonly saving = signal(false);
 
@@ -69,7 +71,6 @@ export class AddRepair implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await Promise.all([
-      this.loadMe(),
       this.loadTechniciens(),
       this.loadMarques(),
       this.loadModeles(),
@@ -120,20 +121,17 @@ export class AddRepair implements OnInit {
     }
   }
 
-  public onRepairSubmitted(payload: Reparation): void {
+  public async onRepairSubmitted(payload: Reparation): Promise<void> {
     this.saving.set(true);
     this.errorMessage.set(null);
-    console.log('Submitting repair:', payload.numero_serie);
-    this.reparationService.enregistrer(payload).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.router.navigate(['/history/'+payload.numero_serie]);
-      },
-      error: () => {
-        this.saving.set(false);
-        this.errorMessage.set("Erreur lors de l'enregistrement de la réparation.");
-      },
-    });
+    try {
+      await firstValueFrom(this.reparationService.enregistrer(payload));
+      await this.router.navigate(['/history', payload.numero_serie]);
+    } catch {
+      this.errorMessage.set("Erreur lors de l'enregistrement de la réparation.");
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   private async findOrCreateMachine(payload: RepairManualSubmit): Promise<Machine> {
@@ -153,10 +151,9 @@ export class AddRepair implements OnInit {
           notes: payload.notes ?? '',
         })
       );
-    } catch (err: any) {
-      if (err?.status === 409) {
-        // Le body du 409 contient souvent l'id de la ressource existante
-        const existing = err?.error?.existing ?? err?.error?.machine ?? err?.error ?? null;
+    } catch (err: unknown) {
+      if (err instanceof HttpErrorResponse && err.status === 409) {
+        const existing = err.error?.existing ?? err.error?.machine ?? err.error ?? null;
         if (existing?.id) return existing as Machine;
 
         const result = await firstValueFrom(
@@ -173,15 +170,6 @@ export class AddRepair implements OnInit {
     }
   }
 
-  private async loadMe(): Promise<void> {
-    try {
-      const me = await firstValueFrom(this.auth.getMeHttp());
-      this.me.set(me);
-    } catch {
-      this.errorMessage.set(null);
-    }
-  }
-
   private async loadTechniciens(): Promise<void> {
     try {
       const techniciens = await firstValueFrom(this.technicienService.getAll());
@@ -193,7 +181,7 @@ export class AddRepair implements OnInit {
 
   private async loadMarques(): Promise<void> {
     try {
-      const marques = await firstValueFrom(this.machineService.getMarques());
+      const marques = await firstValueFrom(this.referenceService.getAllMarques());
       this.marques.set(marques ?? []);
     } catch {
       this.marques.set([]);
@@ -202,7 +190,7 @@ export class AddRepair implements OnInit {
 
   private async loadModeles(): Promise<void> {
     try {
-      const modeles = await firstValueFrom(this.machineService.getModeles());
+      const modeles = await firstValueFrom(this.referenceService.getAllModeles());
       this.modeles.set(modeles ?? []);
     } catch {
       this.modeles.set([]);

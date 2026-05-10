@@ -51,7 +51,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         switchMap(() => next(req)),
         catchError((refreshErr) => {
           const returnUrl = router.url;
-          router.navigate(['/login'], { queryParams: { returnUrl } });
+          const loginRoute = cfg.routes?.login ?? '/auth/login';
+          router.navigate([loginRoute], { queryParams: { returnUrl } });
           return throwError(() => refreshErr);
         }),
       );

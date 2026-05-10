@@ -25,9 +25,9 @@ import { Marque }            from '../../models/marque.model';
 import { Modele }            from '../../models/modele.model';
 import { TechnicienOption }  from '../../models/user.model';
 import { NavService }        from '../../core/nav.service';
-import { ReferenceService }  from '../../services/references.services';
 import { OcrResult }         from '../../models/ocr.model';
 import { PieceChangee, PieceRef }      from '../../models/piece.model';
+import { ReferenceService } from '../../services/references.service';
 
 type ScanState = 'idle' | 'loading-image' | 'analysing' | 'success' | 'ocr-failed';
 
