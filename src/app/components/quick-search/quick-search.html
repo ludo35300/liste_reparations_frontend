@@ -11,6 +11,7 @@
         <span class="input-group-text" id="basic-addon1"><fa-icon [icon]="faSearch"></fa-icon></span>
         <input
           class="form-control"
+          type="text"
           [ngModel]="query()"
           (ngModelChange)="searchChange($event)"
           placeholder="Numéro de série de la machine…"
