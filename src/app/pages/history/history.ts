@@ -16,25 +16,10 @@ import { StatutMachine }     from '../../models/statut.model';
 import { Topbar }            from '../../components/topbar/topbar';
 import { NavService }        from '../../core/nav.service';
 import { faTrash, faWarning, faPen, faCheck, faXmark, faArrowLeft, faClock, faPlus, faListCheck, faWrench, faGears, faGrip, faQrcode, faMagnifyingGlass, faBell, faBars, faExpand, faSpinner, faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import { STATUTS, TYPES_ACTION } from '../../const/constantes';
 
 type ActiveTab = 'pieces' | 'actions';
 
-const TYPES_ACTION = [
-  { value: 'diagnostic',          label: '🔍 Diagnostic' },
-  { value: 'demontage',           label: '🔧 Démontage' },
-  { value: 'remplacement_piece',  label: '🔩 Remplacement pièce' },
-  { value: 'nettoyage',           label: '🧹 Nettoyage' },
-  { value: 'test',                label: '✅ Test' },
-  { value: 'commentaire',         label: '💬 Commentaire' },
-  { value: 'statut',              label: '🔄 Changement de statut' },
-] as const;
-
-const STATUTS: { value: StatutMachine; label: string; cls: string }[] = [
-  { value: 'en_attente',    label: 'En attente',    cls: 'badge--waiting' },
-  { value: 'en_reparation', label: 'En réparation', cls: 'badge--progress' },
-  { value: 'pret',          label: 'Prêt',          cls: 'badge--ready' },
-  { value: 'termine',       label: 'Terminé',       cls: 'badge--done' },
-];
 
 @Component({
   selector: 'app-history',
@@ -169,7 +154,7 @@ export class History implements OnInit {
 
   // ── Statut machine ─────────────────────────────────────────
   getStatutCls(statut?: string): string {
-    return STATUTS.find(s => s.value === statut)?.cls ?? '';
+    return STATUTS.find(s => s.value === statut)?.couleur ?? '';
   }
 
   openEditStatut(): void {

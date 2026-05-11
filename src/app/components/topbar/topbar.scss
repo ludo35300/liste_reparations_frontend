@@ -97,27 +97,6 @@
   gap: 0.25rem;
 }
 
-// Drapeau / langue
-.lang-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px; height: 34px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: background var(--t-base);
-
-  &:hover { background: var(--topbar-hover); }
-
-  img {
-    width: 22px; height: 16px;
-    border-radius: 2px;
-    object-fit: cover;
-    display: block;
-  }
-}
 
 // Bouton icône droite (cloche, mail)
 .top-icon-btn {

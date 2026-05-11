@@ -1,43 +1,71 @@
-<div class="quick-search-shell">
-  <div class="quick-search-bar">
-    <input
-      class="quick-search-input"
-      [ngModel]="query()"
-      (ngModelChange)="query.set($event)"
-      placeholder="Rechercher un numéro de série..."
-      (keyup.enter)="rechercher()"
-    />
+<div class="quick-search-shell" #searchRoot>
+  <div class="quick-search-card">
+    <div class="quick-search-header">
+      <div>
+        <p class="quick-search-kicker">Recherche rapide par numéro de série</p>
+      </div>
+    </div>
 
-    <button
-      class="quick-search-btn"
-      (click)="rechercher()"
-      [disabled]="loading()"
-    >
-      @if (loading()) {
-        <span class="btn-spinner" aria-hidden="true"></span>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1"><fa-icon [icon]="faSearch"></fa-icon></span>
+        <input
+          class="form-control"
+          [ngModel]="query()"
+          (ngModelChange)="searchChange($event)"
+          placeholder="Numéro de série de la machine…"
+          autocomplete="off"
+        />
+
+        @if (query().length > 0) {
+          <button class="btn btn-danger-ghost" type="button"(click)="clearSearch()" aria-label="Effacer">x</button>
+        }
+      </div>
+
+
+    @if (loading()) {
+      <div class="quick-search-state">Recherche en cours…</div>
+    }
+
+    @if (errorMessage()) {
+      <div class="alert-danger" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (searched() && !loading()) {
+      @if (hasResults()) {
+        <ul class="search-results-list">
+          @for (machine of machines(); track machine.id) {
+            <li class="search-result-item" (click)="openMachine(machine)">
+              <div class="search-result-main">
+                <strong>{{ machine.modele?.type_machine}} {{ machine.modele?.marque?.nom || 'Marque inconnue' }} {{ machine.modele?.nom || 'Modèle inconnu' }}</strong>
+                <span>{{ machine.numero_serie }}</span>
+              </div>
+              <div class="search-result-meta">
+                <span class="badge {{ getStatutCouleur(machine.statut) }}">
+                  {{ labelStatut(machine?.statut) }}
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
       } @else {
-        Rechercher
+        <div class="alert alert-warning alert-machine" role="alert">
+          <div class="alert-machine__content">
+            <div class="alert-machine__body">
+              <h4 class="alert-heading mb-1">Aucune machine enregistrée</h4>
+              <p class="mb-0">
+                Vous pouvez créer une nouvelle réparation pour commencer le suivi.
+              </p>
+
+              <button class="btn btn-primary mt-3" (click)="nouvelleReparation()">
+                Créer une nouvelle réparation
+              </button>
+            </div>
+          </div>
+        </div>
       }
-    </button>
-
-    <button class="quick-search-clear" (click)="clear()" *ngIf="query()">
-      ×
-    </button>
-
-    <button class="quick-search-new" (click)="nouvelleReparation()">
-      + Nouvelle réparation
-    </button>
+    }
   </div>
-
-  @if (errorMessage()) {
-    <div class="quick-search-error">
-      {{ errorMessage() }}
-    </div>
-  }
-
-  @if (searched() && searchResult() && !searchResult()!.found) {
-    <div class="quick-search-empty">
-      Aucun résultat pour <strong>{{ query() }}</strong>
-    </div>
-  }
 </div>

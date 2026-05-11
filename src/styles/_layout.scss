@@ -26,8 +26,19 @@
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: calc(var(--topbar-top-h) + var(--navbar-h) + 1.75rem) 2.5rem 3rem;
+  padding: calc(var(--header-total-h) + 1.75rem) 2.5rem 3rem;
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+
+
+.search-host {
+  position: fixed;
+  top: var(--topbar-total-h);
+  left: 0;
+  right: 0;
+  z-index: 1025;
 }
 
 // ── En-tête de section ────────────────────────────────────────────

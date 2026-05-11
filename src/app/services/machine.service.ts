@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Reparation } from '../models/reparation.model';
@@ -20,6 +20,11 @@ export class MachineService {
     return this.http.get<Machine>(
       `${this.apiUrl}/machines/serie/${encodeURIComponent(numeroSerie)}`
     );
+  }
+
+  public search(query: string): Observable<Machine[]> {
+    const params = new HttpParams().set('q', query);
+    return this.http.get<Machine[]>(`${this.apiUrl}/machines/search`, { params });
   }
 
   public create(payload: CreateMachinePayload): Observable<Machine> {

@@ -70,6 +70,13 @@
             </div>
 
             <div class="quick-links">
+              <a class="quick-link" type="button" (click)="openQuickSearch()">
+                <div class="quick-icon"><fa-icon [icon]="faMagnifyingGlass"></fa-icon></div>
+                <div class="quick-content">
+                  <strong>Rechercher une machine</strong>
+                  <p>Consulter l’historique par numéro de série.</p>
+                </div>
+              </a>
               @for (link of quickLinks; track link.route) {
                 <a class="quick-link" [routerLink]="link.route">
                   <div class="quick-icon"><fa-icon [icon]="link.icon"></fa-icon></div>

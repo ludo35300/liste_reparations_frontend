@@ -10,6 +10,6 @@ export class NavService {
     { label: 'Mes réparations', route: '/my-repairs', icon: faWrench },
     { label: 'Ajout Réparation',      route: '/ajout-repair',   icon: faQrcode },
     /*{ label: 'Statistiques', route: '/stats',  icon: faChartBar },*/
-    { label: 'Rechercher',   route: '/search', icon: faMagnifyingGlass },
+    /*{ label: 'Rechercher',   route: '/search', icon: faMagnifyingGlass },*/
   ];
 }

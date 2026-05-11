@@ -2,17 +2,12 @@
   TOPBAR — Niveau 1 (gris clair, se cache au scroll)
   Layout grid : [ outils gauche ] [ brand centré ] [ user droite ]
 ════════════════════════════════════════════════════════════════ -->
-<app-quick-search></app-quick-search>
+
 
 <div class="topbar-top" [class.hidden]="topbarHidden()" role="banner">
 
   <!-- ── Outils gauche ──────────────────────────────────────── -->
   <div class="topbar-tools">
-
-    <!-- Hamburger (ouvre le menu global / sidebar) -->
-    <button class="tool-btn" aria-label="Menu principal">
-      <fa-icon [icon]="faBars"></fa-icon>
-    </button>
 
     <!-- Plein écran -->
     <button class="tool-btn" aria-label="Plein écran" (click)="toggleFullscreen()">
@@ -20,7 +15,7 @@
     </button>
 
     <!-- Recherche -->
-    <button class="tool-btn" aria-label="Recherche">
+    <button class="tool-btn" aria-label="Recherche" (click)="toggleSearch()">
       <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
     </button>
 
@@ -167,3 +162,10 @@
   }
 
 </nav>
+
+// Barre de recherche rapide de machines
+
+@if (searchOpen()) {
+  <app-quick-search (closed)="closeSearch()"></app-quick-search>
+}
+

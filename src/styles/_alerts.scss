@@ -1,0 +1,49 @@
+.alert-machine {
+  border-left-width: 6px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.12);
+  padding: 1rem 1.15rem;
+}
+
+.alert-machine__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.alert-machine__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-machine .alert-heading {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.alert-machine p {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.alert-machine .btn-primary {
+  border-radius: 10px;
+}
+
+.alert-machine .btn-close {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .alert-machine__content {
+    flex-direction: column;
+  }
+
+  .alert-machine .btn-close {
+    align-self: flex-end;
+    margin-top: 0;
+  }
+}
