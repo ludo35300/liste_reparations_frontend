@@ -7,3 +7,8 @@
 
 /* Quand topbar-top cachée, la navbar monte */
 body.topbar-hidden .topbar-nav { top: 0 !important; }
+
+body.search-open .main-content {
+  top: calc(var(--topbar-total-h) + var(--quick-search-h));
+}
+

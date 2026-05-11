@@ -7,6 +7,7 @@ import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { Topbar } from '../../components/topbar/topbar';
 import { NavService } from '../../core/nav.service';
+import { SearchBarStateService } from '../../services/search.service';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,7 @@ import { NavService } from '../../core/nav.service';
 export class Home implements OnInit {
   private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
-
+  private readonly searchBarState = inject(SearchBarStateService);
   protected readonly navItems = inject(NavService).navItems; // Injection du menu partagé
 
 
@@ -46,12 +47,6 @@ export class Home implements OnInit {
 
   public readonly quickLinks = [
     {
-      route: '/search',
-      title: 'Rechercher une machine',
-      desc: 'Consulter l’historique par numéro de série.',
-      icon: faMagnifyingGlass,
-    },
-    {
       route: '/ajout-repair',
       title: 'Ajouter une réparation',
       desc: 'Créer une nouvelle intervention rapidement.',
@@ -71,6 +66,10 @@ export class Home implements OnInit {
         this.loading.set(false);
       }
     })();
+  }
+
+  public openQuickSearch(): void {
+    this.searchBarState.show();
   }
 
   public async logout(): Promise<void> {

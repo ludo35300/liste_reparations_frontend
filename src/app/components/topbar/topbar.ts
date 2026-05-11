@@ -1,6 +1,7 @@
 import {
   Component, computed, input, output, signal,
-  HostListener, OnInit
+  HostListener, OnInit,
+  inject
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -17,9 +18,10 @@ import {
   faTimes,
   faUser,
   faWrench,
+  faSignOut
 } from '@fortawesome/free-solid-svg-icons';
-import { faSignOut } from '@fortawesome/free-solid-svg-icons';
 import { QuickSearch } from '../quick-search/quick-search';
+import { SearchBarStateService } from '../../services/search.service';
 
 export interface NavItem {
   label: string;
@@ -36,6 +38,8 @@ export interface NavItem {
 })
 export class Topbar implements OnInit {
 
+  private readonly searchBarState = inject(SearchBarStateService);
+
   // ── Inputs / Outputs ────────────────────────────────────────────
   public readonly me        = input<MeResponse | null>(null);
   public readonly pageTitle = input<string>('');
@@ -46,6 +50,7 @@ export class Topbar implements OnInit {
   public readonly menuOpen      = signal(false);
   public readonly mobileNavOpen = signal(false);
   public readonly topbarHidden  = signal(false);
+  public readonly searchOpen = this.searchBarState.open;
 
   // ── Icônes ──────────────────────────────────────────────────────
   public readonly faBars            = faBars;
@@ -73,12 +78,10 @@ export class Topbar implements OnInit {
 
   // ── Actions ──────────────────────────────────────────────────────
   public toggleMenu(): void { this.menuOpen.update(v => !v); }
-
   public onLogout(): void {
     this.menuOpen.set(false);
     this.logoutEvt.emit();
   }
-
   public toggleFullscreen(): void {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
@@ -86,6 +89,25 @@ export class Topbar implements OnInit {
       document.exitFullscreen().catch(() => {});
     }
   }
+  public toggleSearch(): void {
+    this.searchBarState.toggle();
+    document.body.classList.toggle('search-open', this.searchBarState.open());
+  }
+
+  public closeSearch(): void {
+    this.searchBarState.hide();
+    document.body.classList.remove('search-open');
+  }
+
+  public toggleMobileNav(): void {
+    this.mobileNavOpen.update(v => !v);
+  }
+
+  public closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
+  }
+
+
 
   // ── Listeners ────────────────────────────────────────────────────
   @HostListener('window:scroll')
@@ -100,7 +122,6 @@ export class Topbar implements OnInit {
     }
     this.lastScrollY = y;
   }
-
   @HostListener('document:click', ['$event'])
   onDocumentClick(e: MouseEvent): void {
     if (!(e.target as HTMLElement).closest('app-topbar')) {
@@ -108,7 +129,6 @@ export class Topbar implements OnInit {
       this.mobileNavOpen.set(false);
     }
   }
-
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.menuOpen.set(false);

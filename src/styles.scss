@@ -22,6 +22,7 @@
 @use './styles/layout';   // structure de page, header, main-content
 @use './styles/buttons';  // styles de boutons globaux (primary, outline, sizes)
 @use './styles/badges';   // styles de badges globaux (status, generic, sizes)
+@use './styles/alerts';   // styles d'alertes globales (success, error, info, warning)
 
 // ── 2. Police ────────────────────────────────────────────────────
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..800&display=swap');
@@ -31,6 +32,8 @@
 body.has-topbar {
   padding-top: var(--header-total-h);
 }
+
+
 // ── Classe ajoutée par le HostListener de topbar.ts ──────────────
 // Quand la topbar se cache, la navbar remonte — on ajuste le padding
 body.topbar-hidden {
@@ -109,7 +112,7 @@ body {
 
 // Éléments de contenu
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
-input, button, textarea, select  { font: inherit; color: inherit; }
+button, textarea, select  { font: inherit; color: inherit; }
 h1, h2, h3, h4, h5, h6          { line-height: 1.2; color: var(--text-dark); }
 button                           { cursor: pointer; background: none; border: none; }
 

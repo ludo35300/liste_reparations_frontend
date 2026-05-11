@@ -19,11 +19,8 @@
       <!-- ── En-tête de page ─────────────────────────────── -->
       <div class="page-header">
         <div class="page-header-left">
-          <button class="btn-back" (click)="retour()" aria-label="Retour">
-            <fa-icon [icon]="faArrowLeft"></fa-icon>
-          </button>
           <div>
-            <h2 class="page-title">{{ numeroSerie() }}</h2>
+            <h5 class="page-title">N° de série: {{ numeroSerie() }}</h5>
             <p class="page-subtitle">
               {{ reparations().length }}
               intervention{{ reparations().length > 1 ? 's' : '' }}
@@ -54,7 +51,7 @@
               <div class="item-date">{{ rep.date_reparation | date:'d MMM y' }}</div>
               <div class="item-tech">{{ rep.technicien || 'Technicien N/A' }}</div>
               <div class="item-badges">
-                <span class="item-badge">
+                <span class="badge badge-progress">
                   {{ rep.pieces.length }} pièce{{ rep.pieces.length > 1 ? 's' : '' }}
                 </span>
                 @if (rep.actions && rep.actions.length > 0) {

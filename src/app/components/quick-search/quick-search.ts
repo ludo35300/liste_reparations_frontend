@@ -1,73 +1,113 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, ElementRef, EventEmitter, HostListener, inject, OnInit, Output, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-import { ReparationService } from '../../services/reparation.service';
 import { AuthService } from '../../auth-lib/services/auth.service';
-import { SearchResult } from '../../models/search.model';
-import { Reparation } from '../../models/reparation.model';
+import { MeResponse } from '../../auth-lib/models/auth.model';
+import { MachineService } from '../../services/machine.service';
+import { Machine } from '../../models/machine.model';
+import { STATUTS } from '../../const/constantes';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-quick-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './quick-search.html',
   styleUrl: './quick-search.scss',
 })
-export class QuickSearch {
-  private readonly service = inject(ReparationService);
+export class QuickSearch implements OnInit {
+  private readonly service = inject(MachineService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly query = signal('');
-  protected readonly loading = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
-  protected readonly searchResult = signal<SearchResult | null>(null);
-  protected readonly searched = signal(false);
+  @ViewChild('searchRoot') searchRoot?: ElementRef<HTMLElement>;
+  @Output() closed = new EventEmitter<void>();
 
-  async rechercher(): Promise<void> {
-    const q = this.query().trim();
-    if (!q) return;
+  readonly me = signal<MeResponse | null>(null);
+  readonly query = signal('');
+  readonly loading = signal(false);
+  readonly searched = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly machines = signal<Machine[]>([]);
 
-    this.loading.set(true);
-    this.errorMessage.set(null);
-    this.searchResult.set(null);
+  readonly hasResults = computed(() => this.machines().length > 0);
 
-    try {
-      const data = await firstValueFrom(this.service.search(q));
-      this.searchResult.set(data);
-      this.searched.set(true);
+  public readonly faSearch = faSearch;
 
-      if (data?.found && data?.numero_serie) {
-        await this.router.navigate(['/history', data.numero_serie]);
-      }
-    } catch (err: any) {
-      if (err?.status === 404) {
-        this.searchResult.set({
-          found: false,
-          numero_serie: q,
-          nombre_reparations: 0,
-          reparations: [],
-        });
-        this.searched.set(true);
-      } else {
-        this.errorMessage.set('Erreur lors de la recherche.');
-      }
-    } finally {
-      this.loading.set(false);
+  ngOnInit(): void {
+    firstValueFrom(this.auth.getMeHttp())
+      .then(me => this.me.set(me))
+      .catch(() => {});
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!this.searchRoot?.nativeElement.contains(target)) {
+      this.closeSearch();
     }
   }
 
-  async nouvelleReparation(): Promise<void> {
-    await this.router.navigate(['/ajout-repair']);
+  searchChange(value: string): void {
+    this.query.set(value);
+    const q = value.trim();
+
+    if (q.length < 2) {
+      this.loading.set(false);
+      this.searched.set(false);
+      this.errorMessage.set(null);
+      this.machines.set([]);
+      return;
+    }
+
+    this.loading.set(true);
+    this.errorMessage.set(null);
+    this.searched.set(true);
+
+    this.service.search(q).subscribe({
+      next: (data) => {
+        this.machines.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Erreur lors de la recherche.');
+        this.loading.set(false);
+      },
+    });
   }
 
-  clear(): void {
+  clearSearch(): void {
     this.query.set('');
+    this.loading.set(false);
     this.searched.set(false);
-    this.searchResult.set(null);
     this.errorMessage.set(null);
+    this.machines.set([]);
   }
+
+  closeSearch(): void {
+    this.closed.emit();
+  }
+
+  openMachine(machine: Machine): void {
+    this.closeSearch();
+    this.router.navigate(['/history/', machine.numero_serie]);
+  }
+
+  nouvelleReparation(): void {
+    this.router.navigate(['/ajout-repair']);
+  }
+
+
+  //helpers
+  labelStatut(statut?: string): string {
+      return STATUTS.find(s => s.value === statut)?.label ?? statut ?? '';
+  }
+  getStatutCouleur(statut?: string): string {
+    return STATUTS.find(s => s.value === statut)?.couleur ?? '';
+  }
+
 }
