@@ -20,6 +20,17 @@
       @if (errorMessage()) {
         <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
       }
+
+      @if (me()) {
+        @if (me()!.firstName === 'Amaury') {
+          <div class="alert alert-success" role="alert">
+            <fa-icon [icon]="faThumbsUp" class="me-2"></fa-icon>
+            Amaury, problème d'enregistrement par scan résolu et affichage du nom corrigé :)
+          </div>
+        }
+      }
+
+
       <!-- Contenu principal -->
       @if (me()) {
         <!-- === SECTION HÉRO === -->
