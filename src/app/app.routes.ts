@@ -18,12 +18,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/scan/scan').then(m => m.Scan)
   },
   {
-    path: 'search',
-    title: 'Rechercher une machine',
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/search/search').then(m => m.Search)
-  },
-  {
     path: 'history/:numeroSerie',
     title: 'Historique machine',
     canActivate: [authGuard],
