@@ -168,6 +168,7 @@
 .icon-btn--danger {
   color: var(--c-danger);
   background: var(--c-danger-light);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.22);
   &:hover { background: rgba(220, 38, 38, 0.16); }
 }
 
