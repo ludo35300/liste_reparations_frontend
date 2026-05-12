@@ -16,6 +16,18 @@ export class MachineService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api';
 
+  public getMachines(): Observable<Machine[]> {
+    return this.http.get<Machine[]>(`${this.apiUrl}/machines`);
+  }
+
+  public getById(id: number): Observable<Machine> {
+    return this.http.get<Machine>(`${this.apiUrl}/machines/${id}`);
+  }
+
+  public deleteMachine(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/machines/${id}`);
+  }
+
   public getByNumeroSerie(numeroSerie: string): Observable<Machine> {
     return this.http.get<Machine>(
       `${this.apiUrl}/machines/serie/${encodeURIComponent(numeroSerie)}`
