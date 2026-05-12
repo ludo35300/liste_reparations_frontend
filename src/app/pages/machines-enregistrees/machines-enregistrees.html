@@ -1,0 +1,118 @@
+<div class="layout">
+  <div class="layout-right">
+
+    <app-topbar
+      [me]="me()"
+      pageTitle="Machines"
+      [navItems]="navItems"
+      (logoutEvt)="logout()"
+    />
+
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Machines enregistrées</h1>
+          <p class="page-subtitle">Liste complète des machines avec modification et suppression.</p>
+        </div>
+
+        <div class="search-wrapper">
+          <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
+          <input
+            class="search-input"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            placeholder="Rechercher une machine"
+            autocomplete="off" />
+          @if (searchQuery()) {
+            <button type="button" class="search-clear" (click)="searchQuery.set('')" aria-label="Effacer">
+              <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-danger">{{ error() }}</div>
+      }
+
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="spinner-border text-primary" role="status"></div>
+          <span>Chargement des machines…</span>
+        </div>
+      }
+
+      @if (!loading() && filteredMachines().length > 0) {
+        <div class="table-wrapper">
+          <table class="machines-table">
+            <thead>
+              <tr>
+                <th>Numéro de série</th>
+                <th>Marque</th>
+                <th>Modèle</th>
+                <th>Statut</th>
+                <th>Créée le</th>
+                <th class="actions-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (machine of filteredMachines(); track machine.id) {
+                <tr>
+                  <td><span class="serie-badge">{{ machine.numero_serie }}</span></td>
+                  <td>
+                    <div class="brand-cell">
+                      @if (machine.modele?.marque?.url_logo) {
+                        <img
+                          [src]="machine.modele?.marque?.url_logo"
+                          [alt]="machine.modele?.marque?.nom"
+                          class="brand-logo" />
+                      }
+                      <span>{{ machine.modele?.marque?.nom ?? '—' }}</span>
+                    </div>
+                  </td>
+                  <td>{{ machine.modele ? (machine.modele.type_machine + ' ' + machine.modele.nom) : '—' }}</td>
+                  <td>
+                    <span class="statut-badge statut-badge--{{ machine.statut }}">
+                      <fa-icon [icon]="statutIcon(machine.statut)" class="statut-icon"></fa-icon>
+                      {{ statutLabel(machine.statut) }}
+                    </span>
+                  </td>
+                  <td>{{ machine.created_at ? (machine.created_at | date:'dd/MM/yyyy') : '—' }}</td>
+                  <td>
+                    <div class="actions">
+                      <button type="button" class="action-btn action-btn--edit" (click)="modifier(machine)" title="Modifier">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                      </button>
+                      <button type="button" class="action-btn action-btn--delete" (click)="demanderSuppression(machine.id)" title="Supprimer">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (!loading() && filteredMachines().length === 0 && !error()) {
+        <div class="empty-state">
+          <p>{{ searchQuery() ? 'Aucune machine ne correspond à votre recherche.' : 'Aucune machine enregistrée.' }}</p>
+        </div>
+      }
+
+      @if (confirmDeleteId()) {
+        <div class="modal-backdrop" (click)="annulerSuppression()">
+          <div class="modal-card" (click)="$event.stopPropagation()">
+            <h3>Confirmer la suppression</h3>
+            <p>Cette action est irréversible. La machine sera définitivement supprimée.</p>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-outline" (click)="annulerSuppression()">Annuler</button>
+              <button type="button" class="btn btn-danger" (click)="confirmerSuppression()">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+</div>

@@ -35,20 +35,25 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/stats/stats').then(m => m.StatsPage)
   },
-  { path: 'machines', 
-    title: 'Machines', 
+  { path: 'machines',
+    title: 'Machines',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/machines/machines').then(m => m.Machines)
   },
-  { path: 'ajout-repair', 
-    title: 'Ajouter une réparation', 
+  { path: 'ajout-repair',
+    title: 'Ajouter une réparation',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/add-repair/add-repair').then(m => m.AddRepair)
   },
-  { path: 'my-repairs', 
-    title: 'Mes réparations', 
+  { path: 'my-repairs',
+    title: 'Mes réparations',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/my-repairs/my-repairs').then(m => m.MyRepairs)
+  },
+  { path: 'machines_enregistrees',
+    title: 'Machines enregistrées',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/machines-enregistrees/machines-enregistrees').then(m => m.MachinesEnregistrees)
   },
   { path: '',   redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' },
