@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGrip, faQrcode, faMagnifyingGlass, faChartBar, faDoorOpen, faGear, faWrench, faCheckCircle, faExclamationTriangle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faGrip, faQrcode, faMagnifyingGlass, faChartBar, faDoorOpen, faGear, faWrench, faCheckCircle, faExclamationTriangle, faPlus, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../auth-lib/services/auth.service';
 import { MeResponse } from '../../auth-lib/models/auth.model';
@@ -36,7 +36,7 @@ export class Home implements OnInit {
   public readonly faCheckCircle = faCheckCircle;
   public readonly faExclamationTriangle = faExclamationTriangle;
   public readonly faPlus = faPlus;
-
+  public readonly faThumbsUp = faThumbsUp;
 
   public readonly statsCards = [
     { title: 'Machines suivies', value: 128, icon: faGear , color: '#3b82f6', delta: '+12%', period: 'Derniers 30 jours' },
