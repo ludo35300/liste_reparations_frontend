@@ -153,7 +153,7 @@
               <label class="field-label">
                 <span>Numéro de série <span class="required">*</span></span>
 
-                <input class="field-input" [(ngModel)]="form.numero_serie"
+                <input class="field-input" [(ngModel)]="form().numero_serie"
                       placeholder="ex: SANTOS-40AN-001" />
 
                 @if (machineStatus() === 'known') {
@@ -172,7 +172,7 @@
               <label class="field-label">
                 <span>Type de machine <span class="required">*</span></span>
                 <select class="field-input field-select"
-                        [ngModel]="form.modele_id"
+                        [ngModel]="form().modele_id"
                         (ngModelChange)="onModeleChange($event)">
                   <option [ngValue]="null" disabled>Choisir un modèle…</option>
                   @for (modele of modeles; track modele.id) {
@@ -181,7 +181,7 @@
                     </option>
                   }
                 </select>
-                @if (form.modele_id === null && !isOcrFailed()) {
+                @if (form().modele_id === null && !isOcrFailed()) {
                   <span class="machine-status-badge machine-status-badge--new">
                     <fa-icon [icon]="faCirclePlus"></fa-icon> Modèle non reconnu — sélectionnez manuellement
                   </span>
@@ -189,13 +189,13 @@
               </label>
               <label class="field-label">
                 <span>Technicien</span>
-                <input class="field-input" [(ngModel)]="form.technicien" placeholder="Nom du technicien" />
+                <input class="field-input" [(ngModel)]="form().technicien" placeholder="Nom du technicien" />
               </label>
               <!-- Date de réparation -->
               <label class="field-label">
                 <span>Date <span class="required">*</span></span>
                 <input class="field-input"
-                      [ngModel]="form.date_affichage"
+                      [ngModel]="form().date_affichage"
                       (ngModelChange)="onDateInput($event)"
                       placeholder="JJ/MM/AAAA" />
               </label>
@@ -203,7 +203,7 @@
 
              <h4 class="form-section-title">🔩 Pièces détectées</h4>
 
-            @if (getPieces().length > 0 || form.modele_id) {
+            @if (getPieces().length > 0 || form().modele_id) {
               <div class="pieces-section">
 
                 @if (avertissementActif()) {
@@ -249,7 +249,7 @@
                                   @if (isNouvelle(piece.ref_piece)) {
                                     <span class="badge-new">Nouvelle</span>
                                   }
-                                  @if (!isNouvelle(piece.ref_piece) && form.modele_id && !isPieceAssociee(piece.ref_piece)) {
+                                  @if (!isNouvelle(piece.ref_piece) && form().modele_id && !isPieceAssociee(piece.ref_piece)) {
                                     <button class="btn-associer" (click)="associerPiece(piece)" title="Associer au modèle sélectionné">
                                       <fa-icon [icon]="faLink"></fa-icon> Associer
                                     </button>
@@ -289,7 +289,7 @@
                                   <span class="status-ok">✔ Vérifiée</span>
                                 }
                               } @else {
-                                <span class="status-known">En base</span>
+                                <span class="status-known">En stock</span>
                               }
                             </td>
 
@@ -311,7 +311,7 @@
 
 
                 <!-- Panel ajout pièce -->
-                @if (showAddPiecePanel() && form.modele_id) {
+                @if (showAddPiecePanel() && form().modele_id) {
                   <div class="add-piece-panel">
                     <div class="search-piece-wrapper">
                       <i class="fas fa-search search-piece-icon"></i>
@@ -348,7 +348,7 @@
                   </div>
                 }
                 <div class="pieces-section-header">
-                  @if (form.modele_id) {
+                  @if (form().modele_id) {
                     <button class="btn btn-sm btn-outline" (click)="toggleAddPiecePanel()">
                       {{ showAddPiecePanel() ? 'Fermer' : ' Ajouter une pièce' }}
                     </button>
@@ -361,7 +361,7 @@
             <label class="field-label full-width">
               <span>Notes</span>
               <textarea class="field-input field-textarea"
-                        [(ngModel)]="form.notes" rows="3"
+                        [(ngModel)]="form().notes" rows="3"
                         placeholder="Remarques, observations…"></textarea>
             </label>
 
@@ -371,19 +371,19 @@
 
             <div class="form-footer">
               <div class="form-footer-hints">
-                @if (!form.numero_serie.trim()) {
+                @if (!form().numero_serie.trim()) {
                   <span class="footer-hint">Numéro de série requis</span>
                 }
-                @if (!form.date_reparation.trim()) {
+                @if (!form().date_reparation.trim()) {
                   <span class="footer-hint">Date requise</span>
                 }
-                @if (!form.modele_id) {
+                @if (!form().modele_id) {
                   <span class="footer-hint">Modèle requis</span>
                 }
                 @if (avertissementActif()) {
                   <span class="footer-hint">Validez toutes les nouvelles pièces</span>
                 }
-                @if (form.modele_id && form.pieces.some(p => !isNouvelle(p.ref_piece) && !isPieceAssociee(p.ref_piece))) {
+                @if (form().modele_id && form().pieces.some(p => !isNouvelle(p.ref_piece) && !isPieceAssociee(p.ref_piece))) {
                   <span class="footer-hint">Associez les pièces hors modèle</span>
                 }
               </div>
@@ -412,7 +412,7 @@
               <p>La fiche a été sauvegardée avec succès dans la base de données.</p>
               <div class="result-actions">
                 <button class="btn btn-primary" (click)="reinitialiser()">➕ Nouvelle réparation</button>
-                <button class="btn btn-outline" (click)="goHistory(form.numero_serie)">🔍 Voir les réparations</button>
+                <button class="btn btn-outline" (click)="goHistory(form().numero_serie)">🔍 Voir les réparations</button>
               </div>
             </div>
           } @else {
