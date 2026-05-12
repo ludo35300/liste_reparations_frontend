@@ -45,7 +45,7 @@
         </section>
         <!-- === SECTION STATS & DASHBOARD === -->
         <section class="stats-grid">
-          @for (card of statsCards; track card.title) {
+          @for (card of statsCards(); track card.title) {
             <article class="stat-card" [style.--card-color]="card.color">
               <div class="stat-top">
                 <div class="stat-text">
