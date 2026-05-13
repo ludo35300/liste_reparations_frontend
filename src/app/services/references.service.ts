@@ -45,7 +45,6 @@ export class ReferenceService {
     return this.http.get<PieceRef[]>(`${this.api}/pieces`);
   }
   createPiece(ref_piece: string, designation: string, marque_id: number): Observable<PieceRef> {
-    console.log('Creating piece with', { ref_piece, designation, marque_id });
     return this.http.post<PieceRef>(`${this.api}/pieces`, { ref_piece, designation, marque_id });
   }
   updatePiece(id: number, ref_piece: string, designation: string): Observable<PieceRef> {

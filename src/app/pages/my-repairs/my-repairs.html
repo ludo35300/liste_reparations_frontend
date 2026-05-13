@@ -115,7 +115,7 @@
                     {{ rep.machine?.numero_serie ?? rep.numero_serie ?? '—' }}
                   </td>
                   <td class="cell-modele">
-                    {{ rep.machine?.modele?.label ?? rep.machine_type ?? '—' }}
+                     {{ rep.machine?.modele?.marque?.nom }} {{ rep.machine?.modele?.nom ?? rep.machine?.modele?.type_machine ?? '-' }}
                   </td>
                   <td class="cell-tech">
                     {{ rep.technicien ?? '—' }}

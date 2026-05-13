@@ -59,9 +59,9 @@
                     {{ rep.actions.length }} action{{ rep.actions.length > 1 ? 's' : '' }}
                   </span>
                 }
-                @if (rep.machine?.statut) {
-                  <span class="badge {{ getStatutCls(rep.machine?.statut) }}">
-                    {{ labelStatut(rep.machine?.statut) }}
+                @if (rep.statut) {
+                  <span class="badge {{ getStatutCls(rep.statut) }}">
+                    {{ labelStatut(rep.statut) }}
                   </span>
                 }
               </div>
