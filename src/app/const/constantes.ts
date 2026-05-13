@@ -1,8 +1,8 @@
 import { StatutMachine } from "../models/statut.model";
 
 export const STATUTS: { value: StatutMachine; label: string; couleur: string }[] = [
-  { value: 'en_attente',    label: 'En attente',    couleur: 'badge-waiting' },
-  { value: 'en_reparation', label: 'En réparation', couleur: 'badge-progress' },
+  { value: 'en_attente',    label: 'En attente',    couleur: 'badge-progress' },
+  { value: 'en_reparation', label: 'En réparation', couleur: 'badge-warning' },
   { value: 'pret',          label: 'Prêt',          couleur: 'badge-ready' },
   { value: 'termine',       label: 'Terminé',       couleur: 'badge-ready' },
 ];
