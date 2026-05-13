@@ -117,6 +117,7 @@ export class History implements OnInit {
       next: (res: any) => {
         const reps: Reparation[] = res.reparations ?? res ?? [];
         this.reparations.set(reps);
+        console.log(this.reparations())
         if (reps.length > 0) this.selectionner(reps[0]);
       },
       error: () => this.errorMessage.set('Impossible de charger l\'historique.'),
