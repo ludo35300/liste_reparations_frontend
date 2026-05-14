@@ -46,6 +46,8 @@ export class Machines implements OnInit {
   readonly showMarqueForm  = signal(false);
   readonly formMarqueNom   = signal('');
   readonly savingMarque    = signal(false);
+  readonly formMarqueLogo  = signal<File | null>(null);
+  readonly logoPreview     = signal<string | null>(null);
   readonly errorMarque     = signal<string | null>(null);
 
   // ── Formulaire ajout modèle ────────────────────────────────
@@ -137,12 +139,45 @@ export class Machines implements OnInit {
 
   saveMarque(): void {
     const nom = this.formMarqueNom().trim().toUpperCase();
-    if (!nom) { this.errorMarque.set('Nom requis.'); return; }
+    const logo = this.formMarqueLogo();
+
+    if(!nom){ this.errorMarque.set('Nom requis.'); return; }
     this.savingMarque.set(true);
-    this.refService.createMarque(nom).subscribe({
-      next: () => { this.savingMarque.set(false); this.showMarqueForm.set(false); this.formMarqueNom.set(''); this.loadAll(); },
-      error: () => { this.errorMarque.set('Erreur lors de la création.'); this.savingMarque.set(false); }
+
+    const fd = new FormData();
+    fd.append('nom', nom);
+    if(logo){ fd.append('logo', logo);}
+
+    this.refService.createMarque(fd).subscribe({
+      next: () => {
+        this.savingMarque.set(false);
+        this.showMarqueForm.set(false);
+        this.formMarqueNom.set('');
+        this.formMarqueLogo.set(null);
+        this.logoPreview.set(null);
+        this.loadAll();
+      },
+      error: () => {
+        this.errorMarque.set('Erreur lors de la création.');
+        this.savingMarque.set(false);
+      }
     });
+  }
+
+  onMarqueLogoChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.formMarqueLogo.set(file);
+
+    if (this.logoPreview()) {
+      URL.revokeObjectURL(this.logoPreview()!);
+      this.logoPreview.set(null);
+    }
+
+    if (file) {
+      this.logoPreview.set(URL.createObjectURL(file));
+    }
   }
 
   deleteMarque(marque: Marque, event: Event): void {

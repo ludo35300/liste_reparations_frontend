@@ -1,5 +1,6 @@
 <div class="layout">
   <div class="layout-right">
+    <!-- TOPBAR  -->
     <app-topbar
       [me]="me()"
       pageTitle="Historique"
@@ -7,39 +8,42 @@
       (logoutEvt)="logout()"
     />
 
-    <main class="main-content">
 
+    <main class="main-content">
+      <!-- MESSAGES -->
       @if (errorMessage()) {
         <div class="alert-error" role="alert">
           <fa-icon [icon]="faWarning"></fa-icon>
           {{ errorMessage() }}
         </div>
       }
+      <!-- HEADER -->
 
-      <div class="page-header">
-        <div class="page-header-left">
+      <section class="hero">
           <div>
-            <h5 class="page-title">N° de série : {{ numeroSerie() }}</h5>
-            <p class="page-subtitle">
+            <p class="hero-kicker">N° de série : {{ numeroSerie() }}</p>
+            <h2 class="hero-title">{{ machineType() }}</h2>
+            <p class="hero-sub">
               {{ reparations().length }}
               intervention{{ reparations().length > 1 ? 's' : '' }}
             </p>
           </div>
-        </div>
-      </div>
+      </section>
+
+      <!-- historique (interventions) -->
 
       <div class="history-layout">
 
         <!-- ── Liste des interventions ─────────────────────── -->
         <aside class="history-list" aria-label="Liste des interventions">
-
+          <!-- SI AUCUNE REPARATION TROUVEE-->
           @if (reparations().length === 0) {
             <div class="empty-state">
               <fa-icon [icon]="faClipboardList"></fa-icon>
               <p>Aucune intervention trouvée</p>
             </div>
           }
-
+          <!-- Sinon on affiche la liste des réparations -->
           @for (rep of reparations(); track rep.id) {
             <button
               class="history-item"
@@ -190,9 +194,7 @@
                     <span class="pieces-count">
                       {{ rep.pieces.length }} pièce{{ rep.pieces.length > 1 ? 's' : '' }}
                     </span>
-                    <button class="btn-primary-sm" (click)="openEditPieces()">
-                      <fa-icon [icon]="faPen"></fa-icon> Modifier
-                    </button>
+
                   </div>
 
                   @if (rep.pieces.length > 0) {
@@ -216,6 +218,13 @@
                         </tbody>
                       </table>
                     </div>
+
+                    <div class="edit-btn">
+                      <button class="btn btn-primary btn-sm" (click)="openEditPieces()">
+                        <fa-icon [icon]="faPen"></fa-icon> Modifier
+                      </button>
+
+                    </div>
                   } @else {
                     <p class="no-pieces">Aucune pièce enregistrée pour cette intervention.</p>
                   }
@@ -224,13 +233,7 @@
                   <div class="pieces-edit-panel">
                     <div class="pieces-edit-header">
                       <h4>Modifier les pièces</h4>
-                      <div class="pieces-edit-actions">
-                        <button class="btn-ghost btn-sm" (click)="cancelEditPieces()">Annuler</button>
-                        <button class="btn btn-primary btn-sm" (click)="savePieces()" [disabled]="savingPieces()">
-                          @if (savingPieces()) { Enregistrement… }
-                          @else { <fa-icon [icon]="faCheck"></fa-icon> Enregistrer }
-                        </button>
-                      </div>
+
                     </div>
 
                     @if (piecesError()) {
@@ -280,8 +283,20 @@
                       }
                     </div>
                   </div>
+
+                  <div class="pieces-edit-actions">
+                        <button class="btn btn-danger-ghost btn-sm" (click)="cancelEditPieces()">Annuler</button>
+                        <button class="btn btn-primary btn-sm" (click)="savePieces()" [disabled]="savingPieces()">
+                          @if (savingPieces()) { Enregistrement… }
+                          @else { <fa-icon [icon]="faCheck"></fa-icon> Enregistrer }
+                        </button>
+                      </div>
+
                 }
+
+
               </div>
+
             }
 
             <!-- ══ ONGLET ACTIONS ═════════════════════════════ -->
@@ -292,7 +307,7 @@
                   <span class="actions-count">
                     {{ actions().length }} action{{ actions().length > 1 ? 's' : '' }}
                   </span>
-                  <button class="btn-primary-sm" (click)="openForm()">
+                  <button class="btn btn-primary btn-sm" (click)="openForm()">
                     <fa-icon [icon]="faPlus"></fa-icon> Ajouter une action
                   </button>
                 </div>
@@ -352,8 +367,8 @@
                       }
                     </div>
                     <div class="form-actions">
-                      <button class="btn-ghost btn-sm" (click)="cancelForm()" [disabled]="saving()">Annuler</button>
-                      <button class="btn btn-primary btn-sm" (click)="submitAction()" [disabled]="saving()">
+                      <button class="btn btn-danger-ghost btn-sm" (click)="cancelForm()" [disabled]="saving()">Annuler</button>
+                      <button class="btn btn btn-primary btn-sm" (click)="submitAction()" [disabled]="saving()">
                         @if (saving()) { Enregistrement… } @else { Enregistrer }
                       </button>
                     </div>
@@ -401,21 +416,18 @@
                   </ol>
                 }
               </div>
+
             }
 
             <!-- ── Suppression ────────────────────────────────── -->
             <div class="detail-footer-danger">
-              <button class="btn-delete" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
+
+              <button class="btn btn-danger" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
                 <fa-icon [icon]="faTrash"></fa-icon> Supprimer l'intervention
               </button>
             </div>
 
           </section>
-        } @else {
-          <div class="detail-empty" aria-label="Aucune intervention sélectionnée">
-            <fa-icon [icon]="faArrowLeft"></fa-icon>
-            <p>Sélectionnez une intervention dans la liste</p>
-          </div>
         }
 
       </div>

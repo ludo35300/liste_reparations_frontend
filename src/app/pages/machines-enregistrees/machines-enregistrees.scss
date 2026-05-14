@@ -27,7 +27,6 @@ host { display: block; padding: 1.5rem; }
 .action-btn--edit { background: #eff6ff; color: #2563eb; }
 .action-btn--delete { background: #fef2f2; color: #dc2626; }
 .loading-state { display: flex; align-items: center; gap: 1rem; color: #64748b; }
-.empty-state { text-align: center; padding: 3rem 1rem; color: #64748b; }
 .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: grid; place-items: center; z-index: 1000; }
 .modal-card { width: min(92vw, 420px); background: white; border-radius: 18px; padding: 1.5rem; text-align: center; box-shadow: 0 20px 60px rgba(15,23,42,.2); }
 .modal-actions { display: flex; justify-content: center; gap: .75rem; margin-top: 1rem; }

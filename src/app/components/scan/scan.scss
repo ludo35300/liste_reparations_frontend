@@ -651,8 +651,8 @@
     transition: background var(--transition), color var(--transition), border-color var(--transition);
 
     &:hover {
-      background: var(--danger-soft);
-      color: var(--danger);
+      background: var(--c-danger-hover);
+      color: var(--c-danger);
       border-color: rgba(220, 38, 38, 0.3);
     }
   }
@@ -665,7 +665,7 @@
   border: 1px solid var(--border); border-radius: 6px;
   font-size: 0.82rem; text-align: center;
   background: var(--bg); color: var(--text-dark); outline: none;
-  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.15); }
+  &:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.15); }
 }
 
 /* ─── Badges & status ─────────────────────────────────────── */

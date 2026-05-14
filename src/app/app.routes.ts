@@ -30,7 +30,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/stats/stats').then(m => m.StatsPage)
   },
   { path: 'machines',
-    title: 'Machines',
+    title: 'Marques & modèles',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/machines/machines').then(m => m.Machines)
   },

@@ -80,6 +80,7 @@ export class History implements OnInit {
   readonly selected     = signal<Reparation | null>(null);
   readonly numeroSerie  = signal('');
   readonly activeTab    = signal<ActiveTab>('pieces');
+  readonly machineType = signal('');
 
   // ── Statut (réparation + machine synchronisés) ────────────
   readonly editingStatut = signal(false);
@@ -124,9 +125,12 @@ export class History implements OnInit {
       next: (res: any) => {
         const reps: Reparation[] = res.reparations ?? res ?? [];
         this.reparations.set(reps);
-        if (reps.length > 0) this.selectionner(reps[0]);
+        if (reps.length > 0){
+           this.selectionner(reps[0]);
+           this.machineType.set(res.machine_type);
+        }
       },
-      error: () => this.errorMessage.set('Impossible de charger l\'historique.'),
+      error: (err) => this.errorMessage.set(err?.error?.message ?? 'Une erreur est survenue.'),
     });
   }
 
