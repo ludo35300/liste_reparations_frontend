@@ -1,8 +1,8 @@
 import { ReparationAction } from "./actions.model";
 import { Machine } from "./machine.model";
 import { PieceChangee } from "./piece.model";
-import { StatutMachine } from "./statut.model";
 
+export type StatutReparation = 'en_reparation' | 'termine';
 
 export interface Reparation {
   id?: number;
@@ -23,7 +23,7 @@ export interface Reparation {
   description?: string;
   created_at?: string;
   // Feature actions
-  statut?: StatutMachine;
+  statut?: StatutReparation;
   date_fin?: string | null;
   actions?: ReparationAction[];
   pieces: PieceChangee[];
