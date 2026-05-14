@@ -18,13 +18,47 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: var(--danger-light);
+  background: var(--c-danger-light);
   color: var(--danger);
   border: 1px solid rgba(220, 38, 38, 0.2);
   border-radius: var(--radius-sm);
   font-size: 0.82rem;
   font-weight: 500;
   margin-bottom: 1.25rem;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-kicker {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.35rem;
+}
+
+.hero-title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.hero-sub {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0;
 }
 
 // ─── Bouton Retour ────────────────────────────────────────────
@@ -92,15 +126,21 @@
   &:hover { background: var(--surface-offset); }
 
   &:focus-visible {
-    outline: 2px solid var(--primary);
+    outline: 2px solid var(--c-primary);
     outline-offset: -2px;
   }
 
   // ✅ Pas de padding-left décalé : box-shadow inset
   &.active {
-    background: var(--primary-soft);
-    box-shadow: inset 3px 0 0 var(--primary);
+    background: var(--c-primary-light);
+    box-shadow: inset 3px 0 0 var(--c-primary);
   }
+}
+
+.edit-btn{
+  display: flex;
+  justify-content: flex-end;
+  background: var(--surface);
 }
 
 .item-date {
@@ -130,20 +170,20 @@
   font-size: 0.7rem;
   font-weight: 600;
   white-space: nowrap;
-  background: var(--primary-light);
-  color: var(--primary);
+  background: var(--c-primary-light);
+  color: var(--c-primary);
 }
 
 .item-badge--actions {
-  background: var(--success-light);
-  color: var(--success);
+  background: var(--c-success-light);
+  color: var(--c-success);
 }
 
 // Statuts
-.badge--waiting  { background: var(--warning-light);  color: var(--warning); }
-.badge--progress { background: var(--primary-light);  color: var(--primary); }
-.badge--ready    { background: var(--success-light);  color: var(--success); }
-.badge--done     { background: var(--surface-offset); color: var(--text-muted); }
+.badge--waiting  { background: var(--c-warning-light);  color: var(--c-warning); }
+.badge--progress { background: var(--c-primary-light);  color: var(--c-primary); }
+.badge--ready    { background: var(--c-success-light);  color: var(--c-success); }
+.badge--done     { background: var(--c-surface-offset); color: var(--text-muted); }
 
 
 
@@ -311,14 +351,14 @@
 
   &--success {
     border-color: rgba(22, 163, 74, 0.3);
-    color: var(--success);
-    &:hover { background: var(--success-light); border-color: var(--success); }
+    color: var(--c-success);
+    &:hover { background: var(--c-success-light); border-color: var(--c-success); }
   }
 
   &--danger {
     border-color: rgba(220, 38, 38, 0.25);
-    color: var(--danger);
-    &:hover { background: var(--danger-light); border-color: var(--danger); }
+    color: var(--c-danger);
+    &:hover { background: var(--c-danger-light); border-color: var(--c-danger); }
   }
 }
 
@@ -337,8 +377,8 @@
 
   &:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 3px var(--c-primary-light);
   }
 
   &--sm {
@@ -547,7 +587,7 @@ select.field-input {
   background: var(--surface);
   font-variant-numeric: tabular-nums;
 
-  &:focus { outline: none; background: var(--primary-soft); }
+  &:focus { outline: none; background: var(--c-primary-soft); }
   // Masquer les flèches natives
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button { appearance: none; }
@@ -569,8 +609,8 @@ select.field-input {
   flex-shrink: 0;
 
   &:hover {
-    background: var(--danger-light);
-    color: var(--danger);
+    background: var(--c-danger-light);
+    color: var(--c-danger);
   }
 }
 
@@ -612,7 +652,7 @@ select.field-input {
   font-size: 0.8rem;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: var(--primary-soft); }
+  &:hover { background: var(--c-primary-soft); }
 
   .piece-desig { flex: 1; color: var(--text); }
 }
@@ -640,8 +680,8 @@ select.field-input {
   align-items: center;
   gap: 0.4rem;
   padding: 0.6rem 0.875rem;
-  background: var(--danger-light);
-  color: var(--danger);
+  background: var(--c-danger-light);
+  color: var(--c-danger);
   border: 1px solid rgba(220, 38, 38, 0.2);
   border-radius: var(--radius-xs);
   font-size: 0.78rem;
@@ -710,7 +750,7 @@ select.field-input {
     &:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
+      box-shadow: 0 0 0 3px var(--c-primary-light);
     }
   }
 
@@ -778,13 +818,13 @@ select.field-input {
   z-index: 1;
   transition: border-color var(--transition);
 
-  &[data-type="diagnostic"]         { border-color: var(--primary);  background: var(--primary-light); }
-  &[data-type="demontage"]           { border-color: var(--warning);  background: var(--warning-light); }
+  &[data-type="diagnostic"]         { border-color: var(--c-primary);  background: var(--c-primary-light); }
+  &[data-type="demontage"]           { border-color: var(--c-warning);  background: var(--c-warning-light); }
   &[data-type="remplacement_piece"]  { border-color: #7c3aed;         background: rgba(124, 58, 237, 0.10); }
   &[data-type="nettoyage"]           { border-color: #0ea5e9;         background: rgba(14, 165, 233, 0.10); }
-  &[data-type="test"]                { border-color: var(--success);  background: var(--success-light); }
-  &[data-type="commentaire"]         { border-color: var(--text-muted); background: var(--surface-offset); }
-  &[data-type="statut"]              { border-color: var(--text-dark); background: var(--surface-offset); }
+  &[data-type="test"]                { border-color: var(--c-success);  background: var(--c-success-light); }
+  &[data-type="commentaire"]         { border-color: var(--text-muted); background: var(--c-surface-offset); }
+  &[data-type="statut"]              { border-color: var(--text-dark); background: var(--c-surface-offset); }
 }
 
 .timeline-content {
@@ -880,7 +920,7 @@ select.field-input {
   transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 
   &:hover {
-    background: var(--danger-light);
+    background: var(--c-danger-light);
     border-color: rgba(220, 38, 38, 0.45);
     box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
   }

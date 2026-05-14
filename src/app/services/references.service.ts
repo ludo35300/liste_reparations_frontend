@@ -14,8 +14,8 @@ export class ReferenceService {
   getAllMarques(): Observable<Marque[]> {
     return this.http.get<Marque[]>(`${this.api}/marques`);
   }
-  createMarque(nom: string): Observable<Marque> {
-    return this.http.post<Marque>(`${this.api}/marques`, { nom });
+  createMarque(formData: FormData) {
+    return this.http.post<Marque>(`${this.api}/marques`, formData);
   }
   deleteMarque(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/marques/${id}`);

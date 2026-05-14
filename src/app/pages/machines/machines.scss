@@ -161,18 +161,19 @@
 }
 
 .icon-btn--primary {
-  color: #fff;
-  background: var(--primary);
+  color: var(--c-primary);
+  background: var(--c-primary-light);
   box-shadow: 0 8px 18px rgba(68, 96, 241, 0.22);
 }
 
 .icon-btn--primary:hover {
-  background: var(--primary-dark);
+  color: #fff;
+  background: var(--c-primary-hover);
 }
 
 .icon-btn--danger {
-  color: var(--danger);
-  background: var(--danger-soft);
+  color: var(--c-danger);
+  background: var(--c-danger-light);
 }
 
 .icon-btn--danger:hover {
@@ -185,8 +186,8 @@
 }
 
 .icon-btn--ghost-danger:hover {
-  color: var(--danger);
-  background: var(--danger-soft);
+  color: var(--c-danger);
+  background: var(--c-danger-light);
 }
 
 /* ── Liste modèles ──────────────────────────────────── */
@@ -242,7 +243,7 @@
   flex-shrink: 0;
   padding: 0.28rem 0.6rem;
   border-radius: var(--radius-pill);
-  background: var(--primary-soft);
+  background: var(--primary-hover);
   color: var(--primary);
   font-size: 0.68rem;
   font-weight: 700;
@@ -474,8 +475,8 @@
   transition: background var(--transition), color var(--transition), border-color var(--transition);
 
   &:hover {
-    background: var(--danger-soft);
-    color: var(--danger);
+    background: var(--c-danger-hover);
+    color: var(--c-danger);
     border-color: rgba(220, 38, 38, 0.25);
   }
 }
@@ -524,7 +525,7 @@
   min-width: 22px;
   padding: 0.1rem 0.45rem;
   background: var(--primary-soft);
-  color: var(--primary);
+  color: var(--c-primary);
   border-radius: 20px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -863,8 +864,8 @@
   transition: background var(--transition), color var(--transition), border-color var(--transition);
 
   &:hover {
-    background: var(--primary-soft);
-    color: var(--primary);
+    background: var(--c-primary-hover);
+    color: var(--c-primary);
     border-color: rgba(68, 96, 241, 0.3);
   }
 }

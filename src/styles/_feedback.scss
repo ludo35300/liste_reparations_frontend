@@ -15,6 +15,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
 
+  fa-icon { font-size: 2rem; color: var(--border-strong); }
   .empty-icon { font-size: 2rem; color: var(--text-faint); margin-bottom: 1rem; }
   h3 { margin: 0 0 0.5rem; font-size: 0.96rem; font-weight: 700; color: var(--text-dark); }
   p  { margin: 0 0 1.25rem; font-size: 0.84rem; color: var(--text-muted); max-width: 36ch; }

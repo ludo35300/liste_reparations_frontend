@@ -20,7 +20,7 @@
       @if (errorMessage()) {
         <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
       }
-
+    <!--
       @if (me()) {
         @if (me()!.firstName === 'Amaury') {
           <div class="alert alert-success" role="alert">
@@ -29,6 +29,7 @@
           </div>
         }
       }
+    -->
 
 
       <!-- Contenu principal -->
@@ -39,7 +40,7 @@
             <p class="hero-kicker">Bienvenue</p>
             <h2 class="hero-title">Bonjour, {{ me()!.firstName }} 👋</h2>
             <p class="hero-sub">
-              Voici un aperçu rapide de votre activité de maintenance.
+              Voici un aperçu rapide de votre activité.
             </p>
           </div>
         </section>
@@ -81,7 +82,7 @@
             </div>
 
             <div class="quick-links">
-              <a class="quick-link" type="button" (click)="openQuickSearch()">
+              <a class="quick-link" (click)="openQuickSearch()">
                 <div class="quick-icon"><fa-icon [icon]="faMagnifyingGlass"></fa-icon></div>
                 <div class="quick-content">
                   <strong>Rechercher une machine</strong>

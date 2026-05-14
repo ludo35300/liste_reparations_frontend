@@ -6,7 +6,7 @@ import { NavItem } from '../components/topbar/topbar';
 export class NavService {
   readonly navItems: NavItem[] = [
     { label: 'Dashboard',    route: '/home',   icon: faGrip },
-    { label: 'Machines',     route: '/machines', icon: faGears },
+    { label: 'Marques',     route: '/machines', icon: faGears },
     { label: 'Mes réparations', route: '/my-repairs', icon: faWrench },
     { label: 'Ajout Réparation',      route: '/ajout-repair',   icon: faQrcode },
     /*{ label: 'Statistiques', route: '/stats',  icon: faChartBar },*/

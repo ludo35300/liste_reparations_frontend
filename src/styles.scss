@@ -23,6 +23,7 @@
 @use './styles/buttons';  // styles de boutons globaux (primary, outline, sizes)
 @use './styles/badges';   // styles de badges globaux (status, generic, sizes)
 @use './styles/alerts';   // styles d'alertes globales (success, error, info, warning)
+@use './styles/hero';      // style du header de la page home /history etc...
 
 // ── 2. Police ────────────────────────────────────────────────────
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..800&display=swap');

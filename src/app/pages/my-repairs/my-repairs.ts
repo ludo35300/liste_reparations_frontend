@@ -187,7 +187,7 @@ export class MyRepairs implements OnInit {
       en_attente:    'badge-waiting',
       en_reparation: 'badge-progress',
       pret:          'badge-ready',
-      termine:       'badge-done',
+      termine:       'badge-ready',
     };
     return map[statut] ?? 'badge-secondary';
   }
