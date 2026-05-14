@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
-import { faPlus, faSearch, faTrash, faCheck, faTimes, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faTrash, faCheck, faTimes, faPen, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService }      from '../../auth-lib/services/auth.service';
 import { MeResponse }       from '../../auth-lib/models/auth.model';
@@ -41,6 +41,8 @@ export class Machines implements OnInit {
   readonly faCheck  = faCheck;
   readonly faTimes  = faTimes;
   readonly faPen    = faPen;
+  readonly faChevronUp = faChevronUp;
+  readonly faChevronDown = faChevronDown;
 
   // ── Formulaire ajout marque ────────────────────────────────
   readonly showMarqueForm  = signal(false);
@@ -49,6 +51,11 @@ export class Machines implements OnInit {
   readonly formMarqueLogo  = signal<File | null>(null);
   readonly logoPreview     = signal<string | null>(null);
   readonly errorMarque     = signal<string | null>(null);
+  // ── Modale pièces par marque ───────────────────────────────
+  readonly selectedMarqueGroup  = signal<BrandGroup | null>(null);
+  readonly marquePiecesLoading  = signal(false);
+  readonly marquePiecesMap      = signal<Map<number, PieceRef[]>>(new Map());
+  readonly searchMarquePiece = signal('');
 
   // ── Formulaire ajout modèle ────────────────────────────────
   readonly showModeleForm  = signal(false);
@@ -94,6 +101,19 @@ export class Machines implements OnInit {
       p.designation.toLowerCase().includes(q)
     );
   });
+
+  readonly marquePiecesByModel = computed(() => {
+    const group = this.selectedMarqueGroup();
+    if (!group) return [];
+    return group.modeles.map(m => ({
+      modele: m,
+      pieces: this.marquePiecesMap().get(m.id) ?? [],
+    }));
+  });
+
+  readonly totalPiecesMarque = computed(() =>
+    this.marquePiecesByModel().reduce((acc, e) => acc + e.pieces.length, 0)
+  );
 
   // ── Lifecycle ──────────────────────────────────────────────
   ngOnInit(): void {
@@ -333,32 +353,103 @@ export class Machines implements OnInit {
 
 
   openEditPiece(piece: PieceRef): void {
-  this.editingPiece.set(piece);
-  this.editPieceRef.set(piece.ref_piece);
-  this.editPieceDesig.set(piece.designation);
-  this.errorEditPiece.set(null);
-}
+    this.editingPiece.set(piece);
+    this.editPieceRef.set(piece.ref_piece);
+    this.editPieceDesig.set(piece.designation);
+    this.errorEditPiece.set(null);
+  }
 
-cancelEditPiece(): void {
-  this.editingPiece.set(null);
-  this.errorEditPiece.set(null);
-}
+  cancelEditPiece(): void {
+    this.editingPiece.set(null);
+    this.errorEditPiece.set(null);
+  }
 
-saveEditPiece(): void {
-  const ref   = this.editPieceRef().trim().toUpperCase();
-  const desig = this.editPieceDesig().trim();
-  const piece = this.editingPiece();
-  if (!ref || !desig || !piece) { this.errorEditPiece.set('Champs requis.'); return; }
-  this.savingEditPiece.set(true);
-  this.refService.updatePiece(piece.id, ref, desig).subscribe({
-    next: (updated) => {
-      this.piecesDuModele.update(list => list.map(p => p.id === updated.id ? updated : p));
-      this.allPieces.update(list => list.map(p => p.id === updated.id ? updated : p));
-      this.savingEditPiece.set(false);
-      this.editingPiece.set(null);
-    },
-    error: () => { this.errorEditPiece.set('Erreur lors de la mise à jour.'); this.savingEditPiece.set(false); }
+  saveEditPiece(): void {
+    const ref   = this.editPieceRef().trim().toUpperCase();
+    const desig = this.editPieceDesig().trim();
+    const piece = this.editingPiece();
+    if (!ref || !desig || !piece) { this.errorEditPiece.set('Champs requis.'); return; }
+    this.savingEditPiece.set(true);
+    this.refService.updatePiece(piece.id, ref, desig).subscribe({
+      next: (updated) => {
+        this.piecesDuModele.update(list => list.map(p => p.id === updated.id ? updated : p));
+        this.allPieces.update(list => list.map(p => p.id === updated.id ? updated : p));
+        this.savingEditPiece.set(false);
+        this.editingPiece.set(null);
+      },
+      error: () => { this.errorEditPiece.set('Erreur lors de la mise à jour.'); this.savingEditPiece.set(false); }
+    });
+  }
+
+  // ── Modale marque ──────────────────────────────────────────
+  openMarqueModal(group: BrandGroup, event: Event): void {
+    event.stopPropagation();
+    this.selectedMarqueGroup.set(group);
+    this.marquePiecesLoading.set(true);
+    const modeles = group.modeles;
+
+    if (modeles.length === 0) {
+      this.marquePiecesLoading.set(false);
+      return;
+    }
+
+    let loaded = 0;
+    const map = new Map<number, PieceRef[]>();
+
+    modeles.forEach(m => {
+      this.refService.getPiecesByModele(m.id).subscribe({
+        next: (pieces) => {
+          map.set(m.id, pieces);
+          loaded++;
+          if (loaded === modeles.length) {
+            this.marquePiecesMap.set(new Map(map));
+            this.marquePiecesLoading.set(false);
+          }
+        },
+        error: () => {
+          map.set(m.id, []);
+          loaded++;
+          if (loaded === modeles.length) {
+            this.marquePiecesMap.set(new Map(map));
+            this.marquePiecesLoading.set(false);
+          }
+        }
+      });
+    });
+  }
+
+  closeMarqueModal(): void {
+    this.selectedMarqueGroup.set(null);
+    this.marquePiecesMap.set(new Map());
+    this.searchMarquePiece.set(''); // ← reset
+  }
+
+  openDrawerFromModal(modele: Modele): void {
+    this.closeMarqueModal();
+    // Petit délai pour laisser la modale se fermer proprement
+    setTimeout(() => this.openPiecesDrawer(modele), 150);
+  }
+
+  readonly allPiecesMarque = computed(() => {
+    const seen = new Set<number>();
+    const result: PieceRef[] = [];
+    for (const entry of this.marquePiecesByModel()) {
+      for (const piece of entry.pieces) {
+        if (!seen.has(piece.id)) {
+          seen.add(piece.id);
+          result.push(piece);
+        }
+      }
+    }
+
+    const q = this.searchMarquePiece().trim().toLowerCase();
+    const flat = result.sort((a, b) => a.ref_piece.localeCompare(b.ref_piece));
+    if (q.length < 1) return flat;
+
+    return flat.filter(p =>
+      p.ref_piece.toLowerCase().includes(q) ||
+      p.designation.toLowerCase().includes(q)
+    );
   });
-}
 }
 

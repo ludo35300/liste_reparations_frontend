@@ -172,6 +172,14 @@
   &:hover { background: rgba(220, 38, 38, 0.16); }
 }
 
+.icon-btn--info {
+  background: var(--c-primary);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.22);
+  &:hover { background: var(--c-primary-hover); }
+
+}
+
 // Neutre au repos, rouge au survol — moins alarmant par défaut
 .icon-btn--ghost-danger {
   color: var(--text-muted);

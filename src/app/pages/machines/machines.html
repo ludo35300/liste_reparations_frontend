@@ -132,11 +132,20 @@
                     <p class="brand-card__meta">{{ group.modeles.length }} modèle{{ group.modeles.length > 1 ? 's' : '' }}</p>
                   </div>
                   <div class="brand-card__actions">
+                    <!-- bouton afficher pieces associées à la marque -->
+                    <button type="button" class="icon-btn icon-btn--info"
+                      (click)="openMarqueModal(group, $event)"
+                      title="Voir les pièces de la marque"
+                      aria-label="Voir les pièces de la marque">
+                      <fa-icon [icon]="faSearch"></fa-icon>
+                    </button>
+                    <!-- bouton ajouter une nouvelle marque -->
                     <button type="button" class="icon-btn icon-btn--primary"
                       (click)="openModeleForm(group.marque.id)"
                       title="Ajouter un modèle" aria-label="Ajouter un modèle">
                       <fa-icon [icon]="faPlus"></fa-icon>
                     </button>
+                    <!-- bouton supprimer la marque -->
                     <button type="button" class="icon-btn icon-btn--danger"
                       (click)="deleteMarque(group.marque, $event)"
                       title="Supprimer la marque" aria-label="Supprimer la marque">
@@ -404,4 +413,82 @@
       }
     </div>
   </aside>
+}
+  <!-- ═══════════════════════════════════════════════════════════
+      MODALE — Pièces par marque
+  ════════════════════════════════════════════════════════════ -->
+  @if (selectedMarqueGroup()) {
+  <div class="modal-backdrop" (click)="closeMarqueModal()" aria-hidden="true"></div>
+
+  <div class="modal-box" role="dialog"
+       [attr.aria-label]="'Pièces de ' + selectedMarqueGroup()!.marque.nom">
+
+    <!-- Header -->
+    <div class="modal-box__header">
+      @if (selectedMarqueGroup()!.marque.url_logo) {
+        <img [src]="selectedMarqueGroup()!.marque.url_logo"
+             [alt]="selectedMarqueGroup()!.marque.nom"
+             class="modal-box__logo" />
+      }
+      <div class="modal-box__header-info">
+        <h3 class="modal-box__title">{{ selectedMarqueGroup()!.marque.nom }}</h3>
+        <p class="modal-box__sub">
+          <span class="stat-pill">{{ selectedMarqueGroup()!.modeles.length }} modèle{{ selectedMarqueGroup()!.modeles.length > 1 ? 's' : '' }}</span>
+          <span class="stat-pill">{{ totalPiecesMarque() }} pièce{{ totalPiecesMarque() > 1 ? 's' : '' }}</span>
+        </p>
+      </div>
+      <button class="drawer-close" (click)="closeMarqueModal()" aria-label="Fermer">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-box__body">
+      @if (marquePiecesLoading()) {
+        <div class="pieces-skeleton">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="skeleton skeleton-piece-row"></div>
+          }
+        </div>
+      }
+
+      @if (!marquePiecesLoading()) {
+        @if (allPiecesMarque().length === 0) {
+          <div class="pieces-empty">
+            <span>🔩</span>
+            <p>Aucune pièce associée à cette marque.</p>
+          </div>
+        } @else {
+           <!-- Champ recherche -->
+          <div class="search-piece-wrapper">
+            <i class="fas fa-search search-piece-icon"></i>
+            <input
+              class="field-input search-piece-input"
+              [ngModel]="searchMarquePiece()"
+              (ngModelChange)="searchMarquePiece.set($event)"
+              placeholder="Référence ou désignation…"
+              autocomplete="off" />
+            @if (searchMarquePiece().length > 0) {
+              <button class="btn btn-outline-danger search-clear-btn"
+                (click)="searchMarquePiece.set('')"
+                aria-label="Effacer">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            }
+          </div>
+          <ul class="pieces-list">
+            @for (piece of allPiecesMarque(); track piece.id) {
+              <li class="piece-item">
+                <div class="piece-item-info">
+                  <span class="piece-ref">{{ piece.ref_piece }} - <span class="piece-desig">{{ piece.designation }}</span></span>
+                  <!--<span class="piece-desig">{{ piece.designation }}</span>-->
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
+
+    </div>
+  </div>
 }
