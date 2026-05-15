@@ -6,7 +6,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
 import {
   faSearch, faTimes, faChevronDown, faChevronUp,
-  faBoxOpen, faTag
+  faBoxOpen, faTag,
+  faCheck,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService }      from '../../auth-lib/services/auth.service';
@@ -42,12 +44,18 @@ export class Inventaire implements OnInit {
   readonly faChevronUp   = faChevronUp;
   readonly faBoxOpen     = faBoxOpen;
   readonly faTag         = faTag;
+  readonly faCheck       = faCheck;
+  readonly faXmark       = faXmark;
 
   // ── State ─────────────────────────────────────────────────
   readonly me           = this.auth.meSignal;
   readonly loading      = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly searchQuery  = signal('');
+
+  readonly editingStockId  = signal<number | null>(null);
+  readonly editingStockVal = signal<number>(0);
+  readonly savingStockId   = signal<number | null>(null);
 
   private readonly _marqueGroups = signal<MarqueGroup[]>([]);
 
@@ -133,6 +141,39 @@ export class Inventaire implements OnInit {
       .filter(g => g.pieces.length > 0 || true); // garde les marques sans pièces
   }
 
+  startEditStock(piece: PieceWithModeles): void {
+  this.editingStockId.set(piece.id);
+  this.editingStockVal.set(piece.quantite);
+}
+
+cancelEditStock(): void {
+  this.editingStockId.set(null);
+}
+
+saveStock(piece: PieceWithModeles): void {
+  const val = this.editingStockVal();
+  if (val < 0 || val === piece.quantite) { this.cancelEditStock(); return; }
+
+  this.savingStockId.set(piece.id);
+  this.refService.updateStock(piece.id, val).subscribe({
+    next: (updated) => {
+      // Met à jour le signal sans recharger toute la page
+      this._marqueGroups.update(groups =>
+        groups.map(g => ({
+          ...g,
+          pieces: g.pieces.map(p => p.id === updated.id ? { ...p, quantite: updated.quantite } : p),
+        }))
+      );
+      this.savingStockId.set(null);
+      this.editingStockId.set(null);
+    },
+    error: () => {
+      this.errorMessage.set('Erreur lors de la mise à jour du stock.');
+      this.savingStockId.set(null);
+    }
+  });
+}
+
   // ── Accordion ─────────────────────────────────────────────
   toggleGroup(group: MarqueGroup): void {
     group.expanded = !group.expanded;
@@ -146,6 +187,7 @@ export class Inventaire implements OnInit {
   collapseAll(): void {
     this._marqueGroups.update(groups => groups.map(g => ({ ...g, expanded: false })));
   }
+
 
   // ── Auth ──────────────────────────────────────────────────
   async logout(): Promise<void> {

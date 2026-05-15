@@ -218,13 +218,15 @@
                         </tbody>
                       </table>
                     </div>
-
-                    <div class="edit-btn">
-                      <button class="btn btn-primary btn-sm" (click)="openEditPieces()">
-                        <fa-icon [icon]="faPen"></fa-icon> Modifier
-                      </button>
+                    @if(rep.statut != 'termine'){
+                      <div class="edit-btn">
+                        <button class="btn btn-primary btn-sm" (click)="openEditPieces()">
+                          <fa-icon [icon]="faPen"></fa-icon> Modifier
+                        </button>
 
                     </div>
+                    }
+
                   } @else {
                     <p class="no-pieces">Aucune pièce enregistrée pour cette intervention.</p>
                   }

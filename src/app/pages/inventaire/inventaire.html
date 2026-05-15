@@ -16,31 +16,34 @@
 
       <!-- HERO -->
       <section class="hero">
-        <div>
-          <h2 class="hero-title">Inventaire des pièces</h2>
-          <p class="hero-sub">
-            <span class="stat-pill">{{ totalMarques() }} marque{{ totalMarques() > 1 ? 's' : '' }}</span>
-            <span class="stat-pill">{{ totalPieces() }} pièce{{ totalPieces() > 1 ? 's' : '' }}</span>
-          </p>
-        </div>
-        <div class="hero-actions">
-          <button class="btn btn-outline btn-sm" (click)="expandAll()">Tout déplier</button>
-          <button class="btn btn-outline btn-sm" (click)="collapseAll()">Tout replier</button>
-        </div>
+          <div>
+            <h2 class="hero-title">Inventaire</h2>
+            <p class="hero-sub">
+              <span class="stat-pill">{{ totalMarques() }} marque{{ totalMarques() > 1 ? 's' : '' }} </span>
+              <span class="stat-pill">{{ totalPieces() }} pièce{{ totalPieces() > 1 ? 's' : '' }} </span>
+            </p>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn btn-outline btn-sm" (click)="expandAll()">Tout déplier</button>
+            <button class="btn btn-outline btn-sm" (click)="collapseAll()">Tout replier</button>
+          </div>
       </section>
 
       <!-- RECHERCHE -->
-      <div class="search-piece-wrapper inv-search">
-        <i class="fas fa-search search-piece-icon"></i>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1"><fa-icon [icon]="faSearch"></fa-icon></span>
         <input
-          class="field-input search-piece-input"
+          class="form-control"
+          type="text"
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
           placeholder="Rechercher une référence, désignation ou marque…"
-          autocomplete="off" />
+          autocomplete="off"
+        />
+
         @if (searchQuery().length > 0) {
-          <button class="btn btn-outline-danger search-clear-btn"
-            (click)="searchQuery.set('')" aria-label="Effacer">
+          <button class="btn btn-danger-ghost" type="button"(click)="searchQuery.set('')" aria-label="Effacer">
             <fa-icon [icon]="faTimes"></fa-icon>
           </button>
         }
@@ -104,6 +107,7 @@
                       <tr>
                         <th class="inv-table__ref">Référence</th>
                         <th class="inv-table__desig">Désignation</th>
+                        <th class="inv-table__stock">Stock</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -114,6 +118,57 @@
                           </td>
                           <td class="inv-table__desig-cell">
                             <span class="piece-desig">{{ piece.designation }}</span>
+                          </td>
+
+                          <!-- ── Colonne stock éditable ── -->
+                          <td class="inv-table__stock-cell">
+
+                            @if (editingStockId() === piece.id) {
+                              <!-- Mode édition -->
+                              <div class="stock-edit">
+                                <button class="stock-qty-btn"
+                                  (click)="editingStockVal.set(editingStockVal() > 0 ? editingStockVal() - 1 : 0)">
+                                  −
+                                </button>
+                                <input
+                                  type="number"
+                                  class="stock-input"
+                                  min="0"
+                                  [ngModel]="editingStockVal()"
+                                  (ngModelChange)="editingStockVal.set($event)"
+                                  (keyup.enter)="saveStock(piece)"
+                                  (keyup.escape)="cancelEditStock()"
+                                  #stockInput />
+                                <button class="stock-qty-btn"
+                                  (click)="editingStockVal.set(editingStockVal() + 1)">
+                                  +
+                                </button>
+                                <button class="stock-save-btn"
+                                  (click)="saveStock(piece)"
+                                  [disabled]="savingStockId() === piece.id">
+                                  @if (savingStockId() === piece.id) {
+                                    <div class="btn-spinner"></div>
+                                  } @else {
+                                    <fa-icon [icon]="faCheck"></fa-icon>
+                                  }
+                                </button>
+                                <button class="stock-cancel-btn" (click)="cancelEditStock()">
+                                  <fa-icon [icon]="faXmark"></fa-icon>
+                                </button>
+                              </div>
+
+                            } @else {
+                              <!-- Mode lecture — clic pour éditer -->
+                              <div class="stock-display" (click)="startEditStock(piece)" title="Cliquer pour modifier">
+                                <span class="stock-badge"
+                                  [class.stock-badge--low]="piece.quantite > 0 && piece.quantite <= 2"
+                                  [class.stock-badge--empty]="piece.quantite === 0">
+                                  {{ piece.quantite }}
+                                </span>
+                                <i class="fas fa-pencil-alt stock-edit-hint"></i>
+                              </div>
+                            }
+
                           </td>
                         </tr>
                       }

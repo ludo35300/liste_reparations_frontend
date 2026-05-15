@@ -3,6 +3,7 @@ export interface PieceRef {
   ref_piece: string;
   designation: string;
   marque_id: number;
+  quantite:    number;
 }
 
 export interface PieceChangee {
