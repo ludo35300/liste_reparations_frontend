@@ -2,7 +2,7 @@ export interface PieceRef {
   id: number;
   ref_piece: string;
   designation: string;
-  marque_id?: number;
+  marque_id: number;
 }
 
 export interface PieceChangee {
@@ -12,4 +12,8 @@ export interface PieceChangee {
   designation: string;
   quantite: number;
   is_new?: boolean;
+}
+
+export interface PieceWithModeles extends PieceRef {
+  modeles: { nom: string; type_machine: string }[];
 }

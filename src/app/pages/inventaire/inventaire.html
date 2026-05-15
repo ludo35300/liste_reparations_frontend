@@ -1,0 +1,132 @@
+<div class="layout">
+  <div class="layout-right">
+
+    <app-topbar
+      [me]="me()"
+      pageTitle="Inventaire"
+      [navItems]="navItems"
+      (logoutEvt)="logout()" />
+
+    <main class="main-content">
+
+      <!-- MESSAGES -->
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert">⚠️ {{ errorMessage() }}</div>
+      }
+
+      <!-- HERO -->
+      <section class="hero">
+        <div>
+          <h2 class="hero-title">Inventaire des pièces</h2>
+          <p class="hero-sub">
+            <span class="stat-pill">{{ totalMarques() }} marque{{ totalMarques() > 1 ? 's' : '' }}</span>
+            <span class="stat-pill">{{ totalPieces() }} pièce{{ totalPieces() > 1 ? 's' : '' }}</span>
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-outline btn-sm" (click)="expandAll()">Tout déplier</button>
+          <button class="btn btn-outline btn-sm" (click)="collapseAll()">Tout replier</button>
+        </div>
+      </section>
+
+      <!-- RECHERCHE -->
+      <div class="search-piece-wrapper inv-search">
+        <i class="fas fa-search search-piece-icon"></i>
+        <input
+          class="field-input search-piece-input"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Rechercher une référence, désignation ou marque…"
+          autocomplete="off" />
+        @if (searchQuery().length > 0) {
+          <button class="btn btn-outline-danger search-clear-btn"
+            (click)="searchQuery.set('')" aria-label="Effacer">
+            <fa-icon [icon]="faTimes"></fa-icon>
+          </button>
+        }
+      </div>
+
+      <!-- SKELETON -->
+      @if (loading()) {
+        <div class="inv-skeleton">
+          @for (i of [1,2,3]; track i) {
+            <div class="skeleton-brand-card">
+              <div class="skeleton skeleton-heading"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text"></div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- LISTE PAR MARQUE -->
+      @if (!loading()) {
+
+        @if (marqueGroups().length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-box-open empty-icon-fa"></i>
+            <h3>Aucune pièce trouvée</h3>
+            <p>{{ searchQuery() ? 'Aucun résultat pour « ' + searchQuery() + ' ».' : 'Aucune pièce enregistrée.' }}</p>
+          </div>
+        }
+
+        <div class="inv-groups">
+          @for (group of marqueGroups(); track group.marque.id) {
+
+            <div class="inv-group" [class.inv-group--collapsed]="!group.expanded">
+
+              <!-- Header marque (cliquable) -->
+              <button type="button" class="inv-group__header" (click)="toggleGroup(group)">
+                <div class="inv-group__brand">
+                  @if (group.marque.url_logo) {
+                    <img [src]="group.marque.url_logo" [alt]="group.marque.nom"
+                         class="inv-group__logo" loading="lazy" />
+                  } @else {
+                    <div class="inv-group__logo-placeholder">
+                      {{ group.marque.nom.charAt(0) }}
+                    </div>
+                  }
+                  <span class="inv-group__name">{{ group.marque.nom }}</span>
+                </div>
+                <div class="inv-group__meta">
+                  <span class="piece-badge">{{ group.pieces.length }} pièce{{ group.pieces.length > 1 ? 's' : '' }}</span>
+                  <fa-icon
+                    [icon]="group.expanded ? faChevronUp : faChevronDown"
+                    class="inv-chevron" />
+                </div>
+              </button>
+
+              <!-- Table des pièces -->
+              @if (group.expanded) {
+                <div class="inv-group__body">
+                  <table class="inv-table">
+                    <thead>
+                      <tr>
+                        <th class="inv-table__ref">Référence</th>
+                        <th class="inv-table__desig">Désignation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (piece of group.pieces; track piece.id) {
+                        <tr class="inv-table__row">
+                          <td class="inv-table__ref-cell">
+                            <span class="piece-ref">{{ piece.ref_piece }}</span>
+                          </td>
+                          <td class="inv-table__desig-cell">
+                            <span class="piece-desig">{{ piece.designation }}</span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+      }
+
+    </main>
+  </div>
+</div>
