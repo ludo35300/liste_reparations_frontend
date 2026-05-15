@@ -13,7 +13,8 @@ import { MeResponse } from '../../auth-lib/models/auth.model';
 import {
   faSort, faSortUp, faSortDown,
   faArrowUpRightFromSquare, faWrench,
-  faCheckCircle, faClock, faTools
+  faCheckCircle, faClock, faTools,
+  faSearch
 } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 
@@ -44,6 +45,7 @@ export class MyRepairs implements OnInit {
   readonly faCheck      = faCheckCircle;
   readonly faClock      = faClock;
   readonly faTools      = faTools;
+  readonly faSearch     = faSearch;
 
   // ── State ──────────────────────────────────────────────────
   readonly me           = signal<MeResponse | null>(null);

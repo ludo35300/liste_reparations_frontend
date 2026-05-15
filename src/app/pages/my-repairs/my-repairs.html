@@ -8,14 +8,13 @@
     />
 
     <main class="main-content">
-
-      <!-- En-tête -->
-      <div class="page-header">
-        <div>
-          <h2 class="page-title">Mes réparations</h2>
-          <p class="page-subtitle">Suivi de vos interventions en cours et terminées</p>
-        </div>
-      </div>
+      <!-- HEADER -->
+      <section class="hero">
+          <div>
+            <h2 class="hero-title">Mes réparations</h2>
+            <p class="hero-sub">Suivi de mes interventions</p>
+          </div>
+      </section>
 
       <!-- Onglets + recherche -->
       <div class="toolbar">
@@ -46,15 +45,18 @@
           </button>
         </div>
 
-        <div class="search-wrapper">
-          <i class="fas fa-search search-icon"></i>
+        <div class="search-wrapper mb-3">
+          <div class="input-group">
+          <span class="input-group-text" id="basic-addon1"><fa-icon [icon]="faSearch"></fa-icon></span>
           <input
-            class="search-input"
+            class="form-control"
+            type="text"
             [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event)"
             placeholder="Rechercher…"
             autocomplete="off"
           />
+            </div>
         </div>
       </div>
 

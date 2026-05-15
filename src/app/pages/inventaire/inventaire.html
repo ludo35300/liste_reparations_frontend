@@ -13,8 +13,7 @@
       @if (errorMessage()) {
         <div class="alert alert-danger" role="alert">⚠️ {{ errorMessage() }}</div>
       }
-
-      <!-- HERO -->
+      <!-- HEADER -->
       <section class="hero">
           <div>
             <h2 class="hero-title">Inventaire</h2>
@@ -66,8 +65,8 @@
       @if (!loading()) {
 
         @if (marqueGroups().length === 0) {
-          <div class="empty-state">
-            <i class="fas fa-box-open empty-icon-fa"></i>
+          <div class="alert alert-warning warning-state">
+            <fa-icon [icon]="faBoxOpen"></fa-icon>
             <h3>Aucune pièce trouvée</h3>
             <p>{{ searchQuery() ? 'Aucun résultat pour « ' + searchQuery() + ' ».' : 'Aucune pièce enregistrée.' }}</p>
           </div>
