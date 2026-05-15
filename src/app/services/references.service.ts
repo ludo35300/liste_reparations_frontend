@@ -50,6 +50,9 @@ export class ReferenceService {
   updatePiece(id: number, ref_piece: string, designation: string): Observable<PieceRef> {
     return this.http.put<PieceRef>(`${this.api}/pieces/${id}`, { ref_piece, designation });
   }
+  updateStock(pieceId: number, quantite: number): Observable<PieceRef> {
+    return this.http.patch<PieceRef>(`${this.api}/pieces/${pieceId}/stock`, { quantite });
+  }
   deletePiece(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/pieces/${id}`);
   }

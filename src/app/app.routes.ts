@@ -49,6 +49,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/machines-enregistrees/machines-enregistrees').then(m => m.MachinesEnregistrees)
   },
+  {
+    path: 'inventaire',
+    title: 'Inventaire',
+    loadComponent: () => import('./pages/inventaire/inventaire').then(m => m.Inventaire),
+    canActivate: [authGuard],
+  },
   { path: '',   redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' },
 ];
