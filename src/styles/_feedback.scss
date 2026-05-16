@@ -20,6 +20,18 @@
   h3 { margin: 0 0 0.5rem; font-size: 0.96rem; font-weight: 700; color: var(--text-dark); }
   p  { margin: 0 0 1.25rem; font-size: 0.84rem; color: var(--text-muted); max-width: 36ch; }
 }
+.warning-state{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1rem;
+  text-align: center;
+
+  fa-icon { font-size: 2rem; color: var(--text-faint); }
+  h3 { margin: 0 0 0.5rem; font-size: 0.96rem; font-weight: 700; color: var(--text-dark); }
+  p  { margin: 0 0 1.25rem; font-size: 0.84rem; color: var(--text-muted); max-width: 36ch; }
+
+}
 
 // ── Skeleton loader ───────────────────────────────────────────
 // Appliqué sur des divs vides en attendant les données.

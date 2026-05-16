@@ -460,18 +460,18 @@
           </div>
         } @else {
            <!-- Champ recherche -->
-          <div class="search-piece-wrapper">
-            <i class="fas fa-search search-piece-icon"></i>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1"><fa-icon [icon]="faSearch"></fa-icon></span>
             <input
-              class="field-input search-piece-input"
+              class="form-control"
+              type="text"
               [ngModel]="searchMarquePiece()"
               (ngModelChange)="searchMarquePiece.set($event)"
               placeholder="Référence ou désignation…"
               autocomplete="off" />
+
             @if (searchMarquePiece().length > 0) {
-              <button class="btn btn-outline-danger search-clear-btn"
-                (click)="searchMarquePiece.set('')"
-                aria-label="Effacer">
+              <button class="btn btn-outline-danger search-clear-btn" (click)="searchMarquePiece.set('')" aria-label="Effacer">
                 <fa-icon [icon]="faTimes"></fa-icon>
               </button>
             }
@@ -481,7 +481,6 @@
               <li class="piece-item">
                 <div class="piece-item-info">
                   <span class="piece-ref">{{ piece.ref_piece }} - <span class="piece-desig">{{ piece.designation }}</span></span>
-                  <!--<span class="piece-desig">{{ piece.designation }}</span>-->
                 </div>
               </li>
             }
