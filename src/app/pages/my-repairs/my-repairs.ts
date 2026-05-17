@@ -14,7 +14,9 @@ import {
   faSort, faSortUp, faSortDown,
   faArrowUpRightFromSquare, faWrench,
   faCheckCircle, faClock, faTools,
-  faSearch
+  faSearch,
+  faChevronLeft, faChevronRight,
+  faAnglesLeft, faAnglesRight
 } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 
@@ -46,6 +48,10 @@ export class MyRepairs implements OnInit {
   readonly faClock      = faClock;
   readonly faTools      = faTools;
   readonly faSearch     = faSearch;
+  readonly faPrev       = faChevronLeft;
+  readonly faNext       = faChevronRight;
+  readonly faFirst      = faAnglesLeft;
+  readonly faLast       = faAnglesRight;
 
   // ── State ──────────────────────────────────────────────────
   readonly me           = signal<MeResponse | null>(null);
@@ -56,6 +62,10 @@ export class MyRepairs implements OnInit {
   readonly sortCol      = signal<SortCol>('date');
   readonly sortDir      = signal<SortDir>('desc');
   readonly searchQuery  = signal('');
+
+  // ── Pagination ─────────────────────────────────────────────
+  readonly currentPage  = signal(1);
+  pageSize              = 10;
 
   private readonly STATUTS_EN_COURS = new Set(['en_attente', 'en_reparation']);
 
@@ -101,6 +111,32 @@ export class MyRepairs implements OnInit {
     return this.sortRows(filtered);
   });
 
+  readonly filteredCount = computed(() => this.displayed().length);
+
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredCount() / this.pageSize))
+  );
+
+  readonly paginated = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.displayed().slice(start, start + this.pageSize);
+  });
+
+  readonly pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages: number[] = [];
+    pages.push(1);
+    if (current > 3) pages.push(-1);
+    for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) {
+      pages.push(p);
+    }
+    if (current < total - 2) pages.push(-1);
+    pages.push(total);
+    return pages;
+  });
+
   // ── Tri ────────────────────────────────────────────────────
   sortBy(col: SortCol): void {
     if (this.sortCol() === col) {
@@ -109,6 +145,7 @@ export class MyRepairs implements OnInit {
       this.sortCol.set(col);
       this.sortDir.set('asc');
     }
+    this.currentPage.set(1);
   }
 
   sortIcon(col: SortCol) {
@@ -141,6 +178,22 @@ export class MyRepairs implements OnInit {
     });
   }
 
+  // ── Pagination helpers ─────────────────────────────────────
+  goToPage(p: number): void {
+    const clamped = Math.max(1, Math.min(p, this.totalPages()));
+    this.currentPage.set(clamped);
+  }
+
+  setPageSize(size: number): void {
+    this.pageSize = Number(size);
+    this.currentPage.set(1);
+  }
+
+  /** Utilisé dans le template pour éviter les pipes custom */
+  minVal(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
   // ── Lifecycle ──────────────────────────────────────────────
   async ngOnInit(): Promise<void> {
     firstValueFrom(this.auth.getMeHttp()).then(me => this.me.set(me)).catch(() => {});
@@ -160,6 +213,12 @@ export class MyRepairs implements OnInit {
   setTab(tab: Tab): void {
     this.activeTab.set(tab);
     this.searchQuery.set('');
+    this.currentPage.set(1);
+  }
+
+  onSearch(query: string): void {
+    this.searchQuery.set(query);
+    this.currentPage.set(1);
   }
 
   goToHistory(rep: Reparation): void {
@@ -172,7 +231,7 @@ export class MyRepairs implements OnInit {
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
 
-  // ── Helpers ────────────────────────────────────────────────
+  // ── Helpers statut ─────────────────────────────────────────
   getStatutLabel(statut?: string): string {
     const labels: Record<string, string> = {
       en_attente:    'En attente',
