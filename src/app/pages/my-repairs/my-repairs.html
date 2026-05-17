@@ -16,8 +16,8 @@
         </div>
       </section>
 
-      <!-- Onglets + recherche -->
-      <div class="toolbar">
+      <!-- Onglets -->
+      <div class="tabs-wrapper">
         <div class="tabs" role="tablist">
           <button
             role="tab"
@@ -44,20 +44,6 @@
             }
           </button>
         </div>
-
-        <div class="search-wrapper">
-          <div class="input-group">
-            <span class="input-group-text"><fa-icon [icon]="faSearch"></fa-icon></span>
-            <input
-              class="form-control"
-              type="text"
-              [ngModel]="searchQuery()"
-              (ngModelChange)="onSearch($event)"
-              placeholder="Rechercher…"
-              autocomplete="off"
-            />
-          </div>
-        </div>
       </div>
 
       <!-- Erreur -->
@@ -68,7 +54,7 @@
       <!-- Skeleton -->
       @if (loading()) {
         <div class="skeleton-table">
-          @for (i of [1,2,3,4,5]; track i) {
+          @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
             <div class="skeleton-row">
               <div class="skeleton skeleton-cell-lg"></div>
               <div class="skeleton skeleton-cell-md"></div>
@@ -80,160 +66,158 @@
         </div>
       }
 
-      <!-- Tableau -->
-      @if (!loading() && displayed().length > 0) {
-        <div class="table-card">
+      <!-- Bloc tableau -->
+      @if (!loading()) {
+        <div class="dt-panel">
 
-          <!-- Info + sélecteur d'entrées -->
-          <div class="table-meta">
-            <span class="table-info">
-              {{ (currentPage() - 1) * pageSize + 1 }}–{{ minVal(currentPage() * pageSize, filteredCount()) }}
-              sur <strong>{{ filteredCount() }}</strong> réparation{{ filteredCount() > 1 ? 's' : '' }}
-            </span>
-            <label class="page-size-label">
-              Afficher
-              <select class="page-size-select" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
+          <!-- Barre search + entries -->
+          <div class="dt-topbar">
+            <div class="dt-search">
+              <fa-icon [icon]="faSearch" class="dt-search-icon"></fa-icon>
+              <input
+                class="dt-search-input"
+                type="text"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="onSearch($event)"
+                placeholder="Rechercher…"
+                autocomplete="off"
+              />
+            </div>
+            <label class="dt-entries-label">
+              <select class="dt-entries-select" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
                 <option [value]="10">10</option>
                 <option [value]="25">25</option>
                 <option [value]="50">50</option>
               </select>
-              par page
+              entries per page
             </label>
           </div>
 
-          <div class="table-wrapper">
-            <table class="repairs-table" aria-label="Mes réparations">
-              <thead>
-                <tr>
-                  <th scope="col" (click)="sortBy('date')" [class]="sortClass('date')">
-                    Date <fa-icon [icon]="sortIcon('date')"></fa-icon>
-                  </th>
-                  <th scope="col" (click)="sortBy('serie')" [class]="sortClass('serie')">
-                    N° de série <fa-icon [icon]="sortIcon('serie')"></fa-icon>
-                  </th>
-                  <th scope="col" (click)="sortBy('modele')" [class]="sortClass('modele')">
-                    Modèle <fa-icon [icon]="sortIcon('modele')"></fa-icon>
-                  </th>
-                  <th scope="col" (click)="sortBy('technicien')" [class]="sortClass('technicien')">
-                    Technicien <fa-icon [icon]="sortIcon('technicien')"></fa-icon>
-                  </th>
-                  <th scope="col" (click)="sortBy('pieces')" [class]="sortClass('pieces')">
-                    Pièces <fa-icon [icon]="sortIcon('pieces')"></fa-icon>
-                  </th>
-                  <th scope="col" (click)="sortBy('statut')" [class]="sortClass('statut')">
-                    Statut <fa-icon [icon]="sortIcon('statut')"></fa-icon>
-                  </th>
-                  <th scope="col" class="th-action"></th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (rep of paginated(); track rep.id) {
-                  <tr class="repair-row" (click)="goToHistory(rep)">
-                    <td class="cell-date">
-                      {{ rep.date_reparation | date:'dd/MM/yyyy' }}
-                    </td>
-                    <td class="cell-serie">
-                      <span class="serie-code">{{ rep.machine?.numero_serie ?? rep.numero_serie ?? '—' }}</span>
-                    </td>
-                    <td class="cell-modele">
-                      {{ rep.machine?.modele?.marque?.nom }}
-                      {{ rep.machine?.modele?.nom ?? rep.machine?.modele?.type_machine ?? '-' }}
-                    </td>
-                    <td class="cell-tech">
-                      {{ rep.technicien ?? '—' }}
-                    </td>
-                    <td class="cell-pieces">
-                      @if ((rep.pieces.length) > 0) {
-                        <span class="pieces-pill">{{ rep.pieces!.length }}</span>
-                      } @else {
-                        <span class="text-muted">—</span>
-                      }
-                    </td>
-                    <td class="cell-statut">
-                      <span class="badge" [class]="getStatutClass(rep.machine?.statut)">
-                        <fa-icon [icon]="getStatutIcon(rep.machine?.statut)"></fa-icon>
-                        {{ getStatutLabel(rep.machine?.statut) }}
-                      </span>
-                    </td>
-                    <td class="cell-action">
-                      <button class="btn-open"
-                              (click)="goToHistory(rep); $event.stopPropagation()"
-                              aria-label="Voir les détails">
-                        <fa-icon [icon]="faOpen"></fa-icon>
-                      </button>
-                    </td>
+          <!-- Tableau -->
+          @if (displayed().length > 0) {
+            <div class="dt-table-wrap">
+              <table class="dt-table" aria-label="Mes réparations">
+                <thead>
+                  <tr>
+                    <th class="th-num">S.L</th>
+                    <th (click)="sortBy('date')" [class]="sortClass('date')">
+                      Date <fa-icon [icon]="sortIcon('date')"></fa-icon>
+                    </th>
+                    <th (click)="sortBy('serie')" [class]="sortClass('serie')">
+                      N° de série <fa-icon [icon]="sortIcon('serie')"></fa-icon>
+                    </th>
+                    <th (click)="sortBy('modele')" [class]="sortClass('modele')">
+                      Modèle <fa-icon [icon]="sortIcon('modele')"></fa-icon>
+                    </th>
+                    <th (click)="sortBy('technicien')" [class]="sortClass('technicien')">
+                      Technicien <fa-icon [icon]="sortIcon('technicien')"></fa-icon>
+                    </th>
+                    <th (click)="sortBy('pieces')" [class]="sortClass('pieces')">
+                      Pièces <fa-icon [icon]="sortIcon('pieces')"></fa-icon>
+                    </th>
+                    <th (click)="sortBy('statut')" [class]="sortClass('statut')">
+                      Statut <fa-icon [icon]="sortIcon('statut')"></fa-icon>
+                    </th>
+                    <th class="th-action">Action</th>
                   </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  @for (rep of paginated(); track rep.id; let idx = $index) {
+                    <tr class="dt-row">
+                      <td class="td-num">{{ (currentPage() - 1) * pageSize + idx + 1 | number:'2.0-0' }}</td>
+                      <td class="td-date">{{ rep.date_reparation | date:'dd/MM/yyyy' }}</td>
+                      <td class="td-serie">
+                        <span class="serie-code">{{ rep.machine?.numero_serie ?? rep.numero_serie ?? '—' }}</span>
+                      </td>
+                      <td class="td-modele">
+                        {{ rep.machine?.modele?.marque?.nom }}
+                        {{ rep.machine?.modele?.nom ?? rep.machine?.modele?.type_machine ?? '-' }}
+                      </td>
+                      <td class="td-tech">{{ rep.technicien ?? '—' }}</td>
+                      <td class="td-pieces">
+                        @if (rep.pieces.length > 0) {
+                          <span class="pieces-pill">{{ rep.pieces.length }}</span>
+                        } @else {
+                          <span class="dash">—</span>
+                        }
+                      </td>
+                      <td class="td-statut">
+                        <span class="status-badge" [class]="getStatutClass(rep.machine?.statut)">
+                          {{ getStatutLabel(rep.machine?.statut) }}
+                        </span>
+                      </td>
+                      <td class="td-action">
+                        <div class="action-btns">
+                          <button class="action-btn action-btn--view"
+                                  (click)="goToHistory(rep)"
+                                  aria-label="Voir">
+                            <fa-icon [icon]="faEye"></fa-icon>
+                          </button>
+                          <button class="action-btn action-btn--edit"
+                                  (click)="$event.stopPropagation()"
+                                  aria-label="Modifier">
+                            <fa-icon [icon]="faEdit"></fa-icon>
+                          </button>
+                          <button class="action-btn action-btn--delete"
+                                  (click)="$event.stopPropagation()"
+                                  aria-label="Supprimer">
+                            <fa-icon [icon]="faTrash"></fa-icon>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
 
-          <!-- Pagination -->
-          @if (totalPages() > 1) {
-            <nav class="pagination-bar" aria-label="Pagination">
-              <button
-                class="page-btn"
-                [disabled]="currentPage() === 1"
-                (click)="goToPage(1)"
-                aria-label="Première page">
-                <fa-icon [icon]="faFirst"></fa-icon>
-              </button>
-              <button
-                class="page-btn"
-                [disabled]="currentPage() === 1"
-                (click)="goToPage(currentPage() - 1)"
-                aria-label="Page précédente">
-                <fa-icon [icon]="faPrev"></fa-icon>
-              </button>
+            <!-- Pied : info + pagination -->
+            <div class="dt-footer">
+              <span class="dt-info">
+                Affichage de {{ (currentPage() - 1) * pageSize + 1 }}
+                à {{ minVal(currentPage() * pageSize, filteredCount()) }}
+                sur {{ filteredCount() }} entrée{{ filteredCount() > 1 ? 's' : '' }}
+              </span>
 
-              @for (p of pageNumbers(); track p) {
-                @if (p === -1) {
-                  <span class="page-ellipsis">…</span>
-                } @else {
-                  <button
-                    class="page-btn"
-                    [class.active]="p === currentPage()"
-                    [attr.aria-current]="p === currentPage() ? 'page' : null"
-                    (click)="goToPage(p)">
-                    {{ p }}
-                  </button>
-                }
+              @if (totalPages() > 1) {
+                <nav class="dt-pagination" aria-label="Pagination">
+                  <button class="pg-btn" [disabled]="currentPage() === 1"
+                          (click)="goToPage(currentPage() - 1)">Précédent</button>
+
+                  @for (p of pageNumbers(); track p) {
+                    @if (p === -1) {
+                      <span class="pg-ellipsis">…</span>
+                    } @else {
+                      <button class="pg-btn" [class.active]="p === currentPage()"
+                              [attr.aria-current]="p === currentPage() ? 'page' : null"
+                              (click)="goToPage(p)">{{ p }}</button>
+                    }
+                  }
+
+                  <button class="pg-btn" [disabled]="currentPage() === totalPages()"
+                          (click)="goToPage(currentPage() + 1)">Suivant</button>
+                </nav>
               }
-
-              <button
-                class="page-btn"
-                [disabled]="currentPage() === totalPages()"
-                (click)="goToPage(currentPage() + 1)"
-                aria-label="Page suivante">
-                <fa-icon [icon]="faNext"></fa-icon>
-              </button>
-              <button
-                class="page-btn"
-                [disabled]="currentPage() === totalPages()"
-                (click)="goToPage(totalPages())"
-                aria-label="Dernière page">
-                <fa-icon [icon]="faLast"></fa-icon>
-              </button>
-            </nav>
+            </div>
           }
 
-        </div>
-      }
+          <!-- Empty state -->
+          @if (displayed().length === 0) {
+            <div class="empty-state">
+              <fa-icon [icon]="activeTab() === 'en_cours' ? faWrench : faCheck" class="empty-icon"></fa-icon>
+              <h3>Aucune réparation {{ activeTab() === 'en_cours' ? 'en cours' : 'terminée' }}</h3>
+              <p>
+                @if (searchQuery()) {
+                  Aucun résultat pour « {{ searchQuery() }} »
+                } @else if (activeTab() === 'en_cours') {
+                  Vous n'avez pas d'intervention active pour le moment.
+                } @else {
+                  Votre historique apparaîtra ici.
+                }
+              </p>
+            </div>
+          }
 
-      <!-- Empty state -->
-      @if (!loading() && displayed().length === 0) {
-        <div class="empty-state">
-          <fa-icon [icon]="activeTab() === 'en_cours' ? faWrench : faCheck" class="empty-icon"></fa-icon>
-          <h3>Aucune réparation {{ activeTab() === 'en_cours' ? 'en cours' : 'terminée' }}</h3>
-          <p>
-            @if (searchQuery()) {
-              Aucun résultat pour « {{ searchQuery() }} »
-            } @else if (activeTab() === 'en_cours') {
-              Vous n'avez pas d'intervention active pour le moment.
-            } @else {
-              Votre historique apparaîtra ici.
-            }
-          </p>
         </div>
       }
 

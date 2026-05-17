@@ -12,11 +12,8 @@ import { Reparation } from '../../models/reparation.model';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import {
   faSort, faSortUp, faSortDown,
-  faArrowUpRightFromSquare, faWrench,
-  faCheckCircle, faClock, faTools,
-  faSearch,
-  faChevronLeft, faChevronRight,
-  faAnglesLeft, faAnglesRight
+  faWrench, faCheckCircle, faClock, faTools, faSearch,
+  faEye, faPencil, faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 
@@ -38,38 +35,36 @@ export class MyRepairs implements OnInit {
   private readonly reparationService = inject(ReparationService);
   protected readonly navItems = inject(NavService).navItems;
 
-  // ── Icons ──────────────────────────────────────────────────
-  readonly faSort       = faSort;
-  readonly faSortUp     = faSortUp;
-  readonly faSortDown   = faSortDown;
-  readonly faOpen       = faArrowUpRightFromSquare;
-  readonly faWrench     = faWrench;
-  readonly faCheck      = faCheckCircle;
-  readonly faClock      = faClock;
-  readonly faTools      = faTools;
-  readonly faSearch     = faSearch;
-  readonly faPrev       = faChevronLeft;
-  readonly faNext       = faChevronRight;
-  readonly faFirst      = faAnglesLeft;
-  readonly faLast       = faAnglesRight;
+  // ── Icons
+  readonly faSort    = faSort;
+  readonly faSortUp  = faSortUp;
+  readonly faSortDown = faSortDown;
+  readonly faWrench  = faWrench;
+  readonly faCheck   = faCheckCircle;
+  readonly faClock   = faClock;
+  readonly faTools   = faTools;
+  readonly faSearch  = faSearch;
+  readonly faEye     = faEye;
+  readonly faEdit    = faPencil;
+  readonly faTrash   = faTrash;
 
-  // ── State ──────────────────────────────────────────────────
-  readonly me           = signal<MeResponse | null>(null);
-  readonly loading      = signal(true);
-  readonly error        = signal<string | null>(null);
-  readonly reparations  = signal<Reparation[]>([]);
-  readonly activeTab    = signal<Tab>('en_cours');
-  readonly sortCol      = signal<SortCol>('date');
-  readonly sortDir      = signal<SortDir>('desc');
-  readonly searchQuery  = signal('');
+  // ── State
+  readonly me          = signal<MeResponse | null>(null);
+  readonly loading     = signal(true);
+  readonly error       = signal<string | null>(null);
+  readonly reparations = signal<Reparation[]>([]);
+  readonly activeTab   = signal<Tab>('en_cours');
+  readonly sortCol     = signal<SortCol>('date');
+  readonly sortDir     = signal<SortDir>('desc');
+  readonly searchQuery = signal('');
 
-  // ── Pagination ─────────────────────────────────────────────
-  readonly currentPage  = signal(1);
-  pageSize              = 10;
+  // ── Pagination
+  readonly currentPage = signal(1);
+  pageSize = 10;
 
   private readonly STATUTS_EN_COURS = new Set(['en_attente', 'en_reparation']);
 
-  // ── Computed ───────────────────────────────────────────────
+  // ── Computed
   private latestRepByMachine(): Map<number, number> {
     const latest = new Map<number, number>();
     for (const r of this.reparations()) {
@@ -83,9 +78,7 @@ export class MyRepairs implements OnInit {
     const latest = this.latestRepByMachine();
     return this.reparations().filter(r => {
       const mid = r.machine_id ?? r.machine?.id;
-      return mid
-        && latest.get(mid) === r.id
-        && this.STATUTS_EN_COURS.has(r.machine?.statut ?? '');
+      return mid && latest.get(mid) === r.id && this.STATUTS_EN_COURS.has(r.machine?.statut ?? '');
     });
   });
 
@@ -124,27 +117,20 @@ export class MyRepairs implements OnInit {
 
   readonly pageNumbers = computed(() => {
     const total = this.totalPages();
-    const current = this.currentPage();
+    const cur = this.currentPage();
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-    const pages: number[] = [];
-    pages.push(1);
-    if (current > 3) pages.push(-1);
-    for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) {
-      pages.push(p);
-    }
-    if (current < total - 2) pages.push(-1);
+    const pages: number[] = [1];
+    if (cur > 3) pages.push(-1);
+    for (let p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++) pages.push(p);
+    if (cur < total - 2) pages.push(-1);
     pages.push(total);
     return pages;
   });
 
-  // ── Tri ────────────────────────────────────────────────────
+  // ── Tri
   sortBy(col: SortCol): void {
-    if (this.sortCol() === col) {
-      this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortCol.set(col);
-      this.sortDir.set('asc');
-    }
+    if (this.sortCol() === col) this.sortDir.update(d => d === 'asc' ? 'desc' : 'asc');
+    else { this.sortCol.set(col); this.sortDir.set('asc'); }
     this.currentPage.set(1);
   }
 
@@ -161,27 +147,20 @@ export class MyRepairs implements OnInit {
     const dir = this.sortDir() === 'asc' ? 1 : -1;
     return [...rows].sort((a, b) => {
       switch (this.sortCol()) {
-        case 'date':
-          return dir * (a.date_reparation > b.date_reparation ? 1 : -1);
-        case 'serie':
-          return dir * ((a.machine?.numero_serie ?? '').localeCompare(b.machine?.numero_serie ?? ''));
-        case 'modele':
-          return dir * ((a.machine?.modele?.label ?? '').localeCompare(b.machine?.modele?.label ?? ''));
-        case 'technicien':
-          return dir * ((a.technicien ?? '').localeCompare(b.technicien ?? ''));
-        case 'pieces':
-          return dir * ((a.pieces?.length ?? 0) - (b.pieces?.length ?? 0));
-        case 'statut':
-          return dir * ((a.machine?.statut ?? '').localeCompare(b.machine?.statut ?? ''));
+        case 'date':       return dir * (a.date_reparation > b.date_reparation ? 1 : -1);
+        case 'serie':      return dir * ((a.machine?.numero_serie ?? '').localeCompare(b.machine?.numero_serie ?? ''));
+        case 'modele':     return dir * ((a.machine?.modele?.label ?? '').localeCompare(b.machine?.modele?.label ?? ''));
+        case 'technicien': return dir * ((a.technicien ?? '').localeCompare(b.technicien ?? ''));
+        case 'pieces':     return dir * ((a.pieces?.length ?? 0) - (b.pieces?.length ?? 0));
+        case 'statut':     return dir * ((a.machine?.statut ?? '').localeCompare(b.machine?.statut ?? ''));
         default: return 0;
       }
     });
   }
 
-  // ── Pagination helpers ─────────────────────────────────────
+  // ── Pagination helpers
   goToPage(p: number): void {
-    const clamped = Math.max(1, Math.min(p, this.totalPages()));
-    this.currentPage.set(clamped);
+    this.currentPage.set(Math.max(1, Math.min(p, this.totalPages())));
   }
 
   setPageSize(size: number): void {
@@ -189,12 +168,9 @@ export class MyRepairs implements OnInit {
     this.currentPage.set(1);
   }
 
-  /** Utilisé dans le template pour éviter les pipes custom */
-  minVal(a: number, b: number): number {
-    return Math.min(a, b);
-  }
+  minVal(a: number, b: number): number { return Math.min(a, b); }
 
-  // ── Lifecycle ──────────────────────────────────────────────
+  // ── Lifecycle
   async ngOnInit(): Promise<void> {
     firstValueFrom(this.auth.getMeHttp()).then(me => this.me.set(me)).catch(() => {});
     this.loading.set(true);
@@ -209,7 +185,7 @@ export class MyRepairs implements OnInit {
     }
   }
 
-  // ── Actions ────────────────────────────────────────────────
+  // ── Actions
   setTab(tab: Tab): void {
     this.activeTab.set(tab);
     this.searchQuery.set('');
@@ -231,7 +207,7 @@ export class MyRepairs implements OnInit {
     await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
   }
 
-  // ── Helpers statut ─────────────────────────────────────────
+  // ── Helpers statut
   getStatutLabel(statut?: string): string {
     const labels: Record<string, string> = {
       en_attente:    'En attente',
@@ -243,14 +219,14 @@ export class MyRepairs implements OnInit {
   }
 
   getStatutClass(statut?: string): string {
-    if (!statut) return 'badge-secondary';
+    if (!statut) return 'status-secondary';
     const map: Record<string, string> = {
-      en_attente:    'badge-waiting',
-      en_reparation: 'badge-progress',
-      pret:          'badge-ready',
-      termine:       'badge-ready',
+      en_attente:    'status-waiting',
+      en_reparation: 'status-progress',
+      pret:          'status-ready',
+      termine:       'status-ready',
     };
-    return map[statut] ?? 'badge-secondary';
+    return map[statut] ?? 'status-secondary';
   }
 
   getStatutIcon(statut?: string): any {
