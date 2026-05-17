@@ -225,7 +225,7 @@
   /* Cache les flèches natives du number input */
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button { -webkit-appearance: none; }
-  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .stock-qty-btn {

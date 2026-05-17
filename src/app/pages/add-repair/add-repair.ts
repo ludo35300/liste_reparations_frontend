@@ -23,6 +23,7 @@ import { Machine } from '../../models/machine.model';
 import { TechnicienOption } from '../../models/user.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ReferenceService } from '../../services/references.service';
+import { faMagnifyingGlassChart, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-add-repair',
@@ -33,30 +34,33 @@ import { ReferenceService } from '../../services/references.service';
     FontAwesomeModule,
     Topbar,
     Scan,
-    RepairManuelForm
+    RepairManuelForm,
+    FontAwesomeModule
   ],
   templateUrl: './add-repair.html',
   styleUrl: './add-repair.scss',
 })
 export class AddRepair implements OnInit {
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
-  private readonly reparationService = inject(ReparationService);
-  private readonly technicienService = inject(TechnicienService);
-  private readonly referenceService = inject(ReferenceService);
-  private readonly machineService = inject(MachineService);
+  private readonly    auth              = inject(AuthService);
+  private readonly    router            = inject(Router);
+  private readonly    reparationService = inject(ReparationService);
+  private readonly    technicienService = inject(TechnicienService);
+  private readonly    referenceService  = inject(ReferenceService);
+  private readonly    machineService    = inject(MachineService);
+  protected readonly  navItems          = inject(NavService).navItems;
 
-  protected readonly navItems = inject(NavService).navItems;
+  public readonly faPenToSquare = faPenToSquare;
+  public readonly faMagnifyingGlassChart = faMagnifyingGlassChart;
 
   protected readonly me = this.auth.meSignal;
   public readonly errorMessage = signal<string | null>(null);
-  public readonly saving = signal(false);
+  public readonly saving      = signal(false);
 
-  public readonly mode = signal<'manual' | 'scan' | null>(null);
+  public readonly mode        = signal<'manual' | 'scan' | null>(null);
 
   public readonly techniciens = signal<TechnicienOption[]>([]);
-  public readonly marques = signal<Marque[]>([]);
-  public readonly modeles = signal<Modele[]>([]);
+  public readonly marques     = signal<Marque[]>([]);
+  public readonly modeles     = signal<Modele[]>([]);
 
   public readonly currentTechnicienId = computed<number | null>(() => {
     const email = this.me()?.email?.trim().toLowerCase();
