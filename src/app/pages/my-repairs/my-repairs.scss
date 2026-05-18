@@ -1,7 +1,8 @@
-// my-repairs.scss
-:host { display: block; }
+:host {
+  display: block;
+}
 
-// ── Onglets ──────────────────────────────────────────────────────
+/* ── Onglets ────────────────────────────────────────────────────── */
 .tabs-wrapper {
   margin-bottom: 1rem;
 }
@@ -30,8 +31,15 @@
   cursor: pointer;
   transition: background var(--t-base), color var(--t-base);
 
-  &:hover  { color: var(--text-dark); background: var(--bg); }
-  &.active { background: var(--c-primary); color: #fff; }
+  &:hover {
+    color: var(--text-dark);
+    background: var(--bg);
+  }
+
+  &.active {
+    background: var(--c-primary);
+    color: #fff;
+  }
 }
 
 .tab-count {
@@ -43,14 +51,21 @@
   border-radius: var(--radius-full);
   font-size: 0.7rem;
   font-weight: 700;
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   color: inherit;
 
-  &--muted { background: var(--c-primary-light); color: var(--c-primary); }
+  &--muted {
+    background: var(--c-primary-light);
+    color: var(--c-primary);
+  }
 }
-.tab.active .tab-count--muted { background: rgba(255,255,255,0.25); color: #fff; }
 
-// ── Panneau principal DataTable ───────────────────────────────
+.tab.active .tab-count--muted {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* ── Panneau principal ─────────────────────────────────────────── */
 .dt-panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -59,7 +74,7 @@
   overflow: hidden;
 }
 
-// ── Barre du haut (search + entries) ────────────────────────
+/* ── Barre supérieure ──────────────────────────────────────────── */
 .dt-topbar {
   display: flex;
   align-items: center;
@@ -70,7 +85,6 @@
   gap: 0.75rem;
 }
 
-// Champ recherche
 .dt-search {
   position: relative;
   display: flex;
@@ -97,14 +111,16 @@
   width: 220px;
   transition: border-color var(--t-base), box-shadow var(--t-base);
 
-  &::placeholder { color: var(--text-muted); }
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
   &:focus {
     border-color: var(--c-primary);
     box-shadow: 0 0 0 3px var(--c-primary-light);
   }
 }
 
-// Sélecteur d'entrées
 .dt-entries-label {
   display: flex;
   align-items: center;
@@ -127,22 +143,22 @@
   appearance: auto;
   transition: border-color var(--t-base);
 
-  &:focus { border-color: var(--c-primary); }
+  &:focus {
+    border-color: var(--c-primary);
+  }
 }
 
-// ── Wrapper scroll horizontal ──────────────────────────────
+/* ── Tableau ──────────────────────────────────────────────────── */
 .dt-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-// ── Tableau ───────────────────────────────────────────────────
 .dt-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 700px;
 
-  // ─ En-tête
   thead tr {
     border-bottom: 2px solid var(--border);
     background: var(--surface);
@@ -159,7 +175,7 @@
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
-    transition: color var(--t-base);
+    transition: color var(--t-base), background var(--t-base);
 
     fa-icon {
       margin-left: 0.25rem;
@@ -168,63 +184,86 @@
       vertical-align: middle;
     }
 
-    &.th-num    { cursor: default; width: 56px; color: var(--text-muted); }
-    &.th-action { cursor: default; text-align: center; }
-    &:hover:not(.th-num):not(.th-action) { color: var(--text-dark); }
+    &:hover {
+      color: var(--text-dark);
+    }
+
     &.th-active {
       color: var(--c-primary);
-      fa-icon { opacity: 1; }
+
+      fa-icon {
+        opacity: 1;
+      }
     }
   }
 
-  // ─ Corps
   td {
     padding: 1rem 1.1rem;
     font-size: 0.875rem;
     color: var(--text);
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
+    transition: background var(--t-base), color var(--t-base);
   }
 
-  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
 }
 
-// Lignes
-.dt-row {
-  transition: background var(--t-base);
-  &:hover td { background: var(--surface-2); }
+/* ── Ligne cliquable ──────────────────────────────────────────── */
+.repair-row-link {
+  cursor: pointer;
+  transition: box-shadow var(--t-base), transform var(--t-base);
+
+  &:hover td {
+    background: var(--surface-2);
+  }
+
+  &:hover .serie-code {
+    color: var(--c-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.12rem;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: -2px;
+  }
+
+  &:focus-visible td {
+    background: var(--c-primary-light);
+  }
+
+  &:active td {
+    background: var(--c-primary-light);
+  }
 }
 
-// ── Cellules spéciales ─────────────────────────────────────────
-
-// Numéro de ligne
-.td-num {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  width: 56px;
-}
-
+/* ── Cellules ─────────────────────────────────────────────────── */
 .td-date {
   white-space: nowrap;
   font-size: 0.84rem;
   color: var(--text-muted);
 }
 
-// N° de série
 .serie-code {
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--c-primary);
   letter-spacing: 0.02em;
+  transition: color var(--t-base), text-decoration-color var(--t-base);
 }
 
-.td-tech { color: var(--text); }
-.dash    { color: var(--text-muted); }
+.td-tech {
+  color: var(--text);
+}
 
-// Pièces
+.dash {
+  color: var(--text-muted);
+}
+
 .pieces-pill {
   display: inline-flex;
   align-items: center;
@@ -238,7 +277,7 @@
   font-weight: 700;
 }
 
-// ── Badges statut (style image de référence) ─────────────────────
+/* ── Statut ───────────────────────────────────────────────────── */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -254,16 +293,19 @@
     color: #16a34a;
     border: 1px solid #bbf7d0;
   }
+
   &.status-waiting {
     background: #fef9c3;
     color: #a16207;
     border: 1px solid #fef08a;
   }
+
   &.status-progress {
     background: #dbeafe;
     color: #1d4ed8;
     border: 1px solid #bfdbfe;
   }
+
   &.status-secondary {
     background: var(--surface-2);
     color: var(--text-muted);
@@ -271,44 +313,7 @@
   }
 }
 
-// ── Boutons action (cercles colorés) ─────────────────────────────
-.action-btns {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-.action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: opacity var(--t-base), transform var(--t-fast);
-
-  &:hover { opacity: 0.8; transform: scale(1.08); }
-  &:active { transform: scale(0.95); }
-
-  &--view {
-    background: #dbeafe;
-    color: #1d4ed8;
-  }
-  &--edit {
-    background: #dcfce7;
-    color: #16a34a;
-  }
-  &--delete {
-    background: #fee2e2;
-    color: #dc2626;
-  }
-}
-
-// ── Pied de tableau (info + pagination) ────────────────────────
+/* ── Footer ───────────────────────────────────────────────────── */
 .dt-footer {
   display: flex;
   align-items: center;
@@ -325,7 +330,6 @@
   color: var(--text-muted);
 }
 
-// Pagination
 .dt-pagination {
   display: flex;
   align-items: center;
@@ -353,6 +357,7 @@
     color: var(--c-primary);
     border-color: var(--c-primary);
   }
+
   &.active {
     background: var(--c-primary);
     color: #fff;
@@ -360,7 +365,11 @@
     cursor: default;
     font-weight: 700;
   }
-  &:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
 }
 
 .pg-ellipsis {
@@ -374,13 +383,11 @@
   user-select: none;
 }
 
+/* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .dt-topbar {
     flex-direction: column;
     align-items: stretch;
-  }
-  table{
-    background-color: #ffffff00;
   }
 
   .dt-search-input {
@@ -400,6 +407,7 @@
     min-width: 100%;
     width: 100%;
     table-layout: fixed;
+    background: transparent;
   }
 
   .dt-table thead {
@@ -414,13 +422,31 @@
     width: 100%;
   }
 
-  .dt-row {
+  .repair-row-link {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     margin-bottom: 0.9rem;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    &:hover td {
+      background: transparent;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--c-primary);
+      outline-offset: 2px;
+    }
+
+    &:focus-visible td {
+      background: transparent;
+    }
   }
 
   .dt-table td {
@@ -431,6 +457,7 @@
     padding: 0.85rem 1rem;
     border-bottom: 1px solid var(--border);
     text-align: right;
+    background: transparent;
   }
 
   .dt-table td:last-child {
@@ -452,18 +479,8 @@
     max-width: 58%;
   }
 
-  .td-num,
   .td-date {
     display: none !important;
-  }
-
-  .td-action {
-    align-items: flex-start !important;
-  }
-
-  .td-action .action-btns {
-    justify-content: flex-end;
-    width: 100%;
   }
 
   .td-statut .status-badge,

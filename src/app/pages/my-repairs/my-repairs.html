@@ -99,7 +99,6 @@
               <table class="dt-table" aria-label="Mes réparations">
                 <thead>
                   <tr>
-                    <th class="th-num"></th>
                     <th (click)="sortBy('date')" [class]="sortClass('date')">
                       Date <fa-icon [icon]="sortIcon('date')"></fa-icon>
                     </th>
@@ -118,13 +117,17 @@
                     <th (click)="sortBy('statut')" [class]="sortClass('statut')">
                       Statut <fa-icon [icon]="sortIcon('statut')"></fa-icon>
                     </th>
-                    <th class="th-action">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (rep of paginated(); track rep.id; let idx = $index) {
-                    <tr class="dt-row">
-                      <td class="td-num" data-label="N°">{{ (currentPage() - 1) * pageSize + idx + 1 | number:'2.0-0' }}</td>
+                  @for (rep of paginated(); track rep.id;) {
+                    <tr
+                      class="repair-row-link"
+                      tabindex="0"
+                      (click)="openRepair(rep)"
+                      (keydown.enter)="openRepair(rep)"
+                      (keydown.space)="$event.preventDefault(); openRepair(rep)"
+                    >
                       <td class="td-date" data-label="Date">{{ rep.date_reparation | date:'dd/MM/yyyy' }}</td>
                       <td class="td-serie" data-label="N°de série">
                         <span class="serie-code">{{ rep.machine?.numero_serie ?? rep.numero_serie ?? '—' }}</span>
@@ -146,29 +149,6 @@
                           <fa-icon [icon]="getStatutIcon(rep.machine?.statut)"></fa-icon> &nbsp;
                           {{ getStatutLabel(rep.machine?.statut) }}
                         </span>
-                      </td>
-                      <td class="td-action" data-label="Action">
-                        <div class="action-btns">
-                          <button class="action-btn action-btn--view"
-                                  (click)="goToHistory(rep)"
-                                  aria-label="Voir">
-                            <fa-icon [icon]="faEye"></fa-icon>
-                          </button>
-                          <!--<button class="action-btn action-btn--edit"
-                                  (click)="$event.stopPropagation()"
-                                  aria-label="Modifier">
-                            <fa-icon [icon]="faEdit"></fa-icon>
-                          </button>-->
-                          @if (rep.machine?.statut!="termine"){
-                            <button class="action-btn action-btn--delete"
-
-                                  (click)="$event.stopPropagation()"
-                                  aria-label="Supprimer">
-                            <fa-icon [icon]="faTrash"></fa-icon>
-                          </button>
-                          }
-
-                        </div>
                       </td>
                     </tr>
                   }
