@@ -4,7 +4,7 @@ import {
   inject
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MeResponse } from '../../auth-lib/models/auth.model';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -39,6 +39,7 @@ export interface NavItem {
 export class Topbar implements OnInit {
 
   private readonly searchBarState = inject(SearchBarStateService);
+  private readonly router = inject(Router);
 
   // ── Inputs / Outputs ────────────────────────────────────────────
   public readonly me        = input<MeResponse | null>(null);
@@ -105,6 +106,11 @@ export class Topbar implements OnInit {
 
   public closeMobileNav(): void {
     this.mobileNavOpen.set(false);
+  }
+
+  goToProfile(): void {
+    this.menuOpen.set(false);
+    this.router.navigate(['/profile']);
   }
 
 

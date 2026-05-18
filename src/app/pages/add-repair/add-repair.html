@@ -26,7 +26,7 @@
           class="mode-card"
           [class.active]="mode() === 'manual'"
           (click)="setMode('manual')">
-          <div class="mode-card-icon"><fa-icon [icon]="faPenToSquare"  style="color: #2563eb"></fa-icon></div>
+          <div class="mode-card-icon"><fa-icon [icon]="faPenToSquare"></fa-icon></div>
           <div class="mode-card-body">
             <h3>Saisie manuelle</h3>
             <p>Créer une réparation en remplissant le formulaire.</p>
@@ -38,7 +38,7 @@
           class="mode-card"
           [class.active]="mode() === 'scan'"
           (click)="setMode('scan')">
-          <div class="mode-card-icon"><fa-icon [icon]="faMagnifyingGlassChart" style="color: #2563eb"></fa-icon></div>
+          <div class="mode-card-icon"><fa-icon [icon]="faMagnifyingGlassChart"></fa-icon></div>
           <div class="mode-card-body">
             <h3>Scan Auto</h3>
             <p>Importer une fiche pour préremplir automatiquement les données.</p>

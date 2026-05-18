@@ -374,14 +374,101 @@
   user-select: none;
 }
 
-// ── Responsive ────────────────────────────────────────────────
 @media (max-width: 768px) {
-  .dt-topbar { flex-direction: column; align-items: stretch; }
-  .dt-search-input { width: 100%; }
-  .dt-footer { flex-direction: column; align-items: flex-start; }
+  .dt-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  table{
+    background-color: #ffffff00;
+  }
+
+  .dt-search-input {
+    width: 100%;
+  }
+
+  .dt-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dt-table-wrap {
+    overflow-x: visible;
+  }
 
   .dt-table {
-    th:nth-child(5), td:nth-child(5),
-    th:nth-child(6), td:nth-child(6) { display: none; }
+    min-width: 100%;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .dt-table thead {
+    display: none;
+  }
+
+  .dt-table,
+  .dt-table tbody,
+  .dt-table tr,
+  .dt-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .dt-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.9rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .dt-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  .dt-table td:last-child {
+    border-bottom: none;
+  }
+
+  .dt-table td::before {
+    content: attr(data-label);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    flex: 0 0 42%;
+  }
+
+  .dt-table td > * {
+    max-width: 58%;
+  }
+
+  .td-num,
+  .td-date {
+    display: none !important;
+  }
+
+  .td-action {
+    align-items: flex-start !important;
+  }
+
+  .td-action .action-btns {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .td-statut .status-badge,
+  .td-pieces .pieces-pill,
+  .td-serie .serie-code {
+    margin-left: auto;
   }
 }

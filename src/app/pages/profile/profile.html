@@ -1,0 +1,114 @@
+<div class="layout">
+  <div class="layout-right">
+    <app-topbar
+      [me]="me()"
+      pageTitle="Mon profil"
+      [navItems]="navItems"
+      (logoutEvt)="logout()"
+    />
+
+    <main class="main-content">
+      <section class="hero">
+        <div>
+          <h2 class="hero-title">Mon profil</h2>
+          <p class="hero-sub">Gérez vos informations personnelles et votre compte</p>
+        </div>
+      </section>
+
+      <section class="profile-grid">
+        <article class="profile-card profile-summary">
+          <div class="profile-avatar">
+            <span>{{ initials() }}</span>
+          </div>
+
+          <div class="profile-identity">
+            <h3>{{ me()?.firstName || 'Utilisateur' }} {{ me()?.lastName || '' }}</h3>
+            <p>{{ me()?.email || 'email@exemple.fr' }}</p>
+            <span class="profile-role">Technicien</span>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="stat-label">Compte</span>
+              <strong class="stat-value">Actif</strong>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Dernière connexion</span>
+              <strong class="stat-value">Aujourd’hui</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="profile-card profile-form-card">
+          <div class="section-head">
+            <div>
+              <h3>Informations personnelles</h3>
+              <p>Modifiez vos informations de contact.</p>
+            </div>
+          </div>
+
+          <form class="profile-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input id="prenom" type="text" class="form-control" [value]="me()?.firstName || ''" />
+              </div>
+
+              <div class="form-group">
+                <label for="nom">Nom</label>
+                <input id="nom" type="text" class="form-control" [value]="me()?.lastName || ''" />
+              </div>
+
+              <div class="form-group form-group--full">
+                <label for="email">Adresse email</label>
+                <input id="email" type="email" class="form-control" [value]="me()?.email || ''" />
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Téléphone</label>
+                <input id="phone" type="text" class="form-control" placeholder="06 00 00 00 00" />
+              </div>
+
+              <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input id="password" type="password" class="form-control" placeholder="••••••••" />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline-secondary">Annuler</button>
+              <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+          </form>
+        </article>
+
+        <!--<article class="profile-card profile-security">
+          <div class="section-head">
+            <div>
+              <h3>Sécurité</h3>
+              <p>Informations liées à la session et à l’accès.</p>
+            </div>
+          </div>
+
+          <div class="security-list">
+            <div class="security-item">
+              <span class="security-label">Statut du compte</span>
+              <span class="security-badge">Actif</span>
+            </div>
+
+            <div class="security-item">
+              <span class="security-label">Email vérifié</span>
+              <span class="security-badge security-badge--ok">Oui</span>
+            </div>
+
+            <div class="security-item">
+              <span class="security-label">Authentification</span>
+              <span class="security-value">Standard</span>
+            </div>
+          </div>
+        </article>
+      -->
+      </section>
+    </main>
+  </div>
+</div>
