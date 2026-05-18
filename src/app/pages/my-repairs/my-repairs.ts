@@ -168,6 +168,13 @@ export class MyRepairs implements OnInit {
     this.currentPage.set(1);
   }
 
+  openRepair(repair: Reparation): void {
+    const numeroSerie = (repair.machine?.numero_serie ?? repair.numero_serie ?? '').trim();
+    if (!numeroSerie) return;
+
+    this.router.navigate(['/history', numeroSerie]);
+  }
+
   minVal(a: number, b: number): number { return Math.min(a, b); }
 
   // ── Lifecycle
@@ -195,11 +202,6 @@ export class MyRepairs implements OnInit {
   onSearch(query: string): void {
     this.searchQuery.set(query);
     this.currentPage.set(1);
-  }
-
-  goToHistory(rep: Reparation): void {
-    const serie = rep.machine?.numero_serie ?? rep.numero_serie ?? '';
-    if (serie) this.router.navigate(['/history', serie]);
   }
 
   async logout(): Promise<void> {

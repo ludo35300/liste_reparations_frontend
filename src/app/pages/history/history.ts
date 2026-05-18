@@ -1,9 +1,10 @@
+import { ReferenceService } from './../../services/references.service';
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin, of, switchMap } from 'rxjs';
 
 import { ReparationService } from '../../services/reparation.service';
 import { ActionsService }    from '../../services/actions.service';
@@ -40,6 +41,7 @@ const REP_TO_MACHINE: Record<StatutReparation, StatutMachine> = {
 export class History implements OnInit {
 
   private readonly service    = inject(ReparationService);
+  private readonly referenceService = inject(ReferenceService )
   private readonly actSvc     = inject(ActionsService);
   private readonly auth       = inject(AuthService);
   private readonly route      = inject(ActivatedRoute);
@@ -98,6 +100,7 @@ export class History implements OnInit {
   readonly editingPieces = signal(false);
   readonly piecesEdit    = signal<PieceChangee[]>([]);
   readonly allPieces     = signal<PieceRef[]>([]);
+  readonly loadingPiecesCatalog = signal(false);
   readonly searchPiece   = signal('');
   readonly savingPieces  = signal(false);
   readonly piecesError   = signal<string | null>(null);
@@ -117,37 +120,55 @@ export class History implements OnInit {
     const serie = this.route.snapshot.paramMap.get('numeroSerie') ?? '';
     this.numeroSerie.set(serie.toUpperCase());
     this.loadHistory(serie);
-    this.loadAllPieces();
+  }
+
+  private loadPiecesForModele(modeleId: number | null): void {
+    if (!modeleId) {
+      this.allPieces.set([]);
+      return;
+    }
+
+    this.referenceService.getPiecesByModele(modeleId).subscribe({
+      next: (pieces) => {
+        this.allPieces.set(pieces ?? []);
+        this.piecesError.set(null);
+      },
+      error: (err) => {
+        this.allPieces.set([]);
+        this.piecesError.set(err?.error?.message ?? 'Impossible de charger les pièces du modèle.');
+      },
+    });
   }
 
   private loadHistory(serie: string): void {
     this.service.search(serie).subscribe({
       next: (res: any) => {
+
         const reps: Reparation[] = res.reparations ?? res ?? [];
+
         this.reparations.set(reps);
-        if (reps.length > 0){
-           this.selectionner(reps[0]);
-           this.machineType.set(res.machine_type);
+        if (reps.length > 0) {
+          this.selectionner(reps[0]);
+          this.machineType.set(res.machine_type);
         }
+        this.machineType.set(res.machine_type);
       },
       error: (err) => this.errorMessage.set(err?.error?.message ?? 'Une erreur est survenue.'),
     });
   }
 
-  private loadAllPieces(): void {
-    this.service.getAllPieces().subscribe({
-      next: (pieces) => this.allPieces.set(pieces),
-      error: () => {},
-    });
-  }
-
   selectionner(rep: Reparation): void {
+
     this.selected.set(rep);
     this.activeTab.set('pieces');
     this.showForm.set(false);
     this.editingPieces.set(false);
     this.editingStatut.set(false);
     this.loadActions(rep.id!);
+
+    const modeleId = rep.machine?.modele_id ?? rep.machine?.modele?.id ?? null;
+
+    this.loadPiecesForModele(modeleId);
   }
 
   setTab(tab: ActiveTab): void {
@@ -329,14 +350,24 @@ export class History implements OnInit {
   }
 
   supprimer(id: number): void {
+    const rep = this.reparations().find(r => r.id === id);
+
+    if (!rep) {
+      this.errorMessage.set('Réparation introuvable.');
+      return;
+    }
+
     if (!confirm('Supprimer cette réparation ?')) return;
-    this.service.supprimer(id).subscribe({
-      next: () => {
-        this.reparations.update(list => list.filter(r => r.id !== id));
-        const remaining = this.reparations();
-        if (remaining.length > 0) this.selectionner(remaining[0]);
-        else { this.selected.set(null); this.actions.set([]); }
-      },
+
+    const machineId = rep.machine?.id;
+
+    this.service.supprimer(id).pipe(
+      switchMap(() => {
+        if (!machineId) return of(null);
+        return this.service.updateMachine(machineId, { statut: 'termine' });
+      })
+    ).subscribe({
+      next: () => this.afterDeleteSuccess(id),
       error: () => this.errorMessage.set('Erreur lors de la suppression.'),
     });
   }
@@ -357,5 +388,17 @@ export class History implements OnInit {
       statut_avant: undefined,
       statut_apres: undefined,
     };
+  }
+
+  private afterDeleteSuccess(id: number): void {
+    this.reparations.update(list => list.filter(r => r.id !== id));
+    const remaining = this.reparations();
+
+    if (remaining.length > 0) {
+      this.selectionner(remaining[0]);
+    } else {
+      this.selected.set(null);
+      this.actions.set([]);
+    }
   }
 }

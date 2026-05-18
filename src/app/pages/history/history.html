@@ -24,7 +24,7 @@
             <h2 class="hero-title">{{ machineType() }}</h2>
             <p class="hero-sub">
               {{ reparations().length }}
-              intervention{{ reparations().length > 1 ? 's' : '' }}
+              - intervention{{ reparations().length > 1 ? 's' : '' }}
             </p>
           </div>
       </section>
@@ -210,7 +210,7 @@
                           @for (p of rep.pieces; track p.ref_piece) {
                             <tr>
                               <td class="cell-ref">{{ p.ref_piece }}</td>
-                              <td>{{ p.designation }}</td>
+                              <td>{{ p.designation  | uppercase }}</td>
                               <td class="cell-qty">{{ p.quantite }}</td>
                             </tr>
                           }
@@ -249,7 +249,7 @@
                           <li class="piece-edit-row">
                             <div class="piece-edit-info">
                               <span class="piece-ref">{{ p.ref_piece }}</span>
-                              <span class="piece-desig">{{ p.designation }}</span>
+                              <span class="piece-desig">{{ p.designation | uppercase }}</span>
                             </div>
                             <div class="qty-control" aria-label="Quantité">
                               <button class="qty-btn" (click)="updateQty(p, -1)" [disabled]="p.quantite <= 1" aria-label="Diminuer">−</button>
@@ -274,7 +274,7 @@
                           @for (p of filteredPieces(); track p.id) {
                             <li class="catalog-row" (click)="addPieceFromCatalog(p)" role="button" tabindex="0" (keydown.enter)="addPieceFromCatalog(p)" (keydown.space)="addPieceFromCatalog(p)">
                               <span class="piece-ref">{{ p.ref_piece }}</span>
-                              <span class="piece-desig">{{ p.designation }}</span>
+                              <span class="piece-desig">{{ p.designation | uppercase }}</span>
                               <span class="catalog-add">+ Ajouter</span>
                             </li>
                           }
@@ -420,13 +420,15 @@
 
             }
 
-            <!-- ── Suppression ────────────────────────────────── -->
-            <div class="detail-footer-danger">
+            <!-- ── Suppression si la réparation n'est pas terminée ───────────────────────────── -->
+            @if(rep.statut != 'termine'){
+              <div class="detail-footer-danger">
+                <button class="btn btn-danger" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
+                  <fa-icon [icon]="faTrash"></fa-icon> Supprimer l'intervention
+                </button>
+              </div>
+            }
 
-              <button class="btn btn-danger" (click)="supprimer(rep.id!)" aria-label="Supprimer cette intervention">
-                <fa-icon [icon]="faTrash"></fa-icon> Supprimer l'intervention
-              </button>
-            </div>
 
           </section>
         }
