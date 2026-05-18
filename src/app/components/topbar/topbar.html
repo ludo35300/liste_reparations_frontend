@@ -78,10 +78,9 @@
 
             <div class="dropdown-divider" role="separator"></div>
 
-            <button class="dropdown-item-custom disabled" disabled role="menuitem" aria-disabled="true">
+            <button class="dropdown-item-custom" role="menuitem" aria-disabled="true" (click)="goToProfile()">
               <fa-icon [icon]="faUser" aria-hidden="true"></fa-icon>
               <span>Mon profil</span>
-              <span class="badge-soon">Bientôt</span>
             </button>
 
             <button class="dropdown-item-custom" (click)="toggleFullscreen()" role="menuitem">
