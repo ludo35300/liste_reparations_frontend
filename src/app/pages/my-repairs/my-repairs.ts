@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { firstValueFrom } from 'rxjs';
 
@@ -34,6 +34,7 @@ export class MyRepairs implements OnInit {
   private readonly router = inject(Router);
   private readonly reparationService = inject(ReparationService);
   protected readonly navItems = inject(NavService).navItems;
+  private route = inject(ActivatedRoute);
 
   // ── Icons
   readonly faSort    = faSort;
@@ -179,6 +180,10 @@ export class MyRepairs implements OnInit {
 
   // ── Lifecycle
   async ngOnInit(): Promise<void> {
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab === 'terminees' || tab === 'en_cours') {
+      this.activeTab.set(tab);
+    }
     firstValueFrom(this.auth.getMeHttp()).then(me => this.me.set(me)).catch(() => {});
     this.loading.set(true);
     this.error.set(null);

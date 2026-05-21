@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, ElementRef, EventEmitter, HostListener, inject, OnInit, Output, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, EventEmitter, HostListener, inject, OnInit, Output, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -19,7 +19,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './quick-search.html',
   styleUrl: './quick-search.scss',
 })
-export class QuickSearch implements OnInit {
+export class QuickSearch implements OnInit, AfterViewInit {
   private readonly service = inject(MachineService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -38,10 +38,18 @@ export class QuickSearch implements OnInit {
 
   public readonly faSearch = faSearch;
 
+  @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+
   ngOnInit(): void {
     firstValueFrom(this.auth.getMeHttp())
       .then(me => this.me.set(me))
       .catch(() => {});
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.searchInput?.nativeElement.focus();
+    }, 0);
   }
 
   @HostListener('document:click', ['$event'])

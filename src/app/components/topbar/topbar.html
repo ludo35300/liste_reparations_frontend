@@ -5,19 +5,34 @@
 
 
 <div class="topbar-top" [class.hidden]="topbarHidden()" role="banner">
-
   <!-- ── Outils gauche ──────────────────────────────────────── -->
   <div class="topbar-tools">
 
-    <!-- Plein écran -->
-    <button class="tool-btn" aria-label="Plein écran" (click)="toggleFullscreen()">
-      <fa-icon [icon]="faExpand"></fa-icon>
+    <!-- Hamburger mobile -->
+    <button
+      class="tool-btn tool-btn-mobile"
+      (click)="mobileNavOpen.set(!mobileNavOpen())"
+      [attr.aria-expanded]="mobileNavOpen()"
+      aria-controls="main-nav-links"
+      aria-label="Ouvrir la navigation">
+      @if (mobileNavOpen()) {
+        <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
+      } @else {
+        <fa-icon [icon]="faBars" aria-hidden="true"></fa-icon>
+      }
     </button>
 
     <!-- Recherche -->
     <button class="tool-btn" aria-label="Recherche" (click)="toggleSearch()">
       <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
     </button>
+
+    <!-- Plein écran -->
+    <button class="tool-btn" aria-label="Plein écran" (click)="toggleFullscreen()">
+      <fa-icon [icon]="faExpand"></fa-icon>
+    </button>
+
+
 
   </div>
 
@@ -105,6 +120,27 @@
 </div>
 
 
+<!-- menu mobile dédié -->
+<div
+  class="mobile-nav-panel"
+  id="mobile-nav-panel"
+  [class.open]="mobileNavOpen()"
+  aria-label="Navigation mobile">
+
+  @for (item of navItems(); track item.route) {
+    <a
+      [routerLink]="item.route"
+      routerLinkActive="mobile-nav-active"
+      [routerLinkActiveOptions]="{ exact: item.route === '/home' }"
+      class="mobile-nav-link"
+      (click)="mobileNavOpen.set(false)">
+      <fa-icon [icon]="item.icon" class="nav-icon" aria-hidden="true"></fa-icon>
+      <span>{{ item.label }}</span>
+    </a>
+  }
+</div>
+
+
 <!-- ═══════════════════════════════════════════════════════════════
   NAVBAR — Niveau 2 (fond anthracite, toujours visible)
   Lien actif : texte blanc + border-left rouge
@@ -162,7 +198,7 @@
 
 </nav>
 
-// Barre de recherche rapide de machines
+<!--Barre de recherche rapide de machines-->
 
 @if (searchOpen()) {
   <app-quick-search (closed)="closeSearch()"></app-quick-search>
