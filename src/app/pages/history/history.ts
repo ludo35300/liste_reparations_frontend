@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { concatMap, firstValueFrom, forkJoin, of, switchMap } from 'rxjs';
+import { concatMap, distinctUntilChanged, firstValueFrom, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { ReferenceService } from './../../services/references.service';
 import { ReparationService } from '../../services/reparation.service';
@@ -156,9 +156,19 @@ export class History implements OnInit {
       .then(me => this.me.set(me))
       .catch(() => {});
 
-    const serie = this.route.snapshot.paramMap.get('numeroSerie') ?? '';
-    this.numeroSerie.set(serie.toUpperCase());
-    this.loadHistory(serie);
+    this.route.paramMap
+      .pipe(
+        map(params => (params.get('numeroSerie') ?? '').toUpperCase()),
+        distinctUntilChanged()
+      )
+      .subscribe(serie => {
+        if (!serie) return;
+        this.numeroSerie.set(serie);
+        this.errorMessage.set(null);
+        this.selected.set(null);
+        this.actions.set([]);
+        this.loadHistory(serie);
+      });
   }
 
   // ── Chargements
