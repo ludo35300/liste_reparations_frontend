@@ -136,8 +136,8 @@
                         {{ rep.machine?.modele?.marque?.nom }}
                         {{ rep.machine?.modele?.nom ?? rep.machine?.modele?.type_machine ?? '-' }}
                       </td>
-                      <td class="td-tech" data-label="Technicien">{{ rep.technicien ?? '—' }}</td>
-                      <td class="td-pieces"  data-label="Pièces">
+                      <td class="td-tech no-mobile" data-label="Technicien">{{ rep.technicien ?? '—' }}</td>
+                      <td class="td-pieces no-mobile"  data-label="Pièces">
                         @if (rep.pieces.length > 0) {
                           <span class="pieces-pill">{{ rep.pieces.length }}</span>
                         } @else {

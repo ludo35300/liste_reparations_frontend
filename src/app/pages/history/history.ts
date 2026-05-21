@@ -1,9 +1,10 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { concatMap, distinctUntilChanged, firstValueFrom, forkJoin, map, of, switchMap } from 'rxjs';
+import { concatMap, firstValueFrom, forkJoin, of, distinctUntilChanged, map  } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ReferenceService } from './../../services/references.service';
 import { ReparationService } from '../../services/reparation.service';
@@ -150,26 +151,33 @@ export class History implements OnInit {
 
   readonly hasSearchPiece = computed(() => this.searchPiece().trim().length > 0);
 
+  private readonly destroyRef = inject(DestroyRef);
+
   // ── Lifecycle
   ngOnInit(): void {
-    firstValueFrom(this.auth.getMeHttp())
-      .then(me => this.me.set(me))
-      .catch(() => {});
+  firstValueFrom(this.auth.getMeHttp())
+    .then(me => this.me.set(me))
+    .catch(() => {});
 
-    this.route.paramMap
-      .pipe(
-        map(params => (params.get('numeroSerie') ?? '').toUpperCase()),
-        distinctUntilChanged()
-      )
-      .subscribe(serie => {
-        if (!serie) return;
-        this.numeroSerie.set(serie);
-        this.errorMessage.set(null);
-        this.selected.set(null);
-        this.actions.set([]);
-        this.loadHistory(serie);
-      });
-  }
+  this.route.paramMap
+    .pipe(
+      map(params => (params.get('numeroSerie') ?? '').trim().toUpperCase()),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe(serie => {
+      if (!serie) return;
+
+      this.numeroSerie.set(serie);
+      this.errorMessage.set(null);
+      this.reparations.set([]);
+      this.selected.set(null);
+      this.actions.set([]);
+      this.machineType.set('');
+
+      this.loadHistory(serie);
+    });
+}
 
   // ── Chargements
   private loadHistory(serie: string): void {
