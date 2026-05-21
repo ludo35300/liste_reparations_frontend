@@ -11,11 +11,12 @@ import { NavService } from '../../core/nav.service';
 import { SearchBarStateService } from '../../services/search.service';
 import { ReparationService } from '../../services/reparation.service';
 import { Stats } from '../../models/stats.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FontAwesomeModule, Topbar],
+  imports: [RouterLink, FontAwesomeModule, Topbar, CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -67,35 +68,44 @@ export class Home implements OnInit {
         value: machines,
         icon: this.faGear,
         color: '#3b82f6',
-        delta: '',
-        period: 'Total général',
+        class: 'no-mobile',
+        route: ''
       },
       {
         title: 'Mes réparations en cours',
         value: enCours,
         icon: this.faWrench,
         color: '#06b6d4',
-        delta: '',
-        period: `Technicien : ${me?.firstName ?? '…'}`,
+        class: '',
+        route: 'my-repairs',
+        tab: 'en_cours'
       },
       {
         title: 'Mes réparations terminées',
         value: terminees,
         icon: this.faCheckCircle,
         color: '#22c55e',
-        delta: '',
-        period: `Technicien : ${me?.firstName ?? '…'}`,
+        class: '',
+        route: 'my-repairs',
+        tab: 'terminees'
       },
       {
         title: 'Pièces changées (total)',
         value: pieces,
         icon: this.faExclamationTriangle,
         color: '#f59e0b',
-        delta: '',
-        period: 'Total général',
+        class: 'no-mobile',
+        route: ''
       },
     ];
   });
+
+  goToCard(card: { route: string; tab?: string }) {
+    if (!card.route) return;
+    this.router.navigate([card.route], {
+      queryParams: card.tab ? { tab: card.tab } : {}
+    });
+  }
 
   public readonly quickLinks = [
     {

@@ -139,7 +139,27 @@ button                           { cursor: pointer; background: none; border: no
     transition-duration: 0.01ms !important;
   }
 }
+// ════════════════════════════════════════════════════════════════════
+// 4b. UTILITAIRES RESPONSIVE
+// ════════════════════════════════════════════════════════════════════
 
+// Cache un élément sur mobile (< 768px)
+// Usage : <div class="no-mobile">...</div>
+.no-mobile {
+  @media (max-width: 767.98px) {
+    display: none !important;
+  }
+}
+
+// Inverse : visible uniquement sur mobile
+// Usage : <div class="mobile-only">...</div>
+.mobile-only {
+  display: none !important;
+
+  @media (max-width: 767.98px) {
+    display: revert !important;
+  }
+}
 
 // ════════════════════════════════════════════════════════════════════
 // 5. COMPOSANTS GLOBAUX
@@ -416,3 +436,5 @@ button                           { cursor: pointer; background: none; border: no
   .topbar-top,
   .topbar-nav { display: none !important; }
 }
+
+

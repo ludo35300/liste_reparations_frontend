@@ -47,7 +47,11 @@
         <!-- === SECTION STATS & DASHBOARD === -->
         <section class="stats-grid">
           @for (card of statsCards(); track card.title) {
-            <article class="stat-card" [style.--card-color]="card.color">
+            <article
+              class="stat-card" [ngClass]="card.class" [style.--card-color]="card.color"
+              (click)="goToCard(card)" (keydown.enter)="goToCard(card)"
+              role="link" tabindex="0"
+            >
               <div class="stat-top">
                 <div class="stat-text">
                   <p class="stat-value">{{ card.value }}</p>
@@ -55,17 +59,12 @@
                 </div>
                 <div class="stat-icon"><fa-icon [icon]="card.icon"></fa-icon></div>
               </div>
-
-              <div class="stat-footer">
-                <span class="stat-delta">{{ card.delta }}</span>
-                <span class="stat-period">{{ card.period }}</span>
-              </div>
             </article>
           }
         </section>
 
         <section class="dashboard-grid">
-          <article class="panel panel-main">
+          <article class="panel panel-main  no-mobile">
             <div class="panel-header">
               <h3>Activité récente</h3>
               <a routerLink="/stats" class="panel-link">Voir les statistiques</a>

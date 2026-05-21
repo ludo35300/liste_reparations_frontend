@@ -10,6 +10,7 @@
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1"><fa-icon [icon]="faSearch"></fa-icon></span>
         <input
+          #searchInput
           class="form-control"
           type="text"
           [ngModel]="query()"

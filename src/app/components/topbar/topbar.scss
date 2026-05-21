@@ -408,18 +408,94 @@
   .breadcrumb-current { color: var(--navbar-text); font-weight: 600; }
 }
 
+.tool-btn-mobile {
+  display: none;
+}
+
+.tool-btn-mobile {
+  display: none;
+}
+
+.mobile-nav-panel {
+  display: none;
+}
 
 // ════════════════════════════════════════════════════════════════════
 // 3. RESPONSIVE
 // ════════════════════════════════════════════════════════════════════
 
 @media (max-width: 768px) {
-  .topbar-top { padding: 0 1rem; }
+  body.has-topbar,
+  body.topbar-hidden { padding-top: var(--topbar-top-h); }
   .brand-name { font-size: 0.9rem; }
   .user-name  { display: none; }
+  .tool-btn-mobile { display: inline-flex; }
+  .topbar-tools { gap: 0.35rem; }
+
+  .topbar-top {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0 1rem;
+  }
+
+  .topbar-nav { display: none !important; }
+
+  .topbar-top.hidden {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .tool-btn-mobile {
+    display: inline-flex;
+  }
+
+  .mobile-nav-panel {
+    display: none;
+    position: fixed;
+    top: var(--topbar-top-h);
+    left: 0;
+    right: 0;
+    z-index: 1028;
+    background: var(--navbar-bg);
+    border-bottom: 1px solid var(--navbar-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    padding: 0.4rem 0;
+  }
+
+  .mobile-nav-panel.open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    color: var(--navbar-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: background var(--t-base), color var(--t-base), border-color var(--t-base);
+
+    &:hover {
+      background: var(--navbar-hover);
+      color: var(--navbar-text);
+    }
+
+    &.mobile-nav-active {
+      color: var(--navbar-text);
+      background: var(--navbar-active-bg);
+      border-left-color: var(--c-brand);
+      font-weight: 700;
+    }
+  }
 }
 
 @media (max-width: 480px) {
   .brand-name { display: none; }
   .lang-btn   { display: none; }
 }
+
+

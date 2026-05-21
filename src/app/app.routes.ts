@@ -7,7 +7,7 @@ export const routes: Routes = [
 
   {
     path: 'home',
-    title: 'Accueil',
+    title: 'Technicien',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/home/home').then(m => m.Home)
   },
