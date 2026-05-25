@@ -6,7 +6,7 @@ export type StatutReparation = 'en_reparation' | 'termine';
 
 export interface Reparation {
   id?: number;
-  machine_id?: number;
+  machine_id?: number | null;
   machine?: Machine;
   // Snapshots retournés par l'API historique
   machine_snapshot?: string;
@@ -28,3 +28,17 @@ export interface Reparation {
   actions?: ReparationAction[];
   pieces: PieceChangee[];
 }
+
+export interface RepairManualSubmit {
+  numero_serie: string;
+  date_reparation: string;
+  technicien?: string;
+  technicien_id?: number;
+  modele_id: number | null;
+  machine_type: string;
+  notes?: string;
+  machine_id?: number | null;
+  pieces: PieceChangee[];
+}
+
+

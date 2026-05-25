@@ -118,6 +118,7 @@ export class History implements OnInit {
   readonly showForm = signal(false);
   readonly saving = signal(false);
   readonly formError = signal<string | null>(null);
+  readonly catalogModalOpen = signal(false);
 
   form: Partial<ReparationAction> = this.emptyForm();
 
@@ -177,6 +178,14 @@ export class History implements OnInit {
 
       this.loadHistory(serie);
     });
+}
+
+openCatalogModal() {
+  this.catalogModalOpen.set(true);
+}
+
+closeCatalogModal() {
+  this.catalogModalOpen.set(false);
 }
 
   // ── Chargements
@@ -426,6 +435,7 @@ export class History implements OnInit {
         quantite: 1,
       },
     ]);
+    this.catalogModalOpen.set(false);
 
     this.decrementCatalogStock(piece.ref_piece, 1);
     this.searchPiece.set('');

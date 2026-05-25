@@ -1126,17 +1126,23 @@ select.field-input {
   }
 
   .table-wrapper {
-    overflow: visible;
+    width: 100%;
+    overflow-x: visible;
+    margin-top: 0.75rem;
+    background: transparent;
   }
 
-  .pieces-table,
-  .pieces-table thead,
-  .pieces-table tbody,
-  .pieces-table tr,
-  .pieces-table th,
-  .pieces-table td {
-    display: block;
+  .pieces-table {
     width: 100%;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    background: transparent;
+    table-layout: fixed;
+  }
+
+  .pieces-table thead {
+    display: none;
   }
 
   .pieces-table thead {
@@ -1144,37 +1150,42 @@ select.field-input {
   }
 
   .pieces-table tbody {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    display: table-row-group;
+    background: transparent;
   }
 
-  .pieces-table tr {
-    padding: 0.9rem;
-    background: var(--surface, #fff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
-  }
 
-  .pieces-table td {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+  .pieces-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(88px, 110px) minmax(0, 1fr) auto;
+    align-items: center;
     gap: 0.75rem;
-    padding: 0.45rem 0;
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 0.85rem;
+  }
+  .pieces-table tbody td {
+    display: none;
+    padding: 0;
+    margin: 0;
     border: 0;
-    text-align: left;
+    background: transparent !important;
+    white-space: nowrap;
   }
 
-  .pieces-table td::before {
-    content: attr(data-label);
-    flex: 0 0 88px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--text-muted, #6b7280);
+  .pieces-table tbody td::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  .pieces-table .cell-ref,
+  .pieces-table td:nth-child(2),
+  .pieces-table .cell-qty {
+    display: block !important;
   }
 
 
@@ -1210,6 +1221,41 @@ select.field-input {
   .piece-remove-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .pieces-table .cell-ref {
+    min-width: 0;
+    font-weight: 700;
+    color: var(--c-primary);
+    font-size: 0.8rem;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pieces-table td:nth-child(2) {
+    min-width: 0;
+    font-size: 0.83rem;
+    color: var(--text);
+    font-weight: 500;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pieces-table .cell-qty {
+    justify-self: end;
+    min-width: 32px;
+    text-align: right;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+
+  .pieces-table tbody tr td,
+  .pieces-table tbody tr td:last-child {
+    border-bottom: 0 !important;
   }
 
   .pieces-edit-actions--inside {
@@ -1313,6 +1359,65 @@ select.field-input {
 
   .detail-header-actions .btn-delete-repair fa-icon {
     margin: 0;
+  }
+}
+.modal-card--catalog {
+  //width: min(960px, 100%);
+  //max-height: min(85vh, 900px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  color: var(--text-dark);
+}
+
+.modal-card--catalog .pieces-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+.modal-card--catalog .table-wrapper--catalog {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.modal-card--catalog .pieces-table--catalog {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .modal-card--catalog {
+    width: 100%;
+    max-height: calc(100dvh - 2rem);
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  .modal-header {
+    align-items: center;
+  }
+
+  .modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .modal-card--catalog .pieces-search-section .field-input {
+    min-height: 44px;
   }
 }
 

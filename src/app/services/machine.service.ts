@@ -6,7 +6,7 @@ import { Machine } from '../models/machine.model';
 
 export interface CreateMachinePayload {
   numero_serie: string;
-  modele_id: number;
+  modele_id: number | null;
   statut: Machine['statut'];
   notes?: string;
 }

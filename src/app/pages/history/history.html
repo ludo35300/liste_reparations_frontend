@@ -25,7 +25,6 @@
             <p class="hero-sub">
               {{ reparations().length }} intervention{{ reparations().length > 1 ? 's' : '' }}
             </p>
-
           </div>
       </section>
 
@@ -187,7 +186,7 @@
                 <fa-icon [icon]="faWrench"></fa-icon>
                 Pièces ({{ rep.pieces.length }})
               </button>
-              <button
+              <!--<button
                 class="tab-btn"
                 [class.tab-active]="activeTab() === 'actions'"
                 (click)="setTab('actions')"
@@ -198,7 +197,7 @@
               >
                 <fa-icon [icon]="faListCheck"></fa-icon>
                 Actions ({{ actions().length }})
-              </button>
+              </button>-->
             </div>
 
             <!-- ══ ONGLET PIÈCES ══════════════════════════════ -->
@@ -239,7 +238,7 @@
 
                     @if (rep.statut != 'termine') {
                       <div class="d-flex justify-content-center">
-                        <button class="btn btn-primary" (click)="openEditPieces()">
+                        <button class="btn btn-primary" (click)="openCatalogModal()">
                           <fa-icon [icon]="faPlus"></fa-icon> Ajouter une pièce
                         </button>
                       </div>
@@ -336,76 +335,13 @@
                       </div>
                     </section>
 
-                    <section class="pieces-catalog-card">
-                      <div class="pieces-edit-header">
-                        <h4>Ajouter une pièce</h4>
-                        <p class="section-subtitle">
-                          Recherchez une référence dans le catalogue et ajoutez-la à l’intervention.
-                        </p>
-                      </div>
 
-                      <div class="pieces-search-section">
-                        <label for="search-piece" class="field-label-sm">Recherche</label>
-
-                        <input
-                          id="search-piece"
-                          type="search"
-                          class="field-input"
-                          [ngModel]="searchPiece()"
-                          (ngModelChange)="searchPiece.set($event)"
-                          placeholder="Rechercher par référence ou désignation…"
-                          autocomplete="off"
-                        />
-
-                        @if (visibleCatalogPieces().length > 0) {
-                          <div class="table-wrapper table-wrapper--catalog">
-                            <table class="pieces-table pieces-table--catalog" aria-label="Catalogue des pièces">
-                              <thead>
-                                <tr>
-                                  <th scope="col">Référence</th>
-                                  <th scope="col">Désignation</th>
-                                  <th scope="col">Stock</th>
-                                  <th scope="col"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                @for (p of visibleCatalogPieces(); track p.id) {
-                                  <tr>
-                                    <td class="cell-ref" data-label="Référence">{{ p.ref_piece }}</td>
-                                    <td data-label="Désignation">{{ p.designation | uppercase }}</td>
-                                    <td data-label="Stock">
-                                      <span class="stock-badge" [class]="getStockClass(p)">
-                                        {{ getStockLabel(p) }}
-                                      </span>
-                                    </td>
-                                    <td  >
-                                      <button
-                                        type="button"
-                                        class="btn btn-primary btn-sm"
-                                        (click)="addPieceFromCatalog(p)"
-                                        [disabled]="!canAddPiece(p)"
-                                      >
-                                        <fa-icon [icon]="faPlus"></fa-icon> Ajouter
-                                      </button>
-                                    </td>
-                                  </tr>
-                                }
-                              </tbody>
-                            </table>
-                          </div>
-                        } @else if (hasSearchPiece()) {
-                          <p class="no-results">Aucune pièce trouvée pour « {{ searchPiece() }} »</p>
-                        } @else {
-                          <p class="no-results">Aucune pièce disponible dans le catalogue.</p>
-                        }
-                      </div>
-                    </section>
                   </div>
                 }
               </div>
             }
 
-            <!-- ══ ONGLET ACTIONS ═════════════════════════════ -->
+            <!-- ══ ONGLET ACTIONS ═════════════════════════════
             @if (activeTab() === 'actions') {
               <div class="actions-section" role="tabpanel" id="panel-actions" aria-labelledby="tab-actions">
 
@@ -523,7 +459,7 @@
                 }
               </div>
 
-            }
+            }-->
 
 
 
@@ -534,6 +470,96 @@
       </div>
     </main>
   </div>
+  @if (catalogModalOpen()) {
+                      <div
+                        class="modal-backdrop"
+                        (click)="closeCatalogModal()"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="catalog-modal-title"
+                        aria-describedby="catalog-modal-desc"
+                      >
+                        <div class="modal-card modal-card--catalog" (click)="$event.stopPropagation()">
+                          <div class="modal-header">
+                            <div>
+                              <h3 id="catalog-modal-title">Ajouter une pièce</h3>
+                            </div>
+
+                            <button
+                              type="button"
+                              class="btn-icon-sm"
+                              (click)="closeCatalogModal()"
+                              aria-label="Fermer la fenêtre"
+                            >
+                              <fa-icon [icon]="faXmark"></fa-icon>
+                            </button>
+                          </div>
+
+                          <div class="pieces-search-section">
+
+                            <input
+                              id="search-piece-modal"
+                              type="search"
+                              class="field-input"
+                              [ngModel]="searchPiece()"
+                              (ngModelChange)="searchPiece.set($event)"
+                              placeholder="Rechercher par référence ou désignation…"
+                              autocomplete="off"
+                            />
+
+                            @if (visibleCatalogPieces().length > 0) {
+                              <div class="table-wrapper table-wrapper--catalog">
+                                <table class="pieces-table pieces-table--catalog" aria-label="Catalogue des pièces">
+                                  <thead>
+                                    <tr>
+                                      <th scope="col">Référence</th>
+                                      <th scope="col">Désignation</th>
+                                      <th scope="col">Stock</th>
+                                      <th scope="col"></th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    @for (p of visibleCatalogPieces(); track p.id) {
+                                      <tr
+                                        class="catalog-row-mobile"
+                                        (click)="canAddPiece(p) && addPieceFromCatalog(p)"
+                                        [class.is-disabled]="!canAddPiece(p)"
+                                        [attr.aria-disabled]="!canAddPiece(p)"
+                                      >
+                                        <td class="cell-ref" data-label="Référence">{{ p.ref_piece }}</td>
+                                        <td data-label="Désignation">{{ p.designation | uppercase }}</td>
+                                        <td data-label="Stock">
+                                          <span class="stock-badge" [class]="getStockClass(p)">
+                                            {{ getStockLabel(p) }}
+                                          </span>
+                                        </td>
+                                        <td class="cell-action">
+                                          <button
+                                            type="button"
+                                            class="btn btn-primary btn-sm"
+                                            (click)="$event.stopPropagation(); addPieceFromCatalog(p)"
+                                            [disabled]="!canAddPiece(p)"
+                                          >
+                                            <fa-icon [icon]="faPlus"></fa-icon> Ajouter
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    }
+                                  </tbody>
+                                </table>
+                              </div>
+                            } @else if (hasSearchPiece()) {
+                              <p class="no-results">Aucune pièce trouvée pour « {{ searchPiece() }} »</p>
+                            } @else {
+                              <p class="no-results">Aucune pièce disponible dans le catalogue.</p>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+
+
   @if (confirmDeleteId()) {
   <div
     class="modal-backdrop"
