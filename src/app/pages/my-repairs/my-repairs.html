@@ -28,7 +28,7 @@
             <fa-icon [icon]="faWrench"></fa-icon>
             En cours
             @if (enCours().length > 0) {
-              <span class="tab-count">{{ enCours().length }}</span>
+              <span class="tab-count  tab-count--muted">{{ enCours().length }}</span>
             }
           </button>
           <button
@@ -89,7 +89,7 @@
                 <option [value]="25">25</option>
                 <option [value]="50">50</option>
               </select>
-              entries per page
+              par page
             </label>
           </div>
 

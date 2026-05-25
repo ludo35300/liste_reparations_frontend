@@ -24,8 +24,9 @@
         <button
           type="button"
           class="mode-card"
+
           [class.active]="mode() === 'manual'"
-          (click)="setMode('manual')">
+          (click)="openRepairModal()">
           <div class="mode-card-icon"><fa-icon [icon]="faPenToSquare"></fa-icon></div>
           <div class="mode-card-body">
             <h3>Saisie manuelle</h3>
@@ -37,7 +38,7 @@
           type="button"
           class="mode-card"
           [class.active]="mode() === 'scan'"
-          (click)="setMode('scan')">
+          (click)="openScanModal()">
           <div class="mode-card-icon"><fa-icon [icon]="faMagnifyingGlassChart"></fa-icon></div>
           <div class="mode-card-body">
             <h3>Scan Auto</h3>
@@ -50,20 +51,27 @@
       <section class="mode-content">
         @if (mode() === 'manual') {
           <app-repair-manuel-form
+            [isOpen]="isRepairModalOpen()"
             [techniciens]="techniciens()"
             [marques]="marques()"
             [modeles]="modeles()"
             [currentTechnicienId]="currentTechnicienId()"
-            (submitted)="onManualRepairSubmitted($event)"
+            [saving]="saving()"
+            [errorMessage]="errorMessage()"
+            (close)="closeRepairModal()"
+            (submitted)="onRepairSubmitted($event)"
           />
         }
 
         @if (mode() === 'scan') {
           <app-scan
+            [isOpen]="isScanModalOpen()"
             [techniciens]="techniciens()"
             [marques]="marques()"
             [modeles]="modeles()"
             [currentTechnicienId]="currentTechnicienId()"
+            (close)="closeScanModal()"
+            (submitted)="closeScanAfterSubmit()"
           />
         }
       </section>

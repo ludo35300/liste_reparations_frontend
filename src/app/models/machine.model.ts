@@ -9,3 +9,5 @@ export interface Machine {
   statut: StatutMachine;
   created_at?: string;
 }
+
+export type MachineStatus = 'idle' | 'loading' | 'found' | 'not_found';
